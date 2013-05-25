@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <string name="appName">JamStreamer</string>
+    
+    <string name="searchIcon">Search icon</string>
+    <string name="nextIcon">Next icon</string>
+    <string name="artistsFound">Artists</string>
+    <string name="albumsFound">Albums</string>
+    <string name="tracksFound">Tracks</string>
+    <string name="playButton">Play</string>
+    <string name="pauseButton">Pause</string>
+    
+    <string name="artistsByNameFieldText">Enter an artist</string>
+    <string name="albumsByNameFieldText">Enter an album</string>
+    <string name="tracksByNameFieldText">Enter a track</string>
+    <string name="buttonText">Search</string>
+    
+    <string name="artistsByNameJSONURL">http://api.jamendo.com/v3.0/artists/?client_id=b6747d04&amp;format=jsonpretty&amp;namesearch=%1$s</string>
+    <string name="albumsByArtistIDJSONURL">http://api.jamendo.com/v3.0/artists/albums?client_id=b6747d04&amp;format=jsonpretty&amp;id=%1$s</string>
+     
+    <string name="albumsByNameJSONURL">http://api.jamendo.com/v3.0/albums?client_id=b6747d04&amp;format=jsonpretty&amp;namesearch=%1$s</string>
+    <string name="tracksByAlbumIDJSONURL">http://api.jamendo.com/v3.0/albums/tracks?client_id=b6747d04&amp;format=jsonpretty&amp;id=%1$s</string>
+    
+    <string name="tracksByArtistNameJSONURL">http://api.jamendo.com/v3.0/artists/tracks?client_id=b6747d04&amp;format=jsonpretty&amp;id=%1$s</string>
+    <string name="tracksByAlbumNameJSONURL">http://api.jamendo.com/v3.0/albums/tracks?client_id=b6747d04&amp;format=jsonpretty&amp;namesearch=%1$s</string>
+    <string name="tracksByNameJSONURL">http://api.jamendo.com/v3.0/artists/tracks?client_id=b6747d04&amp;format=jsonpretty&amp;namesearch=%1$s</string>
+    
+    <string name="trackByIDURL">http://api.jamendo.com/v3.0/tracks/file?client_id=b6747d04&amp;audioformat=mp32&amp;id=%1$s</string>
+    
+    <string name="radiosJSONURL">http://api.jamendo.com/v3.0/radios/?client_id=b6747d04&amp;format=jsonpretty</string>
+    <string name="radioStreamJSONURL">http://api.jamendo.com/v3.0/radios/stream?client_id=b6747d04&amp;format=jsonpretty&amp;id=%1$s</string>
+
+</resources>

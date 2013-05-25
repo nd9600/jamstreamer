@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+      
+    <TextView
+        android:id="@+id/main_artistsText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/background_highlighter"
+        android:clickable="true"
+        android:onClick="artistsMainButton"
+        android:paddingBottom="5dp"
+        android:paddingLeft="5dp"
+        android:paddingTop="5dp"
+        android:text="@string/artistsFound"
+        android:textColor="@color/text_highlighter"
+        android:textSize="32sp" />
+
+    <ImageView
+        android:contentDescription="@string/nextIcon"
+        android:layout_alignRight="@id/main_artistsText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="5dp"
+        android:paddingTop="11dp"
+        android:src="@drawable/next_purple" />
+
+    <View
+        android:id="@+id/main_separator_1"
+        android:layout_width="fill_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/main_artistsText"
+        android:visibility="visible"
+        android:background="@android:color/darker_gray"/>
+       
+    <TextView
+        android:id="@+id/main_albumsText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/main_separator_1"
+        android:background="@drawable/background_highlighter"
+        android:clickable="true"
+        android:onClick="albumsMainButton"
+        android:paddingBottom="5dp"
+        android:paddingLeft="5dp"
+        android:paddingTop="9dp"
+        android:text="@string/albumsFound"
+        android:textColor="@color/text_highlighter"
+        android:textSize="32sp" />
+    
+    <ImageView
+        android:contentDescription="@string/nextIcon"
+        android:layout_alignTop="@id/main_albumsText"
+        android:layout_alignRight="@id/main_albumsText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="5dp"
+        android:paddingTop="11dp"
+        android:src="@drawable/next_purple" />
+
+    <View
+        android:id="@+id/main_separator_2"
+        android:layout_width="fill_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/main_albumsText"
+        android:visibility="visible"
+        android:background="@android:color/darker_gray"/>   
+        
+    <TextView
+        android:id="@+id/main_tracksText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/main_separator_2"
+        android:layout_alignParentLeft="true"
+        android:text="@string/tracksFound"
+        android:background="@drawable/background_highlighter"
+        android:textColor="@color/text_highlighter"
+        android:textSize="32sp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:clickable="true"
+        android:onClick="tracksMainButton" />
+    
+    <ImageView
+        android:contentDescription="@string/nextIcon"
+        android:layout_alignTop="@id/main_tracksText"
+        android:layout_alignRight="@id/main_tracksText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="5dp"
+        android:paddingTop="11dp"
+        android:src="@drawable/next_purple" />
+
+
+</RelativeLayout>
