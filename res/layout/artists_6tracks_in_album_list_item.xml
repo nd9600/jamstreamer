@@ -3,13 +3,8 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-	<View
-        android:layout_width="fill_parent"
-        android:layout_height="0.5dp"
-        android:visibility="visible"
-        android:background="@android:color/darker_gray"/>
 	
-	    <TextView
+	 <TextView
        android:id="@+id/track_name"
        android:layout_width="fill_parent"
        android:layout_height="wrap_content"
@@ -17,7 +12,7 @@
        android:paddingBottom="5dp"
        android:textSize="24sp"
        android:background="@drawable/background_highlighter"
-       android:textColor="@color/text_highlighter" />
+       android:textColor="@drawable/text_highlighter" />
 	
     <TextView
        android:id="@+id/track_duration"
@@ -27,11 +22,17 @@
        android:paddingBottom="5dp"
        android:textSize="12sp"
        android:background="@drawable/background_highlighter"
-       android:textColor="@color/text_highlighter" />
+       android:textColor="@drawable/text_highlighter" />
     
    <TextView
        android:id="@+id/track_id"
        android:layout_width="0dp"
        android:layout_height="0dp" />
+   
+   	<View
+        android:layout_width="fill_parent"
+        android:layout_height="0.5dp"
+        android:visibility="visible"
+        android:background="@android:color/darker_gray"/>
 
 </LinearLayout>

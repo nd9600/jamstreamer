@@ -1,1 +1,9 @@
 proguard-project.txt
+bin/AndroidManifest.xml
+bin/classes
+bin/classes.dex
+bin/dexedLibs
+bin/JamStreamer.apk
+bin/jarlist.cache
+bin/res
+bin/resources.ap_

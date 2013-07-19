@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
 //import android.support.v4.app.NavUtils;
@@ -38,8 +39,14 @@ public class ArtistsSearch extends Activity {
 		//Intent intent = new Intent(getApplicationContext(), ArtistsParser.class);
         EditText editText = (EditText) findViewById(R.id.artistsByNameField);
         String artistName = editText.getText().toString();
-        intent.putExtra(INTENT_TAG, artistName);
-        startActivity(intent);
+        if (artistName.length() >= 2){
+            intent.putExtra(INTENT_TAG, artistName);
+            startActivity(intent);	
+        }
+        else {
+        	Toast.makeText(getApplicationContext(), "You must enter two or more characters", Toast.LENGTH_SHORT).show();
+        }
+
 	}	
 	
 	@Override

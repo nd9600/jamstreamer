@@ -18,7 +18,7 @@
         android:paddingLeft="5dp"
         android:paddingTop="5dp"
         android:text="@string/artistsFound"
-        android:textColor="@color/text_highlighter"
+        android:textColor="@drawable/text_highlighter"
         android:textSize="32sp" />
 
     <ImageView
@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:paddingRight="5dp"
         android:paddingTop="11dp"
-        android:src="@drawable/next_purple" />
+        android:src="@drawable/img_next_purple" />
 
     <View
         android:id="@+id/main_separator_1"
@@ -51,7 +51,7 @@
         android:paddingLeft="5dp"
         android:paddingTop="9dp"
         android:text="@string/albumsFound"
-        android:textColor="@color/text_highlighter"
+        android:textColor="@drawable/text_highlighter"
         android:textSize="32sp" />
     
     <ImageView
@@ -62,7 +62,7 @@
         android:layout_height="wrap_content"
         android:paddingRight="5dp"
         android:paddingTop="11dp"
-        android:src="@drawable/next_purple" />
+        android:src="@drawable/img_next_purple" />
 
     <View
         android:id="@+id/main_separator_2"
@@ -80,7 +80,7 @@
         android:layout_alignParentLeft="true"
         android:text="@string/tracksFound"
         android:background="@drawable/background_highlighter"
-        android:textColor="@color/text_highlighter"
+        android:textColor="@drawable/text_highlighter"
         android:textSize="32sp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
@@ -97,7 +97,7 @@
         android:layout_height="wrap_content"
         android:paddingRight="5dp"
         android:paddingTop="11dp"
-        android:src="@drawable/next_purple" />
+        android:src="@drawable/img_next_purple" />
 
 
 </RelativeLayout>

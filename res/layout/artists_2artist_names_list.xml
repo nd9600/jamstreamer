@@ -3,18 +3,13 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-	<View
-        android:layout_width="fill_parent"
-        android:layout_height="0.5dp"
-        android:visibility="visible"
-        android:background="@android:color/darker_gray"/>
 	
     <TextView
         android:id="@+id/artists_names"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/background_highlighter"
-        android:textColor="@color/text_highlighter"
+        android:textColor="@drawable/text_highlighter"
         android:textSize="24sp"
         android:paddingTop="5dp"
        android:paddingLeft="5dp"
@@ -24,5 +19,11 @@
         android:id="@+id/artists_ids"
         android:layout_width="0dp"
         android:layout_height="0dp" />
+   
+   	<View
+        android:layout_width="fill_parent"
+        android:layout_height="0.5dp"
+        android:visibility="visible"
+        android:background="@android:color/darker_gray"/>
 
 </LinearLayout>
