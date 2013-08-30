@@ -1,35 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:background="@drawable/list_selector"
-    android:padding="5dp">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent">
+    
+    <CheckBox
+        android:id="@+id/playlist_checkBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="4dp"
+        android:layout_marginRight="10dp"
+        android:focusable="false"
+        android:background="@android:color/transparent" >
+    </CheckBox>
     
     <TextView
-       android:id="@+id/playlist_track_name"
+       android:id="@+id/playlist_trackName"
        android:layout_width="fill_parent"
        android:layout_height="wrap_content"
+       android:layout_alignParentTop="true"
+       android:layout_toRightOf="@id/playlist_checkBox"
        android:paddingLeft="5dp"
        android:paddingBottom="5dp"
        android:textSize="24sp"
        android:background="@drawable/background_highlighter"
        android:textColor="@drawable/text_highlighter" />
-	
+    
     <TextView
-       android:id="@+id/playlist_track_duration"
+       android:id="@+id/playlist_trackDuration"
        android:layout_width="fill_parent"
        android:layout_height="wrap_content"
+       android:layout_below="@id/playlist_trackName"
+       android:layout_alignLeft="@id/playlist_trackName"
        android:paddingLeft="5dp"
        android:paddingBottom="5dp"
        android:textSize="12sp"
        android:background="@drawable/background_highlighter"
        android:textColor="@drawable/text_highlighter" />
-    
-   <TextView
-       android:id="@+id/playlist_track_id"
-       android:layout_width="0dp"
-       android:layout_height="0dp" />
-   
-</LinearLayout>
+     
+   	<View
+        android:layout_width="fill_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/playlist_trackDuration"
+        android:visibility="visible"
+        android:background="#d3d3d3"/>
+
+</RelativeLayout>

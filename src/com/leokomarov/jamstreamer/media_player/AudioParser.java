@@ -16,9 +16,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.TargetApi;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.util.Log;
 
 class Pair
@@ -39,6 +42,7 @@ public class AudioParser extends AsyncTask<String, Void, Pair> {
 	private static final String TAG_ALBUM_IMAGE = "album_image";
 	private static final String TAG_TRACK_NAME = "name";
 	private static final String TAG_TRACK_DURATION = "duration";
+	Context context;
 	
 	public JSONObject getJSONFromUrl(String myurl) {
 		try {
@@ -50,13 +54,14 @@ public class AudioParser extends AsyncTask<String, Void, Pair> {
 	        conn.setDoInput(true);
 	        conn.connect();
 	        is = conn.getInputStream();
-
+		} catch (NullPointerException e) {
+			Log.e("AudioParser", "NullPointerException: " + e.getMessage(), e);
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			Log.e("AudioParser", "UnsupportedEncodingException: " + e.getMessage(), e);
 		} catch (ClientProtocolException e) {
-			e.printStackTrace();
+			Log.e("AudioParser", "ClientProtocolException: " + e.getMessage(), e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			Log.e("AudioParser", "IOException: " + e.getMessage(), e);
 		}
 		
 		try {
@@ -90,7 +95,23 @@ public class AudioParser extends AsyncTask<String, Void, Pair> {
     	try {
     		results = jObj.getJSONArray(TAG_RESULTS);
     		JSONObject trackInfo = results.getJSONObject(0);
-			String imageURL = trackInfo.getString(TAG_ALBUM_IMAGE);
+    		String imageURL = trackInfo.getString(TAG_ALBUM_IMAGE);
+    		
+    		//Crashes when finding density, probably needs to be an activity
+    		/*
+    		double screenDensity = context.getResources().getDisplayMetrics().density;
+    		Log.v(DEBUG,"Screen density is " + screenDensity);
+			if (screenDensity > 1.5 && screenDensity < 3.0){
+				imageURL = imageURL.replace("imagesize=300", "imagesize=400");
+			}
+			else if (screenDensity <= 1.0 ){
+				imageURL = imageURL.replace("imagesize=300", "imagesize=200");
+				
+			}
+			else if (screenDensity >= 3.0){
+				imageURL = imageURL.replace("imagesize=300", "imagesize=500");
+			}
+			*/
 			Bitmap bitmap = BitmapFactory.decodeStream((InputStream)new URL(imageURL).getContent());
 	    	AudioParserPair.jObj = jObj;
 	    	AudioParserPair.bitmap = bitmap;
@@ -105,6 +126,7 @@ public class AudioParser extends AsyncTask<String, Void, Pair> {
         return AudioParserPair;
     }
 			   
+	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 	@Override
     protected void onPostExecute(Pair AudioParserPair) {
 		jObj = AudioParserPair.jObj;

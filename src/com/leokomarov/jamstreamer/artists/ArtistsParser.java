@@ -12,12 +12,14 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -26,19 +28,20 @@ import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.JSONParser;
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
+import com.leokomarov.jamstreamer.playlist.PlaylistAdapter;
 
 /**Retrieves JSON file, parses and populates a clickable ListView, which opens another 
  *  activity - SingleMenuItemActivity - with the name shown to the user
  * @author LeoKomarov
  */
-public class ArtistsParser extends ListActivity implements JSONParser.MyCallbackInterface  {
+public class ArtistsParser extends ListActivity implements JSONParser.CallbackInterface  {
 	
-	// JSON Node names
 	private static final String TAG_RESULTS = "results";
 	public static final String TAG_ARTIST_ID = "id";
 	private static final String TAG_ARTIST_NAME = "name";
-	
 	JSONArray results = null;
+	private ImageButton button_playlist;
 	
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
@@ -78,8 +81,10 @@ public class ArtistsParser extends ListActivity implements JSONParser.MyCallback
 
 				artistList.add(map);
 			}
+		} catch (NullPointerException e) {
+			Log.e("ArtistsParser", "NullPointerException: " + e.getMessage(), e);
 		} catch (JSONException e) {
-			e.printStackTrace();
+			Log.e("ArtistsParser", "JSONException: " + e.getMessage(), e);
 		}
 		
 		if ( artistList.isEmpty() ) {
@@ -95,6 +100,15 @@ public class ArtistsParser extends ListActivity implements JSONParser.MyCallback
 				new String[] {TAG_ARTIST_NAME, TAG_ARTIST_ID}, new int[] {R.id.artists_names, R.id.artists_ids});
 			setListAdapter(adapter);
 		
+			button_playlist = (ImageButton) findViewById(R.id.artists2_btnPlaylist);    	
+	    	button_playlist.setOnClickListener(new View.OnClickListener() {
+				@Override
+	            public void onClick(View v) {
+	                Intent button_playlistIntent = new Intent(getApplicationContext(), PlaylistActivity.class);
+	                startActivityForResult(button_playlistIntent, 1);
+	            }
+			});
+			
 			lv.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -104,10 +118,23 @@ public class ArtistsParser extends ListActivity implements JSONParser.MyCallback
 					Intent in = new Intent(ArtistsParser.this, AlbumsByArtist.class);
 					in.putExtra(TAG_ARTIST_NAME, artistName);
 					in.putExtra(TAG_ARTIST_ID, artistID);
-					startActivity(in);
+					startActivityForResult(in, 2);
 				}
 			});
+			
 		}
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == 1) {
+	    	PlaylistAdapter.PlaylistCheckboxList.clear();
+	    	PlaylistAdapter.PlaylistCheckboxCount = 0;
+	    }
+		if (requestCode == 2) {
+	    	AlbumsByArtistAdapter.AlbumsByArtistCheckboxList.clear();
+	    	AlbumsByArtistAdapter.AlbumsByArtistCheckboxCount = 0;
+	    }
 	}
 	
 	@Override

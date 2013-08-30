@@ -11,6 +11,7 @@
     <string name="artistsFound">Artists</string>
     <string name="albumsFound">Albums</string>
     <string name="tracksFound">Tracks</string>
+    <string name="listErrorMessage">Please retry, there has been an error downloading the list</string>
     
     <string name="playlist">Playlist</string>
     <string name="backwardButton">Backward</string>
@@ -27,6 +28,10 @@
     <string name="albumsByNameFieldText">Enter an album</string>
     <string name="tracksByNameFieldText">Enter a track</string>
     <string name="buttonText">Search</string>
+    <string name="addTrackToPlaylistCAB">Add track(s)</string>
+    <string name="addAlbumToPlaylistCAB">Add album(s)</string>
+    <string name="playlistRemoveCAB">Remove track(s)</string>
+    <string name="deletePlaylistCAB">Delete playlist</string>
     
     <string name="artistsByNameJSONURL">http://api.jamendo.com/v3.0/artists/?client_id=19482a65&amp;format=jsonpretty&amp;order=popularity_total&amp;namesearch=%1$s</string>
     <string name="albumsByArtistIDJSONURL">http://api.jamendo.com/v3.0/artists/albums?client_id=19482a65&amp;format=jsonpretty&amp;order=id&amp;id=%1$s</string>
@@ -37,7 +42,7 @@
     <string name="tracksByArtistNameJSONURL">http://api.jamendo.com/v3.0/artists/tracks?client_id=19482a65&amp;format=jsonpretty&amp;order=popularity_total&amp;id=%1$s</string>
     <string name="tracksByAlbumNameJSONURL">http://api.jamendo.com/v3.0/albums/tracks?client_id=19482a65&amp;format=jsonpretty&amp;order=popularity_total&amp;namesearch=%1$s</string>
     <string name="tracksByNameJSONURL">http://api.jamendo.com/v3.0/artists/tracks?client_id=19482a65&amp;format=jsonpretty&amp;order=popularity_total&amp;namesearch=%1$s</string>
-    <string name="trackByIDURL">http://api.jamendo.com/v3.0/tracks/file?client_id=19482a65&amp;audioformat=mp32&amp;id=%1$s</string>
+    <string name="trackByIDURL">http://api.jamendo.com/v3.0/tracks/file?client_id=19482a65&amp;audioformat=mp31&amp;id=%1$s</string>
     <string name="trackInformation">http://api.jamendo.com/v3.0/tracks/?client_id=19482a65&amp;format=jsonpretty&amp;imagesize=300&amp;id=%1$s</string>
     
     <string name="radiosJSONURL">http://api.jamendo.com/v3.0/radios/?client_id=19482a65&amp;format=jsonpretty</string>

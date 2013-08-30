@@ -1,7 +1,5 @@
 package com.leokomarov.jamstreamer;
 
-import com.leokomarov.jamstreamer.artists.ArtistsSearch;
-
 import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
@@ -10,6 +8,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+
+import com.leokomarov.jamstreamer.artists.ArtistsSearch;
 
 public class MainMenu extends Activity {
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)

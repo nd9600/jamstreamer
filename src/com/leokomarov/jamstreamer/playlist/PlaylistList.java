@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.media_player;
+package com.leokomarov.jamstreamer.playlist;
 
 import java.util.ArrayList;
 import java.util.HashMap;

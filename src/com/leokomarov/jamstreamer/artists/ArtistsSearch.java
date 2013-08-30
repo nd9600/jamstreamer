@@ -1,5 +1,6 @@
 package com.leokomarov.jamstreamer.artists;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
@@ -11,11 +12,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
-//import android.support.v4.app.NavUtils;
 
 public class ArtistsSearch extends Activity {
 	public final static String INTENT_TAG = "com.leokomarov.jamstreamer.artists.NAME";
 
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,7 +37,6 @@ public class ArtistsSearch extends Activity {
 	
 	public void sendArtistName(View v){
 		Intent intent = new Intent(this, ArtistsParser.class);
-		//Intent intent = new Intent(getApplicationContext(), ArtistsParser.class);
         EditText editText = (EditText) findViewById(R.id.artistsByNameField);
         String artistName = editText.getText().toString();
         if (artistName.length() >= 2){

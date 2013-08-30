@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <lint>
+    <issue id="ContentDescription">
+        <ignore path="res/layout/rowlayout.xml" />
+    </issue>
     <issue id="DefaultLocale" severity="ignore" />
+    <issue id="MenuTitle">
+        <ignore path="res/menu/playlist_contextual_menu.xml" />
+    </issue>
     <issue id="UseCompoundDrawables">
         <ignore path="res/layout/dragitem.xml" />
+        <ignore path="res/layout/rowlayout.xml" />
     </issue>
 </lint>

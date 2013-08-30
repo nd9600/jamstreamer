@@ -29,6 +29,7 @@
             android:id="@+id/btnPlaylist"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent"
+            android:paddingTop="5dp"
             android:background="@null"
             android:contentDescription="@string/playlistButton"
             android:src="@drawable/button_playlist" />
@@ -82,7 +83,6 @@
         android:background="#ffffff"
         android:gravity="center">
  
-        <!-- Player Buttons -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -92,7 +92,7 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:layout_marginBottom="10dp">
-            <!-- Previous Button -->
+            
             <ImageButton
                 android:id="@+id/btnPrevious"
                 android:src="@drawable/button_previous"
@@ -100,7 +100,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:contentDescription="@string/previousButton"/>
-            <!-- Backward Button -->
+            
             <ImageButton
                 android:id="@+id/btnBackward"
                 android:src="@drawable/button_backward"
@@ -108,7 +108,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:contentDescription="@string/backwardButton"/>
-            <!-- Play Button -->
+            
             <ImageButton
                 android:id="@+id/btnPlay"
                 android:src="@drawable/button_play"
@@ -116,7 +116,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:contentDescription="@string/playButton"/>
-            <!-- Forward Button -->
+
             <ImageButton
                 android:id="@+id/btnForward"
                 android:src="@drawable/button_forward"
@@ -124,7 +124,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:contentDescription="@string/forwardButton"/>
-            <!-- Next Button -->
+
             <ImageButton
                 android:id="@+id/btnNext"
                 android:src="@drawable/button_next"

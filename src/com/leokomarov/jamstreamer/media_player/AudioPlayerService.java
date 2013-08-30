@@ -15,8 +15,10 @@ import android.util.Log;
 
 import com.leokomarov.jamstreamer.ComplexPreferences;
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.playlist.PlaylistList;
 
-public class AudioPlayerService extends Service implements MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener{
+public class AudioPlayerService extends Service implements MediaPlayer.OnErrorListener,
+	MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener{
 	
 	private String DEBUG = "AudioPlayerService";
 	public static MediaPlayer mp;
@@ -26,48 +28,6 @@ public class AudioPlayerService extends Service implements MediaPlayer.OnComplet
 	    		getString(R.string.trackPreferencesFile), MODE_PRIVATE);
 	    PlaylistList trackPreferencesObject = trackPreferences.getObject("tracks", PlaylistList.class);
 	    return trackPreferencesObject.trackList;
-    }
-	
-	private void playSong(int indexPosition){
-    	Log.v(DEBUG, "Playing index " + indexPosition ); 	
-    	
-    	ArrayList<HashMap<String, String>> trackList = getTrackListFromPreferences();
-    	String trackID = trackList.get(indexPosition).get("id");
-    	Log.v(DEBUG,"Track ID in playSong() in AudioPlayerService is " + trackID);
-    	String unformattedURL = getResources().getString(R.string.trackByIDURL);
-    	String url = String.format(unformattedURL, trackID).replace("&amp;", "&");
-    	
-    	String unformattedTrackInfoURL = getResources().getString(R.string.trackInformation);
-    	String trackInfoURL = String.format(unformattedTrackInfoURL, trackID).replace("&amp;", "&");
-    	
-    	AudioParser jParser = new AudioParser();
-		jParser.execute(trackInfoURL);
-    	
-    	SharedPreferences currentTrackPreference = getSharedPreferences(getString(R.string.currentTrackPreferences), 0);
-    	SharedPreferences.Editor currentTrackEditor = currentTrackPreference.edit();
-    	currentTrackEditor.putInt("currentTrack", Integer.parseInt(trackID) );
-        currentTrackEditor.commit();
-  	
-    	mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
-    	try {
-    		mp.setDataSource(url);
-    		mp.setOnCompletionListener(this);
-        	mp.setOnPreparedListener(this);
-    		mp.prepareAsync();
-    		AudioPlayer.button_play.setImageResource(R.drawable.button_pause);
-    	} catch(FileNotFoundException e){
-    		Log.e(DEBUG, "FileNotFoundException: " + e.getMessage(), e);
-    	} catch (IllegalArgumentException e) {
-    		Log.e(DEBUG, "IllegalArgumentException: " + e.getMessage(), e);
-    	} catch (IllegalStateException e) {
-    		Log.e(DEBUG, "IllegalStateException: " + e.getMessage(), e);
-    	} catch(RuntimeException e){
-    		Log.e(DEBUG, "RuntimeException: " + e.getMessage(), e);
-    	} catch (IOException e) {
-    		Log.e(DEBUG, "IOException: " + e.getMessage(), e);
-    	} catch (Exception e) {
-    		Log.e(DEBUG, "Exception: " + e.getMessage(), e);
-    	}
     }
     
     @Override
@@ -109,11 +69,61 @@ public class AudioPlayerService extends Service implements MediaPlayer.OnComplet
         	}
                 	
         }
+        
         Log.v(DEBUG, "Outside ACTION_PLAY");
         return super.onStartCommand(AudioPlayerServiceIntent,flags,startId);
     }
-      
-   	@Override
+    
+    private void playSong(int indexPosition){
+    	
+    	ArrayList<HashMap<String, String>> trackList = getTrackListFromPreferences();
+    	String trackID = trackList.get(indexPosition).get("id");
+    	String unformattedURL = getResources().getString(R.string.trackByIDURL);
+    	String url = String.format(unformattedURL, trackID).replace("&amp;", "&");
+    	
+    	String unformattedTrackInfoURL = getResources().getString(R.string.trackInformation);
+    	String trackInfoURL = String.format(unformattedTrackInfoURL, trackID).replace("&amp;", "&");
+    	
+    	AudioParser jParser = new AudioParser();
+		jParser.execute(trackInfoURL);
+    	
+    	SharedPreferences currentTrackPreference = getSharedPreferences(getString(R.string.currentTrackPreferences), 0);
+    	SharedPreferences.Editor currentTrackEditor = currentTrackPreference.edit();
+    	currentTrackEditor.putInt("currentTrack", Integer.parseInt(trackID) );
+        currentTrackEditor.commit();
+          	
+    	mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+    	try {
+    		mp.setDataSource(url);
+    		mp.setOnCompletionListener(this);
+        	mp.setOnPreparedListener(this);
+        	mp.setOnErrorListener(this);
+    		mp.prepare();
+    		Log.v(DEBUG,"Preparing mp");
+    		AudioPlayer.button_play.setImageResource(R.drawable.button_pause);
+    	} catch(FileNotFoundException e){
+    		Log.e(DEBUG, "FileNotFoundException: " + e.getMessage(), e);
+    	} catch (IllegalArgumentException e) {
+    		Log.e(DEBUG, "IllegalArgumentException: " + e.getMessage(), e);
+    	} catch (IllegalStateException e) {
+    		Log.e(DEBUG, "IllegalStateException in AudioPlayerService: " + e.getMessage(), e);
+    	} catch(RuntimeException e){
+    		Log.e(DEBUG, "RuntimeException: " + e.getMessage(), e);
+    	} catch (IOException e) {
+    		Log.e(DEBUG, "IOException: " + e.getMessage(), e);
+    	} catch (Exception e) {
+    		Log.e(DEBUG, "Exception: " + e.getMessage(), e);
+    	}
+    	
+    }
+    
+    @Override
+	public boolean onError(MediaPlayer mp, int what, int extra) {
+		Log.e(DEBUG,"Error preparing mp: " + what + extra);
+		return true;
+	}
+    
+    @Override
     public void onPrepared(MediaPlayer mp) {
         Log.v(DEBUG, "Prepared mp");
         mp.start();
@@ -128,7 +138,9 @@ public class AudioPlayerService extends Service implements MediaPlayer.OnComplet
     	AudioPlayer.button_forward.setClickable(false);
     	AudioPlayer.button_backward.setClickable(false);
     	AudioPlayer.button_play.setImageResource(R.drawable.button_play);
-    	mp.stop();
+    	if ( mp.isPlaying() ){
+    		mp.stop();
+    	}
         mp.reset();
     	Log.v(DEBUG, "In onCompletion method");
     	
@@ -136,14 +148,21 @@ public class AudioPlayerService extends Service implements MediaPlayer.OnComplet
     	int indexPosition = indexPositionPreference.getInt("indexPosition", 0);
     	
         ArrayList<HashMap<String, String>> trackList = getTrackListFromPreferences();
-        trackList.remove(indexPosition);
-        PlaylistList trackListObject = new PlaylistList();
-        trackListObject.setTrackList(trackList);    
-		ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this, 
-    		getString(R.string.trackPreferencesFile), MODE_PRIVATE);;
-    	trackPreferences.putObject("tracks", trackListObject);
-    	trackPreferences.commit();
-    	playSong(indexPosition);
+        if (! trackList.isEmpty() ){
+        	if (trackList.get(trackList.size()-1) != trackList.get(indexPosition)){
+        		trackList.remove(indexPosition);
+        		PlaylistList trackListObject = new PlaylistList();
+        		trackListObject.setTrackList(trackList);    
+        		ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this, 
+        			getString(R.string.trackPreferencesFile), MODE_PRIVATE);;
+        		trackPreferences.putObject("tracks", trackListObject);
+        		trackPreferences.commit();
+        		if (! trackList.isEmpty() ){
+        			playSong(indexPosition);
+        		}
+        	}
+        			
+        }
     }    
     
     @Override

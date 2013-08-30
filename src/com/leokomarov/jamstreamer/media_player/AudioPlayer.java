@@ -14,14 +14,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 //import java.util.Random;
 //import android.media.MediaPlayer.OnCompletionListener;
 
 public class AudioPlayer extends Activity {
 //public class AudioPlayer extends Activity implements OnCompletionListener, SeekBar.OnSeekBarChangeListener {
 	private String DEBUG = "AudioPlayer";
-	//private static final String TAG_TRACK_ID = "id";
-	//private static final String TAG_TRACK_DURATION = "duration";
 	
 	protected static ImageButton button_play;
 	protected static ImageButton button_forward;
@@ -89,12 +88,10 @@ public class AudioPlayer extends Activity {
 		//songCurrentDurationLabel = (TextView) findViewById(R.id.songCurrentDurationLabel);
 		songTotalDurationLabel = (TextView) findViewById(R.id.songTotalDurationLabel);
 		
+		button_play.setImageResource(R.drawable.button_play);
 		button_play.setClickable(false);
     	button_forward.setClickable(false);
     	button_backward.setClickable(false);
-		
-		//SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
-    	//int indexPosition = indexPositionPreference.getInt("indexPosition", 0);
 		
 		Intent audioService = new Intent(getApplicationContext(),AudioPlayerService.class);
 		Log.v(DEBUG, "Starting AudioPlayerService");

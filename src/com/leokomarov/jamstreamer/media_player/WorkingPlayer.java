@@ -4,13 +4,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-//import java.util.Random;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-//import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,6 +21,9 @@ import android.widget.TextView;
 
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.artists.TracksByAlbum;
+import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
+//import java.util.Random;
+//import android.media.MediaPlayer.OnCompletionListener;
 //import android.widget.SeekBar;
 
 //Shouldn't extend Activity
@@ -62,6 +64,7 @@ public class WorkingPlayer extends Activity{
 	//private boolean isRepeat = false;
 	private ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
 	
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		//Needs fixed, complains about API level if <11 in manifest
