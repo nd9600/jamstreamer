@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.artists;
+package com.leokomarov.jamstreamer.searches;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,14 +7,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.annotation.TargetApi;
-import android.app.ListActivity;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -26,16 +22,16 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.SherlockListActivity;
+import com.actionbarsherlock.view.MenuItem;
 import com.leokomarov.jamstreamer.JSONParser;
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.common.AlbumsByName;
+import com.leokomarov.jamstreamer.common.AlbumsByNameAdapter;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistAdapter;
 
-/**Retrieves JSON file, parses and populates a clickable ListView, which opens another 
- *  activity - SingleMenuItemActivity - with the name shown to the user
- * @author LeoKomarov
- */
-public class ArtistsParser extends ListActivity implements JSONParser.CallbackInterface  {
+public class ArtistsParser extends SherlockListActivity implements JSONParser.CallbackInterface  {
 	
 	private static final String TAG_RESULTS = "results";
 	public static final String TAG_ARTIST_ID = "id";
@@ -43,21 +39,17 @@ public class ArtistsParser extends ListActivity implements JSONParser.CallbackIn
 	JSONArray results = null;
 	private ImageButton button_playlist;
 	
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            getActionBar().setDisplayHomeAsUpEnabled(true);
-        }
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		
 		Intent intent = getIntent();
-        String artistName = intent.getStringExtra(ArtistsSearch.INTENT_TAG); 
+        String artistName = intent.getStringExtra(ArtistsSearch.TAG_ARTIST_NAME); 
         String unformattedURL = getResources().getString(R.string.artistsByNameJSONURL);
-    	String url = String.format(unformattedURL, artistName);
-    	url = url.replace("&amp;", "&").replace(" ", "+");
+    	String url = String.format(unformattedURL, artistName).replace("&amp;", "&").replace(" ", "+");
     		
-		setContentView(R.layout.artists_1artist_names_original_empty_list);
+		setContentView(R.layout.original_empty_list);
 		JSONParser jParser = new JSONParser(this);
 		jParser.execute(url);
 	}
@@ -87,20 +79,23 @@ public class ArtistsParser extends ListActivity implements JSONParser.CallbackIn
 			Log.e("ArtistsParser", "JSONException: " + e.getMessage(), e);
 		}
 		
-		if ( artistList.isEmpty() ) {
+		if (json.isNull(TAG_RESULTS)){
+			Toast.makeText(getApplicationContext(), "There are no artists matching this search", Toast.LENGTH_SHORT).show();
+		}
+		else if (json.isNull(TAG_RESULTS) && artistList.isEmpty()) {
         	Toast.makeText(getApplicationContext(), "Please retry, there has been an error downloading the artist list", Toast.LENGTH_SHORT).show();
         }
 		else {		
 			ListView lv = getListView();
 			LayoutInflater inflater = getLayoutInflater();
 		
-			ViewGroup header = (ViewGroup)inflater.inflate(R.layout.artists_2header, lv, false);
+			ViewGroup header = (ViewGroup)inflater.inflate(R.layout.artists_list_header, lv, false);
 			lv.addHeaderView(header, null, false);
-			ListAdapter adapter = new SimpleAdapter(this, artistList, R.layout.artists_2artist_names_list, 
-				new String[] {TAG_ARTIST_NAME, TAG_ARTIST_ID}, new int[] {R.id.artists_names, R.id.artists_ids});
+			ListAdapter adapter = new SimpleAdapter(this, artistList, R.layout.artists_list, 
+				new String[] {TAG_ARTIST_NAME, TAG_ARTIST_ID}, new int[] {R.id.artists_list_artists_names, R.id.artists_list_artists_ids});
 			setListAdapter(adapter);
 		
-			button_playlist = (ImageButton) findViewById(R.id.artists2_btnPlaylist);    	
+			button_playlist = (ImageButton) findViewById(R.id.artists1_btnPlaylist);    	
 	    	button_playlist.setOnClickListener(new View.OnClickListener() {
 				@Override
 	            public void onClick(View v) {
@@ -112,11 +107,9 @@ public class ArtistsParser extends ListActivity implements JSONParser.CallbackIn
 			lv.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					String artistName = ((TextView) view.findViewById(R.id.artists_names)).getText().toString();
-					String artistID = ((TextView) view.findViewById(R.id.artists_ids)).getText().toString();
+					String artistID = ((TextView) view.findViewById(R.id.artists_list_artists_ids)).getText().toString();
 
-					Intent in = new Intent(ArtistsParser.this, AlbumsByArtist.class);
-					in.putExtra(TAG_ARTIST_NAME, artistName);
+					Intent in = new Intent(ArtistsParser.this, AlbumsByName.class);
 					in.putExtra(TAG_ARTIST_ID, artistID);
 					startActivityForResult(in, 2);
 				}
@@ -132,18 +125,18 @@ public class ArtistsParser extends ListActivity implements JSONParser.CallbackIn
 	    	PlaylistAdapter.PlaylistCheckboxCount = 0;
 	    }
 		if (requestCode == 2) {
-	    	AlbumsByArtistAdapter.AlbumsByArtistCheckboxList.clear();
-	    	AlbumsByArtistAdapter.AlbumsByArtistCheckboxCount = 0;
+	    	AlbumsByNameAdapter.AlbumsByNameCheckboxList.clear();
+	    	AlbumsByNameAdapter.AlbumsByNameCheckboxCount = 0;
 	    }
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) { 
-	        switch (item.getItemId()) {
-	        case android.R.id.home: 
-	            onBackPressed();
-	            return true;
-	        }
+	        int itemId = item.getItemId();
+			if (itemId == android.R.id.home) {
+				onBackPressed();
+				return true;
+			}
 	    return super.onOptionsItemSelected(item);
 	}
 

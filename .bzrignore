@@ -7,3 +7,7 @@ bin/JamStreamer.apk
 bin/jarlist.cache
 bin/res
 bin/resources.ap_
+bin/R.txt
+bin/proguard.txt
+libs/gson-2.2.4.jar
+gen/com/actionbarsherlock

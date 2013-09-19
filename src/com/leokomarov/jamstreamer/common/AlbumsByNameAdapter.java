@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.artists;
+package com.leokomarov.jamstreamer.common;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,12 +15,12 @@ import android.widget.TextView;
 
 import com.leokomarov.jamstreamer.R;
 
-class AlbumsByArtistModel {
+class AlbumsByNameModel {
 
 	  private HashMap<String, String> albumMap;
 	  private boolean selected;
 
-	  public AlbumsByArtistModel(HashMap<String, String> albumMap) {
+	  public AlbumsByNameModel(HashMap<String, String> albumMap) {
 		  this.albumMap = albumMap;
 		  selected = false;
 	  }
@@ -32,27 +32,27 @@ class AlbumsByArtistModel {
 	  public boolean isSelected() {
 		  return selected;
 	  }
-
+	  
 	  public void setSelected(boolean selected) {
-	    this.selected = selected;
+		    this.selected = selected;
 	  }
 
 } 
 
-public class AlbumsByArtistAdapter extends ArrayAdapter<AlbumsByArtistModel> {
-	private final List<AlbumsByArtistModel> list;
+public class AlbumsByNameAdapter extends ArrayAdapter<AlbumsByNameModel> {
+	private final List<AlbumsByNameModel> list;
 	private final Activity context;
-	protected static SparseBooleanArray AlbumsByArtistCheckboxList = new SparseBooleanArray();
-	protected static int AlbumsByArtistCheckboxCount = 0;
+	public static SparseBooleanArray AlbumsByNameCheckboxList = new SparseBooleanArray();
+	public static int AlbumsByNameCheckboxCount = 0;
 	
 	protected interface CallbackInterface {
-        public void setListItemChecked(int position, boolean checked);
+        public void callActionBar();
     }
 	
 	private CallbackInterface mCallback;
 	
-	protected AlbumsByArtistAdapter(CallbackInterface callback, Activity context, List<AlbumsByArtistModel> list) {
-		super(context, R.layout.artists_4albums_by_list_item, list);
+	protected AlbumsByNameAdapter(CallbackInterface callback, Activity context, List<AlbumsByNameModel> list) {
+		super(context, R.layout.albums_by_name, list);
 		this.context = context;
 		this.list = list;
 		mCallback = callback;
@@ -82,33 +82,43 @@ public class AlbumsByArtistAdapter extends ArrayAdapter<AlbumsByArtistModel> {
 		View view = null;
 		if (convertView == null) {
 			LayoutInflater inflator = context.getLayoutInflater();
-			view = inflator.inflate(R.layout.artists_4albums_by_list_item, null);
+			view = inflator.inflate(R.layout.albums_by_name, null);
 			final ViewHolder viewHolder = new ViewHolder();
 			
-			viewHolder.albumName = (TextView) view.findViewById(R.id.artists4_albumName);
-			viewHolder.checkbox = (CheckBox) view.findViewById(R.id.artists4_checkBox);
+			viewHolder.albumName = (TextView) view.findViewById(R.id.albums_by_name_albumName);
+			viewHolder.checkbox = (CheckBox) view.findViewById(R.id.albums_by_name_checkBox);
       
 			viewHolder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-					AlbumsByArtistModel element = (AlbumsByArtistModel) viewHolder.checkbox.getTag();
+					mCallback.callActionBar();
+					
+					AlbumsByNameModel element = (AlbumsByNameModel) viewHolder.checkbox.getTag();
 					element.setSelected(buttonView.isChecked());
 					if (element.isSelected()){
-						if (AlbumsByArtistCheckboxList.get(position, false) == false){
-							AlbumsByArtistCheckboxList.put(position, true);
-							++AlbumsByArtistCheckboxCount;
-							mCallback.setListItemChecked(position, true);
+						if (AlbumsByNameCheckboxList.get(position, false) == false){
+							AlbumsByNameCheckboxList.put(position, true);
+							AlbumsByNameCheckboxCount++;
 						}
 					}
 					else {
-						if (AlbumsByArtistCheckboxList.get(position, false) == true){
-							AlbumsByArtistCheckboxList.put(position, false);
-							if (AlbumsByArtistCheckboxCount >= 1){
-								--AlbumsByArtistCheckboxCount;
-								mCallback.setListItemChecked(position, false);
+						if (AlbumsByNameCheckboxList.get(position, false) == true){
+							AlbumsByNameCheckboxList.put(position, false);
+							if (AlbumsByNameCheckboxCount >= 1){
+								AlbumsByNameCheckboxCount--;
 							}
 						}
 					}
+					
+					if (AlbumsByNameCheckboxCount == 0){
+						AlbumsByName.mActionMode.finish();
+	                }
+	                else if (AlbumsByNameCheckboxCount == 1){
+	                	AlbumsByName.mActionMode.setTitle(AlbumsByNameCheckboxCount + " album selected");
+	                }
+	                else if(AlbumsByNameCheckboxCount >= 2){
+	                	AlbumsByName.mActionMode.setTitle(AlbumsByNameCheckboxCount + " albums selected");
+	                }
 				}
 			});
       

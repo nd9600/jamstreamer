@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.playlist;
+package com.leokomarov.jamstreamer.common;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,23 +15,20 @@ import android.widget.TextView;
 
 import com.leokomarov.jamstreamer.R;
 
-class PlaylistModel {
+class TracksByNameModel {
+
 	  private HashMap<String, String> trackMap;
 	  private boolean selected;
 
-	  public PlaylistModel(HashMap<String, String> trackMap) {
+	  public TracksByNameModel(HashMap<String, String> trackMap) {
 		  this.trackMap = trackMap;
 		  selected = false;
 	  }
-	    
+	  
 	  public String getTrackNameAndDuration(){
 		  return trackMap.get("trackName") + " - " + trackMap.get("trackDuration");
 	  }
-	  
-	  public String getTrackArtistAndAlbum(){
-		  return trackMap.get("trackArtist") + " - " + trackMap.get("trackAlbum");
-	  }
-
+	  	  
 	  public boolean isSelected() {
 		  return selected;
 	  }
@@ -42,11 +39,11 @@ class PlaylistModel {
 
 } 
 
-public class PlaylistAdapter extends ArrayAdapter<PlaylistModel> {
-	private final List<PlaylistModel> list;
+public class TracksByNameAdapter extends ArrayAdapter<TracksByNameModel> {
+	private final List<TracksByNameModel> list;
 	private final Activity context;
-	public static SparseBooleanArray PlaylistCheckboxList = new SparseBooleanArray();
-	public static int PlaylistCheckboxCount = 0;
+	public static SparseBooleanArray TracksByNameCheckboxList = new SparseBooleanArray();
+	public static int TracksByNameCheckboxCount = 0;
 	
 	protected interface CallbackInterface {
         public void callActionBar();
@@ -54,8 +51,8 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistModel> {
 	
 	private CallbackInterface mCallback;
 	
-	protected PlaylistAdapter(CallbackInterface callback, Activity context, List<PlaylistModel> list) {
-		super(context, R.layout.playlist_by_list_item, list);
+	protected TracksByNameAdapter(CallbackInterface callback, Activity context, List<TracksByNameModel> list) {
+		super(context, R.layout.tracks_by_name, list);
 		this.context = context;
 		this.list = list;
 		mCallback = callback;
@@ -63,7 +60,6 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistModel> {
 
 	static class ViewHolder {
 		protected TextView trackNameAndDuration;
-		protected TextView trackArtistAndAlbum;
 		protected CheckBox checkbox;
 	}
 	
@@ -86,44 +82,44 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistModel> {
 		View view = null;
 		if (convertView == null) {
 			LayoutInflater inflator = context.getLayoutInflater();
-			view = inflator.inflate(R.layout.playlist_by_list_item, null);
+			view = inflator.inflate(R.layout.tracks_by_name, null);
 			final ViewHolder viewHolder = new ViewHolder();
 			
-			viewHolder.trackNameAndDuration = (TextView) view.findViewById(R.id.playlist_trackNameAndDuration);
-			viewHolder.trackArtistAndAlbum = (TextView) view.findViewById(R.id.playlist_trackArtistAndAlbum);
-			viewHolder.checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
+			viewHolder.trackNameAndDuration = (TextView) view.findViewById(R.id.tracks_by_name_trackNameAndDuration);
+			viewHolder.checkbox = (CheckBox) view.findViewById(R.id.tracks_by_name_checkBox);
       
 			viewHolder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 				@Override
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 					mCallback.callActionBar();
 					
-					PlaylistModel element = (PlaylistModel) viewHolder.checkbox.getTag();
+					TracksByNameModel element = (TracksByNameModel) viewHolder.checkbox.getTag();
 					element.setSelected(buttonView.isChecked());
 					if (element.isSelected()){
-						if (PlaylistCheckboxList.get(position, false) == false){
-							PlaylistCheckboxList.put(position, true);
-							PlaylistCheckboxCount++;
+						if (TracksByNameCheckboxList.get(position, false) == false){
+							TracksByNameCheckboxList.put(position, true);
+							TracksByNameCheckboxCount++;
 						}
 					}
 					else {
-						if (PlaylistCheckboxList.get(position, false) == true){
-							PlaylistCheckboxList.put(position, false);
-							if (PlaylistCheckboxCount >= 1){
-								PlaylistCheckboxCount--;
+						if (TracksByNameCheckboxList.get(position, false) == true){
+							TracksByNameCheckboxList.put(position, false);
+							if (TracksByNameCheckboxCount >= 1){
+								TracksByNameCheckboxCount--;
 							}
 						}
 					}
 					
-					if (PlaylistCheckboxCount == 0){
-	                	PlaylistActivity.mActionMode.finish();
+					if (TracksByNameCheckboxCount == 0){
+						TracksByName.mActionMode.finish();
 	                }
-	                else if (PlaylistCheckboxCount == 1){
-	                	PlaylistActivity.mActionMode.setTitle(PlaylistCheckboxCount + " track selected");
+	                else if (TracksByNameCheckboxCount == 1){
+	                	TracksByName.mActionMode.setTitle("1 track selected");
 	                }
-	                else if(PlaylistCheckboxCount >= 2){
-	                	PlaylistActivity.mActionMode.setTitle(PlaylistCheckboxCount + " tracks selected");
+	                else if(TracksByNameCheckboxCount >= 2){
+	                	TracksByName.mActionMode.setTitle(TracksByNameCheckboxCount + " tracks selected");
 	                }
+					
 				}
 			});
       
@@ -133,12 +129,10 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistModel> {
 			view = convertView;
 			((ViewHolder) view.getTag()).checkbox.setTag(list.get(position));
 		}
-		
+	  	
 		ViewHolder holder = (ViewHolder) view.getTag();
 		String trackNameAndDuration = list.get(position).getTrackNameAndDuration();
-		String trackArtistAndAlbum = list.get(position).getTrackArtistAndAlbum();
 		holder.trackNameAndDuration.setText(trackNameAndDuration);
-		holder.trackArtistAndAlbum.setText(trackArtistAndAlbum);
 		holder.checkbox.setChecked(list.get(position).isSelected());
 		return view;
 	}

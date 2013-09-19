@@ -17,15 +17,15 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 public class JSONParser extends AsyncTask<String, Void, JSONObject>  {
-
     static InputStream is = null;
 	static JSONObject jObj = null;
 	static String json = "";
-	private static String DEBUG = "JSONParser";
-	
-	public JSONObject getJSONFromUrl(String myurl) {
-		try {
-	        URL url = new URL(myurl);
+
+	@Override
+    protected JSONObject doInBackground(String... urls) {
+		String urlString = urls[0];  
+      try {
+	        URL url = new URL(urlString);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 	        conn.setReadTimeout(10000 /* milliseconds */);
 	        conn.setConnectTimeout(15000 /* milliseconds */);
@@ -34,11 +34,10 @@ public class JSONParser extends AsyncTask<String, Void, JSONObject>  {
 	        conn.connect();
 	        is = conn.getInputStream();
 		} catch (SocketTimeoutException e) {
-			e.printStackTrace();    
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			Log.e("JSONParser", "ClientProtocolException: " + e.getMessage(), e);
 		} catch (ClientProtocolException e) {
-			e.printStackTrace();
+			Log.e("JSONParser", "ClientProtocolException: " + e.getMessage(), e);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -53,22 +52,15 @@ public class JSONParser extends AsyncTask<String, Void, JSONObject>  {
 			is.close();
 			json = sb.toString();
 		} catch (Exception e) {
-			Log.e("Buffer Error", "Error converting result " + e.toString());
+			Log.e("JSONParser", "Error converting result " + e.toString());
 		}
 
 		try {
 			jObj = new JSONObject(json);
 		} catch (JSONException e) {
-			Log.e(DEBUG, "Error parsing data " + e.toString());
+			Log.e("JSONParser", "JSONException: " + e.getMessage(), e);
 		}
-	
 		return jObj;
-	}
-
-	@Override
-    protected JSONObject doInBackground(String... urls) {
-    	String url = urls[0];            
-        return getJSONFromUrl(url);
     }
 	
 	public interface CallbackInterface {

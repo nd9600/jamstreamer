@@ -8,30 +8,31 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
+        android:layout_alignBottom="@+id/playlist_trackNameAndDuration"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="10dp"
         android:focusable="false"
-        android:background="@android:color/transparent" >
+        android:visibility="visible" >
     </CheckBox>
     
     <TextView
-       android:id="@+id/playlist_trackName"
+       android:id="@id/playlist_trackNameAndDuration"
        android:layout_width="fill_parent"
        android:layout_height="wrap_content"
        android:layout_alignParentTop="true"
        android:layout_toRightOf="@id/playlist_checkBox"
        android:paddingLeft="5dp"
        android:paddingBottom="5dp"
-       android:textSize="24sp"
+       android:textSize="18sp"
        android:background="@drawable/background_highlighter"
        android:textColor="@drawable/text_highlighter" />
     
     <TextView
-       android:id="@+id/playlist_trackDuration"
+       android:id="@+id/playlist_trackArtistAndAlbum"
        android:layout_width="fill_parent"
        android:layout_height="wrap_content"
-       android:layout_below="@id/playlist_trackName"
-       android:layout_alignLeft="@id/playlist_trackName"
+       android:layout_below="@id/playlist_trackNameAndDuration"
+       android:layout_alignLeft="@id/playlist_trackNameAndDuration"
        android:paddingLeft="5dp"
        android:paddingBottom="5dp"
        android:textSize="12sp"
@@ -41,7 +42,7 @@
    	<View
         android:layout_width="fill_parent"
         android:layout_height="0.5dp"
-        android:layout_below="@id/playlist_trackDuration"
+        android:layout_below="@id/playlist_trackArtistAndAlbum"
         android:visibility="visible"
         android:background="#d3d3d3"/>
 

@@ -4,22 +4,23 @@
     android:layout_height="match_parent">
     
     <CheckBox
-        android:id="@+id/artists4_checkBox"
+        android:id="@+id/tracks_by_name_checkBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
+        android:layout_alignBaseline="@+id/tracks_by_name_trackNameAndDuration"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="10dp"
         android:focusable="false"
-        android:background="@android:color/transparent" >
+        android:visibility="visible" >
     </CheckBox>
     
     <TextView
-       android:id="@+id/artists4_albumName"
+       android:id="@id/tracks_by_name_trackNameAndDuration"
        android:layout_width="fill_parent"
        android:layout_height="wrap_content"
        android:layout_alignParentTop="true"
-       android:layout_toRightOf="@id/artists4_checkBox"
+       android:layout_toRightOf="@id/tracks_by_name_checkBox"
        android:paddingLeft="5dp"
        android:paddingBottom="5dp"
        android:textSize="24sp"
@@ -29,13 +30,8 @@
    	<View
         android:layout_width="fill_parent"
         android:layout_height="0.5dp"
-        android:layout_below="@id/artists4_albumName"
+        android:layout_below="@id/tracks_by_name_trackNameAndDuration"
         android:visibility="visible"
         android:background="#d3d3d3"/>
-   	
-   	<TextView
-       android:id="@+id/artists4_albumID"
-       android:layout_width="0dp"
-       android:layout_height="0dp" />
 
 </RelativeLayout>

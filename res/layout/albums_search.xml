@@ -6,17 +6,17 @@
     android:orientation="horizontal">
     
     <EditText 
-        android:id="@+id/tracksByNameField"
+        android:id="@+id/albumsByNameField"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:inputType="textCapWords"
-        android:hint="@string/tracksByNameFieldText" />
+        android:hint="@string/albumsByNameFieldText" />
 
     <Button
+        android:id="@+id/albumsSearchButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:onClick="sendTrackName"
         android:text="@string/buttonText" />
 
 </LinearLayout>

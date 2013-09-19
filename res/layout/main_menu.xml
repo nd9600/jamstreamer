@@ -4,7 +4,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical">
-      
+    
     <TextView
         android:id="@+id/main_artistsText"
         android:layout_width="fill_parent"
@@ -20,15 +20,6 @@
         android:text="@string/artistsFound"
         android:textColor="@drawable/text_highlighter"
         android:textSize="32sp" />
-
-    <ImageView
-        android:contentDescription="@string/nextIcon"
-        android:layout_alignRight="@id/main_artistsText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingRight="5dp"
-        android:paddingTop="11dp"
-        android:src="@drawable/img_next_purple" />
 
     <View
         android:id="@+id/main_separator_1"
@@ -54,16 +45,6 @@
         android:textColor="@drawable/text_highlighter"
         android:textSize="32sp" />
     
-    <ImageView
-        android:contentDescription="@string/nextIcon"
-        android:layout_alignTop="@id/main_albumsText"
-        android:layout_alignRight="@id/main_albumsText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingRight="5dp"
-        android:paddingTop="11dp"
-        android:src="@drawable/img_next_purple" />
-
     <View
         android:id="@+id/main_separator_2"
         android:layout_width="fill_parent"
@@ -89,15 +70,23 @@
         android:clickable="true"
         android:onClick="tracksMainButton" />
     
-    <ImageView
-        android:contentDescription="@string/nextIcon"
-        android:layout_alignTop="@id/main_tracksText"
-        android:layout_alignRight="@id/main_tracksText"
+    <View
+        android:id="@+id/main_separator_3"
+        android:layout_width="fill_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/main_tracksText"
+        android:visibility="visible"
+        android:background="#d3d3d3"/>  
+    
+    <ImageButton
+        android:id="@+id/mainMenu_btnPlaylist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingRight="5dp"
-        android:paddingTop="11dp"
-        android:src="@drawable/img_next_purple" />
-
+        android:layout_below="@id/main_separator_3"
+        android:layout_alignParentRight="true"
+        android:paddingTop="5dp"
+        android:background="@null"
+        android:contentDescription="@string/playlistButton"
+        android:src="@drawable/button_playlist" />
 
 </RelativeLayout>

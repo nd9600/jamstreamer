@@ -4,7 +4,7 @@
     android:layout_height="fill_parent"
     android:orientation="horizontal">
     <TextView
-        android:id="@+id/artists2_artistsHeader"
+        android:id="@+id/artists1_artistsHeader"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="#702f6f"
@@ -17,12 +17,12 @@
         android:textStyle="bold" />
     
     <ImageButton
-        android:id="@+id/artists2_btnPlaylist"
+        android:id="@+id/artists1_btnPlaylist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_alignBottom="@id/artists2_artistsHeader"
+        android:layout_alignBottom="@id/artists1_artistsHeader"
         android:paddingTop="5dp"
         android:background="@null"
         android:contentDescription="@string/playlistButton"

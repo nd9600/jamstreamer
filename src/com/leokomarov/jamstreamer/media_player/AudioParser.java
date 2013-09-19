@@ -8,45 +8,35 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.annotation.TargetApi;
-import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.util.Log;
 
-class Pair
-{
-	public JSONObject jObj;
-	public Bitmap bitmap;
-}
-
-public class AudioParser extends AsyncTask<String, Void, Pair> {
+public class AudioParser extends AsyncTask<String, Void, Bitmap> {
 
 	private static String DEBUG = "AudioParser";
     static InputStream is = null;
 	static JSONObject jObj = null;
 	static String json = "";
 	private static final String TAG_RESULTS = "results";
+	private static final String TAG_ALBUM_IMAGE = "album_image";
 	private static final String TAG_ARTIST_NAME = "artist_name";
 	private static final String TAG_ALBUM_NAME = "album_name";
-	private static final String TAG_ALBUM_IMAGE = "album_image";
-	private static final String TAG_TRACK_NAME = "name";
-	private static final String TAG_TRACK_DURATION = "duration";
-	Context context;
-	
-	public JSONObject getJSONFromUrl(String myurl) {
-		try {
-	        URL url = new URL(myurl);
+
+	@Override
+    protected Bitmap doInBackground(String... parameters) {
+	    String urlString = parameters[0];    	
+	    try {
+	        URL url = new URL(urlString);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 	        conn.setReadTimeout(10000 /* milliseconds */);
 	        conn.setConnectTimeout(15000 /* milliseconds */);
@@ -82,74 +72,53 @@ public class AudioParser extends AsyncTask<String, Void, Pair> {
 		} catch (JSONException e) {
 		Log.e(DEBUG, "Error parsing data " + e.toString());
 		}
-	
-		return jObj;
-	}
-
-	@Override
-    protected Pair doInBackground(String... urls) {
-		String url = urls[0];    	
-    	jObj = getJSONFromUrl(url);
-    	Pair AudioParserPair = new Pair();
+		
     	JSONArray results = null;
+    	Bitmap albumImage = null;
     	try {
     		results = jObj.getJSONArray(TAG_RESULTS);
     		JSONObject trackInfo = results.getJSONObject(0);
-    		String imageURL = trackInfo.getString(TAG_ALBUM_IMAGE);
     		
-    		//Crashes when finding density, probably needs to be an activity
-    		/*
-    		double screenDensity = context.getResources().getDisplayMetrics().density;
-    		Log.v(DEBUG,"Screen density is " + screenDensity);
-			if (screenDensity > 1.5 && screenDensity < 3.0){
-				imageURL = imageURL.replace("imagesize=300", "imagesize=400");
+    		String imageURL = trackInfo.getString(TAG_ALBUM_IMAGE);
+    		String artistName = trackInfo.getString(TAG_ARTIST_NAME);
+    		String albumName = trackInfo.getString(TAG_ALBUM_NAME);
+    		String artistAndAlbum = artistName + " - " + albumName;
+    		String audioPlayer_artistAndAlbum = parameters[1];
+    		BitmapDrawable albumImageDrawable = ((BitmapDrawable)AudioPlayer.albumArt.getDrawable());
+    		
+    		double screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
+    		double screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
+    		double screenDensityDPI = Resources.getSystem().getDisplayMetrics().densityDpi;
+            double screenDiagonal = Math.sqrt((screenWidth * screenWidth) + (screenHeight * screenHeight)) / screenDensityDPI;
+    		   		
+			if (screenDiagonal <= 3.0 ){
+				imageURL = imageURL.replace("300.jpg", "200.jpg");
 			}
-			else if (screenDensity <= 1.0 ){
-				imageURL = imageURL.replace("imagesize=300", "imagesize=200");
-				
+			else if (screenDiagonal >= 7.5 && screenDiagonal < 9.0){
+				imageURL = imageURL.replace("300.jpg", "400.jpg");
 			}
-			else if (screenDensity >= 3.0){
-				imageURL = imageURL.replace("imagesize=300", "imagesize=500");
+			else if (screenDiagonal >= 9.0){
+				imageURL = imageURL.replace("300.jpg", "500.jpg");
 			}
-			*/
-			Bitmap bitmap = BitmapFactory.decodeStream((InputStream)new URL(imageURL).getContent());
-	    	AudioParserPair.jObj = jObj;
-	    	AudioParserPair.bitmap = bitmap;
+
+     		if (albumImageDrawable == null || ! audioPlayer_artistAndAlbum.equals(artistAndAlbum) ){
+    			albumImage = BitmapFactory.decodeStream((InputStream)new URL(imageURL).getContent());
+        	}		
 		} catch (JSONException e) {
 			Log.e(DEBUG, "JSONException " + e.toString());
 		} catch (MalformedURLException e) {
 			Log.e("MalformedURLException", "Wrong URL:  " + e.toString());
 		} catch (IOException e) {
 			Log.e("IOException ", "IOException: " + e.toString());
-		} 	
-    	
-        return AudioParserPair;
+		}
+    	return albumImage;
     }
 			   
-	@TargetApi(Build.VERSION_CODES.GINGERBREAD)
 	@Override
-    protected void onPostExecute(Pair AudioParserPair) {
-		jObj = AudioParserPair.jObj;
-		Bitmap bitmap = AudioParserPair.bitmap;
-    	JSONArray results = null;
-				try {
-					results = jObj.getJSONArray(TAG_RESULTS);
-					JSONObject trackInfo = results.getJSONObject(0);
-							
-					String artistName = trackInfo.getString(TAG_ARTIST_NAME);
-					String albumName = trackInfo.getString(TAG_ALBUM_NAME);
-					String trackName = trackInfo.getString(TAG_TRACK_NAME);
-					String trackDuration = trackInfo.getString(TAG_TRACK_DURATION);
-					long trackDurationLong = Long.valueOf(trackDuration);
-					String timeString = String.format(Locale.US, "%d:%02d", TimeUnit.SECONDS.toMinutes(trackDurationLong),trackDurationLong % 60);
-					
-					AudioPlayer.songTitleLabel.setText(trackName + " - " + artistName);
-					AudioPlayer.albumLabel.setText(albumName);
-					AudioPlayer.songThumbnailImageView.setImageBitmap(bitmap);
-					AudioPlayer.songTotalDurationLabel.setText(timeString);
-				} catch (JSONException e) {
-					Log.e(DEBUG, "JSONException " + e.toString());
-				}
-     }
+    protected void onPostExecute(Bitmap albumImage) {
+		if(albumImage != null){
+			AudioPlayer.albumArt.setImageBitmap(albumImage);
+		}
+    }
     	
 }

@@ -5,13 +5,13 @@
     <string name="trackPreferencesFile">track_preferences</string>
     <string name="currentTrackPreferences">currentTrack_preferences</string>
     <string name="indexPositionPreferences">indexPosition_preferences</string>
+    <string name="hierarchyPreferences">hierarchy_preferences</string>
     
     <string name="searchIcon">Search icon</string>
     <string name="nextIcon">Next icon</string>
     <string name="artistsFound">Artists</string>
     <string name="albumsFound">Albums</string>
     <string name="tracksFound">Tracks</string>
-    <string name="listErrorMessage">Please retry, there has been an error downloading the list</string>
     
     <string name="playlist">Playlist</string>
     <string name="backwardButton">Backward</string>
@@ -21,7 +21,7 @@
     <string name="nextButton">Next</string>
     <string name="forwardButton">Forward</string>
     <string name="playlistButton">Playlist</string>
-    <string name="repeatButton">Repeate</string>
+    <string name="repeatButton">Repeat</string>
     <string name="shuffleButton">Shuffle</string>
     
     <string name="artistsByNameFieldText">Enter an artist</string>
@@ -39,12 +39,7 @@
     <string name="albumsByNameJSONURL">http://api.jamendo.com/v3.0/albums?client_id=19482a65&amp;format=jsonpretty&amp;order=popularity_total&amp;namesearch=%1$s</string>
     <string name="tracksByAlbumIDJSONURL">http://api.jamendo.com/v3.0/albums/tracks?client_id=19482a65&amp;format=jsonpretty&amp;order=track_position&amp;id=%1$s</string>
     
-    <string name="tracksByArtistNameJSONURL">http://api.jamendo.com/v3.0/artists/tracks?client_id=19482a65&amp;format=jsonpretty&amp;order=popularity_total&amp;id=%1$s</string>
-    <string name="tracksByAlbumNameJSONURL">http://api.jamendo.com/v3.0/albums/tracks?client_id=19482a65&amp;format=jsonpretty&amp;order=popularity_total&amp;namesearch=%1$s</string>
-    <string name="tracksByNameJSONURL">http://api.jamendo.com/v3.0/artists/tracks?client_id=19482a65&amp;format=jsonpretty&amp;order=popularity_total&amp;namesearch=%1$s</string>
+    <string name="tracksByNameJSONURL">http://api.jamendo.com/v3.0/tracks?client_id=19482a65&amp;format=jsonpretty&amp;order=popularity_total&amp;namesearch=%1$s</string>
     <string name="trackByIDURL">http://api.jamendo.com/v3.0/tracks/file?client_id=19482a65&amp;audioformat=mp31&amp;id=%1$s</string>
     <string name="trackInformation">http://api.jamendo.com/v3.0/tracks/?client_id=19482a65&amp;format=jsonpretty&amp;imagesize=300&amp;id=%1$s</string>
-    
-    <string name="radiosJSONURL">http://api.jamendo.com/v3.0/radios/?client_id=19482a65&amp;format=jsonpretty</string>
-    <string name="radioStreamJSONURL">http://api.jamendo.com/v3.0/radios/stream?client_id=19482a65&amp;format=jsonpretty&amp;id=%1$s</string>
 </resources>

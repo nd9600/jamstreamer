@@ -4,25 +4,25 @@
     android:layout_height="fill_parent"
     android:orientation="horizontal">
     <TextView
-        android:id="@+id/artists6_tracksHeader"
+        android:id="@+id/albums_by_nameHeader"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="#702f6f"
         android:paddingBottom="5dp"
         android:paddingTop="5dp"
         android:paddingLeft="5dp"
-        android:text="@string/tracksFound"
+        android:text="@string/albumsFound"
         android:textColor="#ffffff"
         android:textSize="32sp"
         android:textStyle="bold" />
     
     <ImageButton
-        android:id="@+id/artists6_btnPlaylist"
+        android:id="@+id/albums_by_name_btnPlaylist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
-        android:layout_alignBottom="@id/artists6_tracksHeader"
+        android:layout_alignBottom="@id/albums_by_nameHeader"
         android:paddingTop="5dp"
         android:background="@null"
         android:contentDescription="@string/playlistButton"

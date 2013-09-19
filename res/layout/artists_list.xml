@@ -5,7 +5,7 @@
     android:orientation="vertical">
 	
     <TextView
-        android:id="@+id/artists_names"
+        android:id="@+id/artists_list_artists_names"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/background_highlighter"
@@ -16,7 +16,7 @@
        android:paddingBottom="5dp" />
     
    <TextView
-        android:id="@+id/artists_ids"
+        android:id="@+id/artists_list_artists_ids"
         android:layout_width="0dp"
         android:layout_height="0dp" />
    

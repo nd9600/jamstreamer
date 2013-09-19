@@ -3,21 +3,20 @@
     package="com.leokomarov.jamstreamer"
     android:installLocation="auto"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="0.01" >
 
     <uses-sdk
         android:minSdkVersion="10"
         android:targetSdkVersion="18" />
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
    <application
         android:icon="@drawable/img_ic_launcher"
         android:label="@string/appName"
-        android:allowBackup="true"
-        android:theme="@style/android:Theme.Holo.Light"  >
+        android:allowBackup="true" 
+        android:theme="@style/Theme.Sherlock.Light">
         <activity
             android:name="com.leokomarov.jamstreamer.MainMenu"
             android:label="@string/appName" >
@@ -28,23 +27,38 @@
         </activity>
         
         <activity
-            android:label="JamStreamer - Artists search"
-            android:name="com.leokomarov.jamstreamer.artists.ArtistsSearch" >
+            android:label="JamStreamer - Artist search"
+            android:name="com.leokomarov.jamstreamer.searches.ArtistsSearch" >
         </activity>
         
         <activity
-            android:label="JamStreamer - Artists found"
-            android:name="com.leokomarov.jamstreamer.artists.ArtistsParser" >
+            android:label="JamStreamer - Artists"
+            android:name="com.leokomarov.jamstreamer.searches.ArtistsParser" >
         </activity>
         
         <activity
-            android:label="JamStreamer - Albums by artist"
-            android:name="com.leokomarov.jamstreamer.artists.AlbumsByArtist" >
+            android:label="JamStreamer - Album search"
+            android:name="com.leokomarov.jamstreamer.searches.AlbumsSearch" >
         </activity>
         
         <activity
-            android:label="JamStreamer - Tracks in album"
-            android:name="com.leokomarov.jamstreamer.artists.TracksByAlbum" >
+            android:label="JamStreamer - Track search"
+            android:name="com.leokomarov.jamstreamer.searches.TracksSearch" >
+        </activity>
+
+        <activity
+            android:label="JamStreamer - Albums"
+            android:name="com.leokomarov.jamstreamer.common.AlbumsByName" >
+        </activity>
+        
+        <activity
+            android:label="JamStreamer - Tracks"
+            android:name="com.leokomarov.jamstreamer.common.TracksByName" >
+        </activity>
+        
+        <activity
+            android:label="JamStreamer - Audio player"
+            android:name="com.leokomarov.jamstreamer.media_player.AudioPlayer" >
         </activity>
         
         <service
@@ -52,46 +66,8 @@
             android:label="JamStreamer - Audio player"
             android:name="com.leokomarov.jamstreamer.media_player.AudioPlayerService"
             android:exported="false" >
-            <intent-filter>
-                <action android:name="com.leokomarov.jamstreamer.media_player.AudioPlayerService.action.PLAY"/>
-            </intent-filter>
         </service>
-        
-        <activity
-            android:label="JamStreamer - Audio player"
-            android:name="com.leokomarov.jamstreamer.media_player.AudioPlayer" >
-        </activity>
-        
-        <activity
-            android:label="JamStreamer - Albums search"
-            android:name="com.leokomarov.jamstreamer.albums.AlbumsSearch" >
-        </activity>
-        
-        <activity
-            android:label="JamStreamer - Albums found"
-            android:name="com.leokomarov.jamstreamer.albums.AlbumsParser" >
-        </activity>
-        
-        <activity
-            android:label="JamStreamer - Tracks in album"
-            android:name="com.leokomarov.jamstreamer.albums.AlbumsSingleItem" >
-        </activity>
-        
-        <activity
-            android:label="JamStreamer - Tracks found"
-            android:name="com.leokomarov.jamstreamer.tracks.TracksSearch" >
-        </activity>
-        
-        <activity
-            android:label="JamStreamer - Tracks parser"
-            android:name="com.leokomarov.jamstreamer.tracks.TracksParser" >
-        </activity>
-        
-        <activity
-            android:label="JamStreamer - Track"
-            android:name="com.leokomarov.jamstreamer.tracks.TracksSingleItem" >
-        </activity>
-        
+
         <activity
             android:label="JamStreamer - Playlist"
             android:name="com.leokomarov.jamstreamer.playlist.PlaylistActivity" >
