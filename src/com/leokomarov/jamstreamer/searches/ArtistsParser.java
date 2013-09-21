@@ -9,7 +9,6 @@ import org.json.JSONObject;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,15 +73,13 @@ public class ArtistsParser extends SherlockListActivity implements JSONParser.Ca
 				artistList.add(map);
 			}
 		} catch (NullPointerException e) {
-			Log.e("ArtistsParser", "NullPointerException: " + e.getMessage(), e);
 		} catch (JSONException e) {
-			Log.e("ArtistsParser", "JSONException: " + e.getMessage(), e);
 		}
 		
-		if (json.isNull(TAG_RESULTS)){
+		if (json.has("results") && artistList.isEmpty()){
 			Toast.makeText(getApplicationContext(), "There are no artists matching this search", Toast.LENGTH_SHORT).show();
 		}
-		else if (json.isNull(TAG_RESULTS) && artistList.isEmpty()) {
+		else if (json.isNull("results")) {
         	Toast.makeText(getApplicationContext(), "Please retry, there has been an error downloading the artist list", Toast.LENGTH_SHORT).show();
         }
 		else {		

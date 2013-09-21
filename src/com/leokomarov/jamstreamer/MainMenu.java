@@ -28,7 +28,6 @@ public class MainMenu extends SherlockActivity {
         setContentView(R.layout.main_menu);       
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         
-        
         button_playlist = (ImageButton) findViewById(R.id.mainMenu_btnPlaylist);    	
     	button_playlist.setOnClickListener(new View.OnClickListener() {
     		@Override

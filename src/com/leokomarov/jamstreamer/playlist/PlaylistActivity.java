@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +31,6 @@ import com.leokomarov.jamstreamer.media_player.AudioPlayer;
 import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
 
 public class PlaylistActivity extends SherlockListActivity implements PlaylistAdapter.CallbackInterface {
-	private final String DEBUG = "PlaylistActivity";
 	private final String TAG_TRACKLIST = "trackListSaved";
 	private ArrayList<HashMap<String, String>> trackList = new ArrayList<HashMap<String, String>>();
 	private ListView PlaylistLV;
@@ -45,7 +43,6 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
     	if (savedInstanceState != null) {
         	@SuppressWarnings("unchecked")
 			ArrayList<HashMap<String, String>> trackList = (ArrayList<HashMap<String,String>>)savedInstanceState.get(TAG_TRACKLIST);
-        	Log.v(DEBUG, "Restoring trackList from savedInstanceState");
         	return trackList;
         } 
         else {
@@ -94,7 +91,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
     	setListAdapter(PlaylistListAdapter);
     	
     	PlaylistLV.setOnItemClickListener(new OnItemClickListener() {
-            @Override
+			@Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				int indexPosition = position - 1;
  
@@ -238,7 +235,6 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 	@Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
     	super.onSaveInstanceState(savedInstanceState);
-    	Log.v(DEBUG, "Saving trackList from savedInstanceState to savedInstanceState");
     	ArrayList<HashMap<String, String>> trackList = restoreTracklist(savedInstanceState);
     	savedInstanceState.putSerializable(TAG_TRACKLIST, trackList); 
     }

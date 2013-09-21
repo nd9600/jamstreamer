@@ -88,7 +88,7 @@ public class AudioPlayer extends SherlockActivity {
     	button_next.setClickable(false);
     	button_previous.setClickable(false);
 		
-		Intent audioService = new Intent(getApplicationContext(),AudioPlayerService.class);
+		Intent audioService = new Intent(getApplicationContext(), AudioPlayerService.class);
 		startService(audioService);
 		
 		button_play.setImageResource(R.drawable.button_pause);
@@ -199,7 +199,6 @@ public class AudioPlayer extends SherlockActivity {
 		button_next.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				
 				ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(AudioPlayer.this,
 					getString(R.string.trackPreferencesFile), MODE_PRIVATE);
 			    SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
@@ -221,7 +220,7 @@ public class AudioPlayer extends SherlockActivity {
 				        	
 							Intent audioServiceIntent = new Intent(getApplicationContext(),AudioPlayerService.class);
 			       			startService(audioServiceIntent);
-						}  
+						}
 					}
 				}
 				else if (AudioPlayerService.shuffleBoolean == true){
@@ -235,7 +234,7 @@ public class AudioPlayer extends SherlockActivity {
 			        	
 						Intent audioServiceIntent = new Intent(getApplicationContext(),AudioPlayerService.class);
 		        		startService(audioServiceIntent);
-					}  
+					}
 				}
 			}
 		

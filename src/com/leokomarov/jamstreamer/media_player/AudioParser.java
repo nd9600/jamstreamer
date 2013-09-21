@@ -19,14 +19,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
-import android.util.Log;
 
 public class AudioParser extends AsyncTask<String, Void, Bitmap> {
 
-	private static String DEBUG = "AudioParser";
-    static InputStream is = null;
-	static JSONObject jObj = null;
-	static String json = "";
+    InputStream is = null;
+	JSONObject jObj = null;
+	String json = "";
 	private static final String TAG_RESULTS = "results";
 	private static final String TAG_ALBUM_IMAGE = "album_image";
 	private static final String TAG_ARTIST_NAME = "artist_name";
@@ -45,13 +43,9 @@ public class AudioParser extends AsyncTask<String, Void, Bitmap> {
 	        conn.connect();
 	        is = conn.getInputStream();
 		} catch (NullPointerException e) {
-			Log.e("AudioParser", "NullPointerException: " + e.getMessage(), e);
 		} catch (UnsupportedEncodingException e) {
-			Log.e("AudioParser", "UnsupportedEncodingException: " + e.getMessage(), e);
 		} catch (ClientProtocolException e) {
-			Log.e("AudioParser", "ClientProtocolException: " + e.getMessage(), e);
 		} catch (IOException e) {
-			Log.e("AudioParser", "IOException: " + e.getMessage(), e);
 		}
 		
 		try {
@@ -64,13 +58,11 @@ public class AudioParser extends AsyncTask<String, Void, Bitmap> {
 			is.close();
 			json = sb.toString();
 		} catch (Exception e) {
-			Log.e("Buffer Error", "Error converting result " + e.toString());
 		}
 
 		try {
 			jObj = new JSONObject(json);
 		} catch (JSONException e) {
-		Log.e(DEBUG, "Error parsing data " + e.toString());
 		}
 		
     	JSONArray results = null;
@@ -105,11 +97,8 @@ public class AudioParser extends AsyncTask<String, Void, Bitmap> {
     			albumImage = BitmapFactory.decodeStream((InputStream)new URL(imageURL).getContent());
         	}		
 		} catch (JSONException e) {
-			Log.e(DEBUG, "JSONException " + e.toString());
 		} catch (MalformedURLException e) {
-			Log.e("MalformedURLException", "Wrong URL:  " + e.toString());
 		} catch (IOException e) {
-			Log.e("IOException ", "IOException: " + e.toString());
 		}
     	return albumImage;
     }

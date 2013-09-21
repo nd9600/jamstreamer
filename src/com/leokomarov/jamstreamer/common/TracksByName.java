@@ -12,7 +12,6 @@ import org.json.JSONObject;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,7 +62,6 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 		Intent intent = getIntent();
 		SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
 		String hierarchy = hierarchyPreference.getString("hierarchy", "none");
-		Log.v("TracksByName","hierarchy is " + hierarchy);
 		String searchTerm = new String();
 		String unformattedURL = new String();
 		if (hierarchy.equals("artists") || hierarchy.equals("albums")){
@@ -75,7 +73,6 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 			unformattedURL = getResources().getString(R.string.tracksByNameJSONURL);
 		}
 		String url = String.format(unformattedURL, searchTerm).replace("&amp;", "&");
-		Log.v("TracksByName","url is " + url);
 		JSONParser jParser = new JSONParser(this);
 		jParser.execute(url);
 	}
@@ -86,7 +83,6 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 			results = json.getJSONArray(TAG_RESULTS);
 			SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
 			String hierarchy = hierarchyPreference.getString("hierarchy", "none");
-			Log.v("TracksByName","hierarchy is " + hierarchy);
 			if (hierarchy.equals("artists") || hierarchy.equals("albums")){
 				for(int i = 0; i < results.length(); i++) {
 					JSONArray tracksArray = results.getJSONObject(i).getJSONArray("tracks");
@@ -132,16 +128,12 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 			}
 		} catch (NullPointerException e) {
 		} catch (JSONException e) {
-			Log.e("TracksByName","JSONException : " + e.getMessage(), e);
 		}
-		
-		Log.v("TracksByName","results.length() is " + results.length());
-		Log.v("TracksByName","json.isNull(TAG_RESULTS) is " + json.isNull(TAG_RESULTS));
-		
-		if (results.length() == 0){
+			
+		if (json.has("results") && trackList.isEmpty()){
 			Toast.makeText(getApplicationContext(), "There are no tracks matching this search", Toast.LENGTH_SHORT).show();
 		}
-		else if (json.isNull(TAG_RESULTS) && trackList.isEmpty()) {
+		else if (json.isNull("results")) {
         	Toast.makeText(getApplicationContext(), "Please retry, there has been an error downloading the track list", Toast.LENGTH_SHORT).show();
         }
 		else {
@@ -173,27 +165,31 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	    			@Override
 	    			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 	    				ArrayList<HashMap<String, String>> newTrackList = new ArrayList<HashMap<String, String>>();
+	    				SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
 	    				SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
 	    				String hierarchy = hierarchyPreference.getString("hierarchy", "none");
+    					
 	    				int indexPosition = 0;
-	    				if (trackPreferences.getObject("tracks", PlaylistList.class) != null){
+	    				int oldTrackListSize = 0;
+	    				if (trackPreferences.getObject("tracks", PlaylistList.class) != null && trackPreferences.getObject("tracks", PlaylistList.class).trackList.size() != 0){
 	    					newTrackList.addAll(trackPreferences.getObject("tracks", PlaylistList.class).trackList);
-	    					indexPosition = trackPreferences.getObject("tracks", PlaylistList.class).trackList.size();
+	    					oldTrackListSize = trackPreferences.getObject("tracks", PlaylistList.class).trackList.size();
 	    				}
+	    				
 	    				if (hierarchy.equals("artists") || hierarchy.equals("albums")){
 	    					newTrackList.addAll(trackList);
+	    					indexPosition = oldTrackListSize + position - 1;
 	    				}
 	    				else if (hierarchy.equals("tracks")){
 	    					newTrackList.add(trackList.get(position - 1));
+	    					indexPosition = oldTrackListSize;
 	    				}
-	    				indexPosition = indexPosition + position - 1;
-	    			
+	    				    				
 	    				PlaylistList trackPreferencesObject = new PlaylistList();
 	    				trackPreferencesObject.setTrackList(newTrackList);
 	    	    		trackPreferences.putObject("tracks", trackPreferencesObject);
 	    	    		trackPreferences.commit();
 	    	    	    				    	        
-	    				SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
 	    	    		SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
 	    	    		indexPositionEditor.putInt("indexPosition", indexPosition);
 	    	    		indexPositionEditor.commit();
@@ -262,15 +258,15 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 					 }
 				}
 				ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(TracksByName.this,
-	    	    		getString(R.string.trackPreferencesFile), MODE_PRIVATE);;
-				PlaylistList trackPreferencesObject = trackPreferences.getObject("tracks", PlaylistList.class);
+	    	    	getString(R.string.trackPreferencesFile), MODE_PRIVATE);;
 				
 				ArrayList<HashMap<String, String>> newTrackList = new ArrayList<HashMap<String, String>>();
     	    	if (trackPreferences.getObject("tracks", PlaylistList.class) != null){
     	    		newTrackList.addAll(trackPreferences.getObject("tracks", PlaylistList.class).trackList);
     	    	}
-    	    	
     	    	newTrackList.addAll(tracksToAddList);
+    	    	
+    	    	PlaylistList trackPreferencesObject = new PlaylistList(); 
 				trackPreferencesObject.setTrackList(newTrackList);
 				trackPreferences.putObject("tracks", trackPreferencesObject);
 				trackPreferences.commit();

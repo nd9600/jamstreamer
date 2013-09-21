@@ -22,7 +22,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -62,6 +61,7 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 	private ArrayAdapter<AlbumsByNameModel>AlbumsByNameListAdapter;
 	private List<AlbumsByNameModel> AlbumsByNameModel = new ArrayList<AlbumsByNameModel>();
 	protected static ActionMode mActionMode;
+	private JSONArray results;
 	private ArrayList<HashMap<String, String>> albumList = new ArrayList<HashMap<String, String>>();
 	private ArrayList<HashMap<String, String>> trackList = new ArrayList<HashMap<String, String>>();
 	private ImageButton button_playlist;
@@ -96,7 +96,7 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 	@Override
 	public void onRequestCompleted(JSONObject json) {
 		try {
-			JSONArray results = json.getJSONArray(TAG_RESULTS);
+			results = json.getJSONArray(TAG_RESULTS);
 			SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
 			String hierarchy = hierarchyPreference.getString("hierarchy", "none");
 			if (hierarchy.equals("artists")){
@@ -130,12 +130,12 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 		} catch (JSONException e) {
 		}
 		
-		if (json.isNull(TAG_RESULTS)){
+		if (json.has("results") && albumList.isEmpty()){
 			Toast.makeText(getApplicationContext(), "There are no albums matching this search", Toast.LENGTH_SHORT).show();
 		}
-		else if (json.isNull(TAG_RESULTS) && albumList.isEmpty()){
-			Toast.makeText(getApplicationContext(), "Please retry, there has been an error downloading the album list", Toast.LENGTH_SHORT).show();
-		}
+		else if (json.isNull("results")) {
+        	Toast.makeText(getApplicationContext(), "Please retry, there has been an error downloading the album list", Toast.LENGTH_SHORT).show();
+        }
 		else {	
 			AlbumsByNameLV = getListView();
 			LayoutInflater inflater = getLayoutInflater();
@@ -298,6 +298,7 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
                 	Toast.makeText(getApplicationContext(),albumsToAddLoop + " albums added to the playlist", Toast.LENGTH_LONG).show();
                 }
     	    }
+		} catch (NullPointerException e) {		
 		} catch (JSONException e) {		
 		}
 	}
@@ -337,7 +338,6 @@ class AlbumsByNameTrackParser extends AsyncTask<String, Void, JSONObject>  {
         	String json = "";
         	String myURL = urls[0];
         	URL url = new URL(myURL);
-        	Log.v("AlbumsByName","url is " + url);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 	        conn.setReadTimeout(10000 /* milliseconds */);
 	        conn.setConnectTimeout(15000 /* milliseconds */);
@@ -358,13 +358,9 @@ class AlbumsByNameTrackParser extends AsyncTask<String, Void, JSONObject>  {
         } catch (SocketTimeoutException e) {
         } catch (JSONException e) {
 		} catch (UnsupportedEncodingException e) {
-			Log.e("AlbumsByName", "UnsupportedEncodingException: " + e.getMessage(), e);  
 		} catch (ClientProtocolException e) {
-			Log.e("AlbumsByName", "ClientProtocolException: " + e.getMessage(), e);  
 		} catch (IOException e) {
-			Log.e("AlbumsByName", "IOException: " + e.getMessage(), e);  
 		} catch (Exception e) {
-			Log.e("AlbumsByName", "Exception: " + e.getMessage(), e);
 		}       
         return jObj;
     }

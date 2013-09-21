@@ -14,7 +14,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 public class JSONParser extends AsyncTask<String, Void, JSONObject>  {
     static InputStream is = null;
@@ -35,11 +34,8 @@ public class JSONParser extends AsyncTask<String, Void, JSONObject>  {
 	        is = conn.getInputStream();
 		} catch (SocketTimeoutException e) {
 		} catch (UnsupportedEncodingException e) {
-			Log.e("JSONParser", "ClientProtocolException: " + e.getMessage(), e);
 		} catch (ClientProtocolException e) {
-			Log.e("JSONParser", "ClientProtocolException: " + e.getMessage(), e);
 		} catch (IOException e) {
-			e.printStackTrace();
 		}
 		
 		try {
@@ -52,13 +48,11 @@ public class JSONParser extends AsyncTask<String, Void, JSONObject>  {
 			is.close();
 			json = sb.toString();
 		} catch (Exception e) {
-			Log.e("JSONParser", "Error converting result " + e.toString());
 		}
 
 		try {
 			jObj = new JSONObject(json);
 		} catch (JSONException e) {
-			Log.e("JSONParser", "JSONException: " + e.getMessage(), e);
 		}
 		return jObj;
     }
