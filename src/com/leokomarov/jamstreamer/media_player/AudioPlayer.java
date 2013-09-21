@@ -59,8 +59,7 @@ public class AudioPlayer extends SherlockActivity {
     	}
     }
 	
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	public void afterIntent(){
         setContentView(R.layout.audio_player);	
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         unshuffledTrackList = getTrackListFromPreferences();
@@ -278,7 +277,25 @@ public class AudioPlayer extends SherlockActivity {
 		        updateProgressBar();
 		    }
 		});
-
+	}
+	
+	@Override
+	public void onNewIntent(Intent intent){
+		super.onNewIntent(intent);
+		setIntent(intent);
+		
+		Boolean fromNotication = intent.getBooleanExtra("fromNotification", false);
+		if (! fromNotication){
+			afterIntent();
+		}
+	}
+	
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		Boolean fromNotication = getIntent().getBooleanExtra("fromNotification", false);
+		if (! fromNotication){
+			afterIntent();
+		}
 	}
 
 	private static Runnable mUpdateTime = new Runnable() {

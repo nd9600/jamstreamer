@@ -100,7 +100,8 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             builder.setContentTitle("JamStreamer");  
             builder.setContentText("Playing " + trackName + " - " + artistName);  
             Intent notificationIntent = new Intent(this, AudioPlayer.class);  
-            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            notificationIntent.putExtra("fromNotification", true);
             PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);  
             builder.setContentIntent(contentIntent);
         	startForeground(46798, builder.getNotification());
@@ -147,18 +148,15 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         }
     	else {
         	if (trackID == currentTrackID ){
-        		String unformattedTrackInfoURL = getResources().getString(R.string.trackInformation);
-       	    	String trackInfoURL = String.format(unformattedTrackInfoURL, trackID).replace("&amp;", "&");
        			String trackName = trackList.get(indexPosition).get("trackName");
        	        String trackDuration = trackList.get(indexPosition).get("trackDuration");
        	        String artistName = trackList.get(indexPosition).get("trackArtist");
        	        String albumName = trackList.get(indexPosition).get("trackAlbum");
-       	        
        	        AudioPlayer.songTitleLabel.setText(trackName + " - " + artistName);
        			AudioPlayer.albumLabel.setText(albumName);
        			AudioPlayer.songTotalDurationLabel.setText(trackDuration);
-       	    	AudioParser jParser = new AudioParser();
-       			jParser.execute(trackInfoURL, trackName + " - " + artistName);
+       			AudioPlayer.albumArt.setImageBitmap(AudioParser.albumImageStore);
+
        			mp.seekTo(0);       			
         	}
         	else {
@@ -180,7 +178,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     
     @Override
     public void onPrepared(MediaPlayer mp) {
-		
 		int audioFocusResult = audioManager.requestAudioFocus(onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 		if (audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
 			originalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);

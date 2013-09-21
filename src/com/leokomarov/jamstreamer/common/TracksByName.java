@@ -199,6 +199,8 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	    	    		}
 	    	        
 	    				Intent in = new Intent(getApplicationContext(), AudioPlayer.class);
+	    				in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+	    				in.putExtra("fromNotification", false);
 	    				startActivityForResult(in, 2);	
 	    			}
 	    		});

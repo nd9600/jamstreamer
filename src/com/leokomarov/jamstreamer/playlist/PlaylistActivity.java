@@ -104,8 +104,9 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
                 	AudioPlayerService.shuffleBoolean = false;
                 	AudioPlayer.button_shuffle.setImageResource(R.drawable.img_repeat_default);
     	    	}
-    	        
     			Intent in = new Intent(getApplicationContext(), AudioPlayer.class);
+    			in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    			in.putExtra("fromNotification", false);
     			startActivityForResult(in, 1);
                 finish();
             }

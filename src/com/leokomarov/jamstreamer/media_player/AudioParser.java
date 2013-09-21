@@ -29,6 +29,7 @@ public class AudioParser extends AsyncTask<String, Void, Bitmap> {
 	private static final String TAG_ALBUM_IMAGE = "album_image";
 	private static final String TAG_ARTIST_NAME = "artist_name";
 	private static final String TAG_ALBUM_NAME = "album_name";
+	protected static Bitmap albumImageStore;
 
 	@Override
     protected Bitmap doInBackground(String... parameters) {
@@ -95,7 +96,11 @@ public class AudioParser extends AsyncTask<String, Void, Bitmap> {
 
      		if (albumImageDrawable == null || ! audioPlayer_artistAndAlbum.equals(artistAndAlbum) ){
     			albumImage = BitmapFactory.decodeStream((InputStream)new URL(imageURL).getContent());
-        	}		
+    			albumImageStore = albumImage;
+        	}
+     		else if(albumImageDrawable != null){
+     			albumImageStore = ((BitmapDrawable)AudioPlayer.albumArt.getDrawable()).getBitmap();
+     		}
 		} catch (JSONException e) {
 		} catch (MalformedURLException e) {
 		} catch (IOException e) {
