@@ -1,6 +1,7 @@
 package com.leokomarov.jamstreamer.common;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -28,6 +29,7 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.leokomarov.jamstreamer.ComplexPreferences;
 import com.leokomarov.jamstreamer.JSONParser;
@@ -130,11 +132,11 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 		} catch (JSONException e) {
 		}
 			
-		if (json.has("results") && trackList.isEmpty()){
-			Toast.makeText(getApplicationContext(), "There are no tracks matching this search", Toast.LENGTH_SHORT).show();
+		if (json == null || json.isNull("results")) {
+	        Toast.makeText(getApplicationContext(), "Please retry, there has been an error downloading the track list", Toast.LENGTH_SHORT).show();
 		}
-		else if (json.isNull("results")) {
-        	Toast.makeText(getApplicationContext(), "Please retry, there has been an error downloading the track list", Toast.LENGTH_SHORT).show();
+		else if (json.has("results") && trackList.isEmpty()){
+			Toast.makeText(getApplicationContext(), "There are no tracks matching this search", Toast.LENGTH_SHORT).show();
         }
 		else {
 			TracksByNameLV = getListView();
@@ -159,7 +161,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	                	Intent button_playlistIntent = new Intent(getApplicationContext(), PlaylistActivity.class);
 	                	startActivityForResult(button_playlistIntent, 1);
 	            	}
-			});
+	    		});
 	    	
 	    		TracksByNameLV.setOnItemClickListener(new OnItemClickListener() {
 	    			@Override
@@ -189,6 +191,12 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	    				trackPreferencesObject.setTrackList(newTrackList);
 	    	    		trackPreferences.putObject("tracks", trackPreferencesObject);
 	    	    		trackPreferences.commit();
+	    	    				
+	            		Collections.shuffle(newTrackList);
+	            		PlaylistList shuffledTrackListObject = new PlaylistList();
+	            		shuffledTrackListObject.setTrackList(trackList);  
+	            		trackPreferences.putObject("shuffledTracks", shuffledTrackListObject);
+	            		trackPreferences.commit();
 	    	    	    				    	        
 	    	    		SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
 	    	    		indexPositionEditor.putInt("indexPosition", indexPosition);
@@ -237,7 +245,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
 		@Override 
 	    	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-	    		com.actionbarsherlock.view.MenuInflater inflater = getSupportMenuInflater();
+	    		MenuInflater inflater = getSupportMenuInflater();
 	        	inflater.inflate(R.menu.tracks_contextual_menu, menu);
 	        	return true;
 	      }

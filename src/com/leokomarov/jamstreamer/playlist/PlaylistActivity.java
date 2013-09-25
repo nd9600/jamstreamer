@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.leokomarov.jamstreamer.ComplexPreferences;
 import com.leokomarov.jamstreamer.R;
@@ -39,7 +40,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 	protected static ActionMode mActionMode;
 	
 	//See ComplexPreferences docs on Github
-    protected ArrayList<HashMap<String, String>> restoreTracklist(Bundle savedInstanceState){
+    private ArrayList<HashMap<String, String>> restoreTracklist(Bundle savedInstanceState){
     	if (savedInstanceState != null) {
         	@SuppressWarnings("unchecked")
 			ArrayList<HashMap<String, String>> trackList = (ArrayList<HashMap<String,String>>)savedInstanceState.get(TAG_TRACKLIST);
@@ -58,8 +59,21 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
         	
         }
     }
-      
-	@Override
+    
+	private void shuffleTrackList(){
+		ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
+			getString(R.string.trackPreferencesFile), MODE_PRIVATE);	
+		PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("tracks", PlaylistList.class);
+		ArrayList<HashMap<String, String>> trackList = shuffledTrackPreferencesObject.trackList;
+		
+		Collections.shuffle(trackList);
+		PlaylistList shuffledTrackListObject = new PlaylistList();
+		shuffledTrackListObject.setTrackList(trackList);  
+		trackPreferences.putObject("shuffledTracks", shuffledTrackListObject);
+		trackPreferences.commit();
+	}
+    
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);     
@@ -141,8 +155,8 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 	
 	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
 		@Override 
-	    public boolean onCreateActionMode(com.actionbarsherlock.view.ActionMode mode, com.actionbarsherlock.view.Menu menu) {
-	    	com.actionbarsherlock.view.MenuInflater inflater = getSupportMenuInflater();
+	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+	    	MenuInflater inflater = getSupportMenuInflater();
 	        inflater.inflate(R.menu.playlist_contextual_menu, menu);
 	        return true;
 	        }
@@ -176,6 +190,10 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 					trackListObject.setTrackList(trackList);
 					trackPreferences.putObject("tracks", trackListObject);
 					trackPreferences.commit();
+					
+					if (trackList != null && ! trackList.isEmpty()){
+						shuffleTrackList();
+					}
 					PlaylistModel.clear();
 					
 					for (HashMap<String, String> map : trackList) {
@@ -202,7 +220,11 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 					trackPreferences.putObject("tracks", trackListObject);
 					trackPreferences.commit();
 					
+					if (trackList != null && ! trackList.isEmpty()){
+						shuffleTrackList();
+					}
 					PlaylistModel.clear();
+					
 					PlaylistAdapter.PlaylistCheckboxList.clear();
 			    	PlaylistAdapter.PlaylistCheckboxCount = 0;
 					PlaylistListAdapter.notifyDataSetChanged();
@@ -240,7 +262,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
     	savedInstanceState.putSerializable(TAG_TRACKLIST, trackList); 
     }
     
-	public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) { 
+	public boolean onOptionsItemSelected(MenuItem item) { 
 	        int itemId = item.getItemId();
 			if (itemId == android.R.id.home) {
 				onBackPressed();

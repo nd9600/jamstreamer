@@ -3,7 +3,6 @@ package com.leokomarov.jamstreamer.media_player;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Random;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,8 +24,6 @@ import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
 
 public class AudioPlayer extends SherlockActivity {
-	private ArrayList<HashMap<String, String>> unshuffledTrackList = new ArrayList<HashMap<String, String>>();
-	
 	protected static ImageButton button_play;
 	protected static ImageButton button_forward;
 	protected static ImageButton button_backward;
@@ -58,13 +55,12 @@ public class AudioPlayer extends SherlockActivity {
     		return null;
     	}
     }
-	
+		
 	public void afterIntent(){
-        setContentView(R.layout.audio_player);	
+		setContentView(R.layout.audio_player);	
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        unshuffledTrackList = getTrackListFromPreferences();
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
-        
+		setVolumeControlStream(AudioManager.STREAM_MUSIC);
+		
 		button_play = (ImageButton) findViewById(R.id.btnPlay);
 		button_forward = (ImageButton) findViewById(R.id.btnForward);
 		button_backward = (ImageButton) findViewById(R.id.btnBackward);
@@ -86,12 +82,15 @@ public class AudioPlayer extends SherlockActivity {
     	button_backward.setClickable(false);
     	button_next.setClickable(false);
     	button_previous.setClickable(false);
+    	
+    	if (AudioPlayerService.repeatBoolean == true){
+    		button_repeat.setImageResource(R.drawable.img_repeat_focused);
+    	}
+
+    	if (AudioPlayerService.shuffleBoolean == true){
+    		button_shuffle.setImageResource(R.drawable.img_shuffle_focused);
+    	}
 		
-		Intent audioService = new Intent(getApplicationContext(), AudioPlayerService.class);
-		startService(audioService);
-		
-		button_play.setImageResource(R.drawable.button_pause);
-	    
 		button_playlist.setOnClickListener(new View.OnClickListener() {
 			@Override
             public void onClick(View v) {
@@ -142,29 +141,7 @@ public class AudioPlayer extends SherlockActivity {
                 }
                 else {
 					AudioPlayerService.shuffleBoolean = true;
-					button_shuffle.setImageResource(R.drawable.img_shuffle_focused);
-					
-					ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(AudioPlayer.this,
-						getString(R.string.trackPreferencesFile), MODE_PRIVATE);
-					PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
-
-					if (shuffledTrackPreferencesObject == null || ! unshuffledTrackList.equals(getTrackListFromPreferences()) ){
-						if (! unshuffledTrackList.equals(getTrackListFromPreferences()) ){
-							unshuffledTrackList = getTrackListFromPreferences();
-						}
-						ArrayList<HashMap<String, String>> shuffledTrackList = getTrackListFromPreferences();
-						Random randomNumber = new Random();
-						for (int i = 0; i < shuffledTrackList.size(); i++) {
-							int changeTo = i + randomNumber.nextInt(shuffledTrackList.size() - i);
-							shuffledTrackList.set(i, shuffledTrackList.get(changeTo));
-							shuffledTrackList.set(changeTo, shuffledTrackList.get(i));
-						}
-            	    
-						PlaylistList trackListObject = new PlaylistList();
-						trackListObject.setTrackList(shuffledTrackList);  
-						trackPreferences.putObject("shuffledTracks", trackListObject);
-						trackPreferences.commit();
-					}
+					button_shuffle.setImageResource(R.drawable.img_shuffle_focused);					
                 }
             }
 		});
@@ -209,8 +186,7 @@ public class AudioPlayer extends SherlockActivity {
 						int indexPosition = indexPositionPreference.getInt("indexPosition", -1);
 					
 						if (AudioPlayerService.repeatBoolean == true){
-							Intent audioServiceIntent = new Intent(getApplicationContext(),AudioPlayerService.class);
-			       			startService(audioServiceIntent);
+							AudioPlayerService.mp.seekTo(0);
 						}
 						else if (indexPosition + 1 <= trackList.size() - 1){
 							indexPosition++;
@@ -222,9 +198,9 @@ public class AudioPlayer extends SherlockActivity {
 						}
 					}
 				}
-				else if (AudioPlayerService.shuffleBoolean == true){
-					PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
-					ArrayList<HashMap<String, String>> shuffledTracklist = shuffledTrackPreferencesObject.trackList;
+				else if (AudioPlayerService.shuffleBoolean == true){					
+					PlaylistList newShuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);		
+					ArrayList<HashMap<String, String>> shuffledTracklist = newShuffledTrackPreferencesObject.trackList;
 					int shuffledIndexPosition = indexPositionPreference.getInt("shuffledIndexPosition", -1);
 					if (shuffledIndexPosition + 1 <= shuffledTracklist.size() - 1){
 						shuffledIndexPosition++;
@@ -283,18 +259,25 @@ public class AudioPlayer extends SherlockActivity {
 	public void onNewIntent(Intent intent){
 		super.onNewIntent(intent);
 		setIntent(intent);
+		afterIntent();
 		
 		Boolean fromNotication = intent.getBooleanExtra("fromNotification", false);
 		if (! fromNotication){
-			afterIntent();
+			Intent audioService = new Intent(getApplicationContext(), AudioPlayerService.class);
+			startService(audioService);
+			button_play.setImageResource(R.drawable.button_pause);
 		}
 	}
 	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		afterIntent();     
 		Boolean fromNotication = getIntent().getBooleanExtra("fromNotification", false);
 		if (! fromNotication){
-			afterIntent();
+			Intent audioService = new Intent(getApplicationContext(), AudioPlayerService.class);
+			startService(audioService);
+			button_play.setImageResource(R.drawable.button_pause);
 		}
 	}
 

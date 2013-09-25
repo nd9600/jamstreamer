@@ -9,6 +9,7 @@ import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -18,6 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -130,11 +132,11 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 		} catch (JSONException e) {
 		}
 		
-		if (json.has("results") && albumList.isEmpty()){
-			Toast.makeText(getApplicationContext(), "There are no albums matching this search", Toast.LENGTH_SHORT).show();
+		if (json == null || json.isNull("results")) {
+	        Toast.makeText(getApplicationContext(), "Please retry, there has been an error downloading the album list", Toast.LENGTH_SHORT).show();
 		}
-		else if (json.isNull("results")) {
-        	Toast.makeText(getApplicationContext(), "Please retry, there has been an error downloading the album list", Toast.LENGTH_SHORT).show();
+		else if (json.has("results") && albumList.isEmpty()){
+			Toast.makeText(getApplicationContext(), "There are no albums matching this search", Toast.LENGTH_SHORT).show();
         }
 		else {	
 			AlbumsByNameLV = getListView();
@@ -226,7 +228,8 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 						String unformattedURL = getResources().getString(R.string.tracksByAlbumIDJSONURL);
 				    	String url = String.format(unformattedURL, albumID).replace("&amp;", "&");
 				    	
-				    	AlbumsByNameTrackParser trackParser = new AlbumsByNameTrackParser(AlbumsByName.this);
+				    	Toast.makeText(getApplicationContext(), "Adding album, please wait", Toast.LENGTH_SHORT).show();
+				    	AlbumsByNameTrackParser trackParser = new AlbumsByNameTrackParser(AlbumsByName.this, getApplicationContext());
 						trackParser.execute(url);     		    		                				
 					 }
 				}
@@ -291,6 +294,13 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
         		trackPreferencesObject.setTrackList(newTrackList);
         	    trackPreferences.putObject("tracks", trackPreferencesObject);
         	    trackPreferences.commit();
+        		
+        		Collections.shuffle(newTrackList);
+        		PlaylistList shuffledTrackListObject = new PlaylistList();
+        		shuffledTrackListObject.setTrackList(newTrackList);  
+        		trackPreferences.putObject("shuffledTracks", shuffledTrackListObject);
+        		trackPreferences.commit();
+    	    
     	    	button_playlist.setClickable(true);
     	    	if (albumsToAddLoop == 1){
             		Toast.makeText(getApplicationContext(),"1 album added to the playlist", Toast.LENGTH_LONG).show();
@@ -330,6 +340,19 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 }
 
 class AlbumsByNameTrackParser extends AsyncTask<String, Void, JSONObject>  {
+	Context context;
+	
+	public interface CallbackInterface {
+        public void onTrackRequestCompleted(JSONObject json);
+    }
+	
+	private CallbackInterface mCallback;
+
+    public AlbumsByNameTrackParser(CallbackInterface callback, Context context) {
+        mCallback = callback;
+        this.context = context;
+    }
+	
 	@Override
     protected JSONObject doInBackground(String... urls) {
 		JSONObject jObj = null;
@@ -356,6 +379,7 @@ class AlbumsByNameTrackParser extends AsyncTask<String, Void, JSONObject>  {
 			json = sb.toString();
             jObj = new JSONObject(json);
         } catch (SocketTimeoutException e) {
+        	Toast.makeText(this.context, "Jamendo has timed out, please retry", Toast.LENGTH_SHORT).show();
         } catch (JSONException e) {
 		} catch (UnsupportedEncodingException e) {
 		} catch (ClientProtocolException e) {
@@ -363,16 +387,6 @@ class AlbumsByNameTrackParser extends AsyncTask<String, Void, JSONObject>  {
 		} catch (Exception e) {
 		}       
         return jObj;
-    }
-	
-	public interface CallbackInterface {
-        public void onTrackRequestCompleted(JSONObject json);
-    }
-	
-	private CallbackInterface mCallback;
-
-    public AlbumsByNameTrackParser(CallbackInterface callback) {
-        mCallback = callback;
     }
 			   
     @Override

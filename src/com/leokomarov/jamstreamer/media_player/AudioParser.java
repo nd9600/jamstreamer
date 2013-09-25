@@ -17,18 +17,14 @@ import org.json.JSONObject;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 
 public class AudioParser extends AsyncTask<String, Void, Bitmap> {
-
     InputStream is = null;
 	JSONObject jObj = null;
 	String json = "";
 	private static final String TAG_RESULTS = "results";
 	private static final String TAG_ALBUM_IMAGE = "album_image";
-	private static final String TAG_ARTIST_NAME = "artist_name";
-	private static final String TAG_ALBUM_NAME = "album_name";
 	protected static Bitmap albumImageStore;
 
 	@Override
@@ -70,15 +66,9 @@ public class AudioParser extends AsyncTask<String, Void, Bitmap> {
     	Bitmap albumImage = null;
     	try {
     		results = jObj.getJSONArray(TAG_RESULTS);
-    		JSONObject trackInfo = results.getJSONObject(0);
+    		JSONObject trackInfo = results.getJSONObject(0);   	
     		
     		String imageURL = trackInfo.getString(TAG_ALBUM_IMAGE);
-    		String artistName = trackInfo.getString(TAG_ARTIST_NAME);
-    		String albumName = trackInfo.getString(TAG_ALBUM_NAME);
-    		String artistAndAlbum = artistName + " - " + albumName;
-    		String audioPlayer_artistAndAlbum = parameters[1];
-    		BitmapDrawable albumImageDrawable = ((BitmapDrawable)AudioPlayer.albumArt.getDrawable());
-    		
     		double screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
     		double screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
     		double screenDensityDPI = Resources.getSystem().getDisplayMetrics().densityDpi;
@@ -94,13 +84,8 @@ public class AudioParser extends AsyncTask<String, Void, Bitmap> {
 				imageURL = imageURL.replace("300.jpg", "500.jpg");
 			}
 
-     		if (albumImageDrawable == null || ! audioPlayer_artistAndAlbum.equals(artistAndAlbum) ){
-    			albumImage = BitmapFactory.decodeStream((InputStream)new URL(imageURL).getContent());
-    			albumImageStore = albumImage;
-        	}
-     		else if(albumImageDrawable != null){
-     			albumImageStore = ((BitmapDrawable)AudioPlayer.albumArt.getDrawable()).getBitmap();
-     		}
+   			albumImage = BitmapFactory.decodeStream((InputStream)new URL(imageURL).getContent());
+   			albumImageStore = albumImage;
 		} catch (JSONException e) {
 		} catch (MalformedURLException e) {
 		} catch (IOException e) {
@@ -110,9 +95,7 @@ public class AudioParser extends AsyncTask<String, Void, Bitmap> {
 			   
 	@Override
     protected void onPostExecute(Bitmap albumImage) {
-		if(albumImage != null){
-			AudioPlayer.albumArt.setImageBitmap(albumImage);
-		}
+		AudioPlayer.albumArt.setImageBitmap(albumImage);
     }
     	
 }

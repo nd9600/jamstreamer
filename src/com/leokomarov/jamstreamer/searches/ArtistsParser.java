@@ -76,11 +76,11 @@ public class ArtistsParser extends SherlockListActivity implements JSONParser.Ca
 		} catch (JSONException e) {
 		}
 		
-		if (json.has("results") && artistList.isEmpty()){
-			Toast.makeText(getApplicationContext(), "There are no artists matching this search", Toast.LENGTH_SHORT).show();
+		if (json == null || json.isNull("results")) {
+	        Toast.makeText(getApplicationContext(), "Please retry, there has been an error downloading the artist list", Toast.LENGTH_SHORT).show();
 		}
-		else if (json.isNull("results")) {
-        	Toast.makeText(getApplicationContext(), "Please retry, there has been an error downloading the artist list", Toast.LENGTH_SHORT).show();
+		else if (json.has("results") && artistList.isEmpty()){
+			Toast.makeText(getApplicationContext(), "There are no artists matching this search", Toast.LENGTH_SHORT).show();
         }
 		else {		
 			ListView lv = getListView();

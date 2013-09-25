@@ -10,6 +10,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaPlayer;
@@ -35,6 +36,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 	private static int originalVolume;
 	protected static boolean repeatBoolean;
 	public static boolean shuffleBoolean;
+	private String artistAndAlbumStore = "";
 
 	private ArrayList<HashMap<String, String>> getTrackListFromPreferences(){
     	ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
@@ -75,13 +77,21 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         String artistName = trackList.get(indexPosition).get("trackArtist");
         String trackDuration = trackList.get(indexPosition).get("trackDuration");
         String albumName = trackList.get(indexPosition).get("trackAlbum");
+        String artistAndAlbum = artistName + " - "  + albumName;
         
         AudioPlayer.songTitleLabel.setText(trackName + " - " + artistName);
 		AudioPlayer.albumLabel.setText(albumName);
 		AudioPlayer.songTotalDurationLabel.setText(trackDuration);
-    	
-    	AudioParser jParser = new AudioParser();
-		jParser.execute(trackInfoURL, trackName + " - " + artistName);
+		if (AudioParser.albumImageStore != null){
+			AudioPlayer.albumArt.setImageBitmap(AudioParser.albumImageStore);
+		}
+		BitmapDrawable albumImageDrawable = ((BitmapDrawable)AudioPlayer.albumArt.getDrawable());
+		
+		if (albumImageDrawable == null | ! artistAndAlbumStore.equals(artistAndAlbum)){
+			AudioParser jParser = new AudioParser();
+			jParser.execute(trackInfoURL, artistName + " - "  + albumName);
+			artistAndAlbumStore = artistName + " - "  + albumName;
+		}
           	
     	mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
     	try {
@@ -98,7 +108,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     		NotificationCompat.Builder builder = new NotificationCompat.Builder(this);  
         	builder.setSmallIcon(R.drawable.img_ic_launcher);
             builder.setContentTitle("JamStreamer");  
-            builder.setContentText("Playing " + trackName + " - " + artistName);  
+            builder.setContentText("" + trackName + " - " + artistName);  
             Intent notificationIntent = new Intent(this, AudioPlayer.class);  
             notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             notificationIntent.putExtra("fromNotification", true);
@@ -186,7 +196,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 	        AudioPlayer.songProgressBar.setProgress(0);
 	        AudioPlayer.songProgressBar.setMax(mp.getDuration() / 1000);
 	        AudioPlayer.updateProgressBar();
-		}		
+		}
         AudioPlayer.button_play.setClickable(true);
         AudioPlayer.button_forward.setClickable(true);
         AudioPlayer.button_backward.setClickable(true);
@@ -202,11 +212,12 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     	AudioPlayer.button_next.setClickable(false);
         AudioPlayer.button_previous.setClickable(false);
     	AudioPlayer.button_play.setImageResource(R.drawable.button_play);
+    	stopForeground(true);
     	
     	if ( mp.isPlaying() ){
     		mp.stop();
-    		stopForeground(true);
     	}
+    	mp.reset();
         audioManager.abandonAudioFocus(onAudioFocusChangeListener);
         wifiLock.release();
 
@@ -221,7 +232,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 				int indexPosition = indexPositionPreference.getInt("indexPosition", -1);
 			
 				if (repeatBoolean == true){
-					playSong(indexPosition);
+					mp.seekTo(0);
 				}
 				else if (indexPosition + 1 <= trackList.size() - 1){
 					indexPosition++;
