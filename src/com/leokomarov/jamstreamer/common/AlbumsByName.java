@@ -90,7 +90,7 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 			unformattedURL = getResources().getString(R.string.albumsByNameJSONURL);
 		}
 		
-    		String url = String.format(unformattedURL, searchTerm).replace("&amp;", "&");
+    	String url = String.format(unformattedURL, searchTerm).replace("&amp;", "&");
 		JSONParser jParser = new JSONParser(this);
 		jParser.execute(url);
 	}
@@ -104,12 +104,14 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 			if (hierarchy.equals("artists")){
 				for(int i = 0; i < results.length(); i++) {
 					JSONArray albumsArray = results.getJSONObject(i).getJSONArray("albums");
+					String artistName = results.getJSONObject(i).getString("name");
 					for(int j = 0; j < albumsArray.length(); j++) {
 						JSONObject albumInfo = albumsArray.getJSONObject(j);
 						
 						HashMap<String, String> map = new HashMap<String, String>();
 						String albumName = albumInfo.getString(TAG_ALBUM_NAME);
-						String albumID = albumInfo.getString(TAG_ALBUM_ID);		
+						String albumID = albumInfo.getString(TAG_ALBUM_ID);
+						map.put("albumArtist", artistName);
 						map.put(TAG_ALBUM_NAME, albumName);
 						map.put(TAG_ALBUM_ID, albumID);
 						albumList.add(map);
@@ -121,8 +123,10 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 					JSONObject albumInfo= results.getJSONObject(i);
 					
 					HashMap<String, String> map = new HashMap<String, String>();
+					String artistName = albumInfo.getString(TAG_ARTIST_NAME);
 					String albumName = albumInfo.getString(TAG_ALBUM_NAME);
 					String albumID = albumInfo.getString(TAG_ALBUM_ID);		
+					map.put("albumArtist", artistName);
 					map.put(TAG_ALBUM_NAME, albumName);
 					map.put(TAG_ALBUM_ID, albumID);
 					albumList.add(map);

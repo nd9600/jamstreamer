@@ -28,6 +28,10 @@ class TracksByNameModel {
 	  public String getTrackNameAndDuration(){
 		  return trackMap.get("trackName") + " - " + trackMap.get("trackDuration");
 	  }
+	  
+	  public String getTrackArtistAndAlbum(){
+		  return trackMap.get("trackArtist") + " - " + trackMap.get("trackAlbum");
+	  }
 	  	  
 	  public boolean isSelected() {
 		  return selected;
@@ -60,6 +64,7 @@ public class TracksByNameAdapter extends ArrayAdapter<TracksByNameModel> {
 
 	static class ViewHolder {
 		protected TextView trackNameAndDuration;
+		protected TextView trackArtistAndAlbum;
 		protected CheckBox checkbox;
 	}
 	
@@ -86,6 +91,7 @@ public class TracksByNameAdapter extends ArrayAdapter<TracksByNameModel> {
 			final ViewHolder viewHolder = new ViewHolder();
 			
 			viewHolder.trackNameAndDuration = (TextView) view.findViewById(R.id.tracks_by_name_trackNameAndDuration);
+			viewHolder.trackArtistAndAlbum = (TextView) view.findViewById(R.id.tracks_by_name_trackArtistAndAlbum);
 			viewHolder.checkbox = (CheckBox) view.findViewById(R.id.tracks_by_name_checkBox);
       
 			viewHolder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -132,7 +138,9 @@ public class TracksByNameAdapter extends ArrayAdapter<TracksByNameModel> {
 	  	
 		ViewHolder holder = (ViewHolder) view.getTag();
 		String trackNameAndDuration = list.get(position).getTrackNameAndDuration();
+		String trackArtistAndAlbum = list.get(position).getTrackArtistAndAlbum();
 		holder.trackNameAndDuration.setText(trackNameAndDuration);
+		holder.trackArtistAndAlbum.setText(trackArtistAndAlbum);
 		holder.checkbox.setChecked(list.get(position).isSelected());
 		return view;
 	}

@@ -28,6 +28,10 @@ class AlbumsByNameModel {
 	  public String getAlbumName(){
 		  return albumMap.get("name");
 	  }
+	  
+	  public String getAlbumArtist(){
+		  return albumMap.get("albumArtist");
+	  }
 	   
 	  public boolean isSelected() {
 		  return selected;
@@ -60,6 +64,7 @@ public class AlbumsByNameAdapter extends ArrayAdapter<AlbumsByNameModel> {
 
 	static class ViewHolder {
 		protected TextView albumName;
+		protected TextView albumArtist;
 		protected CheckBox checkbox;
 	}
 	
@@ -86,6 +91,7 @@ public class AlbumsByNameAdapter extends ArrayAdapter<AlbumsByNameModel> {
 			final ViewHolder viewHolder = new ViewHolder();
 			
 			viewHolder.albumName = (TextView) view.findViewById(R.id.albums_by_name_albumName);
+			viewHolder.albumArtist = (TextView) view.findViewById(R.id.albums_by_name_albumArtist);
 			viewHolder.checkbox = (CheckBox) view.findViewById(R.id.albums_by_name_checkBox);
       
 			viewHolder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -131,7 +137,9 @@ public class AlbumsByNameAdapter extends ArrayAdapter<AlbumsByNameModel> {
 	  	
 		ViewHolder holder = (ViewHolder) view.getTag();
 		String albumName = list.get(position).getAlbumName();
+		String albumArtist = list.get(position).getAlbumArtist();
 		holder.albumName.setText(albumName);
+		holder.albumArtist.setText(albumArtist);
 		holder.checkbox.setChecked(list.get(position).isSelected());
 		return view;
 	}

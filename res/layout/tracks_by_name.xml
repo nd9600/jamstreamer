@@ -26,11 +26,23 @@
        android:textSize="24sp"
        android:background="@drawable/background_highlighter"
        android:textColor="@drawable/text_highlighter" />
+    
+    <TextView
+       android:id="@+id/tracks_by_name_trackArtistAndAlbum"
+       android:layout_width="fill_parent"
+       android:layout_height="wrap_content"
+       android:layout_below="@id/tracks_by_name_trackNameAndDuration"
+       android:layout_alignLeft="@id/tracks_by_name_trackNameAndDuration"
+       android:paddingLeft="5dp"
+       android:paddingBottom="5dp"
+       android:textSize="12sp"
+       android:background="@drawable/background_highlighter"
+       android:textColor="@drawable/text_highlighter" />
         
    	<View
         android:layout_width="fill_parent"
         android:layout_height="0.5dp"
-        android:layout_below="@id/tracks_by_name_trackNameAndDuration"
+        android:layout_below="@id/tracks_by_name_trackArtistAndAlbum"
         android:visibility="visible"
         android:background="#d3d3d3"/>
 
