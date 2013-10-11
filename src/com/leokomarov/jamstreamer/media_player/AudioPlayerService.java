@@ -81,6 +81,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         
         AudioPlayer.songTitleLabel.setText(trackName + " - " + artistName);
 		AudioPlayer.albumLabel.setText(albumName);
+		AudioPlayer.songCurrentDurationLabel.setText("0:00");
 		AudioPlayer.songTotalDurationLabel.setText(trackDuration);
 		if (AudioParser.albumImageStore != null){
 			AudioPlayer.albumArt.setImageBitmap(AudioParser.albumImageStore);
@@ -98,7 +99,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     		mp.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
     		wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, "myWifiLock");
     		wifiLock.acquire();
-    		
     		mp.setDataSource(url);
     		mp.setOnCompletionListener(this);
         	mp.setOnPreparedListener(this);
@@ -192,7 +192,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 		if (audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
 			originalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 			mp.start();
-	        AudioPlayer.songCurrentDurationLabel.setText("0");
 	        AudioPlayer.songProgressBar.setProgress(0);
 	        AudioPlayer.songProgressBar.setMax(mp.getDuration() / 1000);
 	        AudioPlayer.updateProgressBar();
@@ -202,6 +201,9 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         AudioPlayer.button_backward.setClickable(true);
         AudioPlayer.button_next.setClickable(true);
         AudioPlayer.button_previous.setClickable(true);
+        AudioPlayer.button_repeat.setClickable(true);
+        AudioPlayer.button_shuffle.setClickable(true);
+        AudioPlayer.songProgressBar.setClickable(true);
     }
 
     @Override
@@ -211,48 +213,52 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     	AudioPlayer.button_backward.setClickable(false);
     	AudioPlayer.button_next.setClickable(false);
         AudioPlayer.button_previous.setClickable(false);
+        AudioPlayer.button_repeat.setClickable(false);
+        AudioPlayer.button_shuffle.setClickable(false);
+        AudioPlayer.songProgressBar.setClickable(false);
     	AudioPlayer.button_play.setImageResource(R.drawable.button_play);
     	stopForeground(true);
     	
     	if ( mp.isPlaying() ){
     		mp.stop();
     	}
-    	mp.reset();
-        audioManager.abandonAudioFocus(onAudioFocusChangeListener);
-        wifiLock.release();
+    	
+    	if (repeatBoolean == true){
+			mp.seekTo(0);
+		}
+    	else {
+        	mp.reset();
+            audioManager.abandonAudioFocus(onAudioFocusChangeListener);
+            wifiLock.release();
 
-        ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-		    getString(R.string.trackPreferencesFile), MODE_PRIVATE);
-        SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
-        SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
-		
-		if (repeatBoolean == true || shuffleBoolean == false){
-			ArrayList<HashMap<String, String>> trackList = getTrackListFromPreferences();
-			if (! trackList.isEmpty()){
-				int indexPosition = indexPositionPreference.getInt("indexPosition", -1);
-			
-				if (repeatBoolean == true){
-					mp.seekTo(0);
-				}
-				else if (indexPosition + 1 <= trackList.size() - 1){
-					indexPosition++;
-					indexPositionEditor.putInt("indexPosition", indexPosition);
-					indexPositionEditor.commit();
-					playSong(indexPosition);
-				}
-			}
-		}
-		else if (shuffleBoolean == true){
-			PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
-			ArrayList<HashMap<String, String>> shuffledTracklist = shuffledTrackPreferencesObject.trackList;
-			int shuffledIndexPosition = indexPositionPreference.getInt("shuffledIndexPosition", -1);
-			if (shuffledIndexPosition + 1 <= shuffledTracklist.size() - 1){
-				shuffledIndexPosition++;
-				indexPositionEditor.putInt("shuffledIndexPosition", shuffledIndexPosition);
-				indexPositionEditor.commit();
-				playSong(shuffledIndexPosition);
-			}
-		}
+            ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
+    		    getString(R.string.trackPreferencesFile), MODE_PRIVATE);
+            SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
+            SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
+    		
+    		if (shuffleBoolean == false){
+    			ArrayList<HashMap<String, String>> trackList = getTrackListFromPreferences();
+    			int indexPosition = indexPositionPreference.getInt("indexPosition", -1);
+    			
+    			if (indexPosition + 1 <= trackList.size() - 1){
+    				indexPosition++;
+    				indexPositionEditor.putInt("indexPosition", indexPosition);
+    				indexPositionEditor.commit();
+    				playSong(indexPosition);
+    			}
+    		}
+    		else if (shuffleBoolean == true){
+    			PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
+    			ArrayList<HashMap<String, String>> shuffledTracklist = shuffledTrackPreferencesObject.trackList;
+    			int shuffledIndexPosition = indexPositionPreference.getInt("shuffledIndexPosition", -1);
+    			if (shuffledIndexPosition + 1 <= shuffledTracklist.size() - 1){
+    				shuffledIndexPosition++;
+    				indexPositionEditor.putInt("shuffledIndexPosition", shuffledIndexPosition);
+    				indexPositionEditor.commit();
+    				playSong(shuffledIndexPosition);
+    			}
+    		}
+    	}
     }    
     
     protected static OnAudioFocusChangeListener onAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {    
@@ -270,11 +276,15 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 			}
     		else if (focusChange == AudioManager.AUDIOFOCUS_LOSS){
     			audioManager.abandonAudioFocus(onAudioFocusChangeListener);
-    			mp.pause();
+    			if (mp.isPlaying()){
+    				mp.pause();
+    			}
     		}
     		else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT){
     			wasPlayingWhenTransientLoss = mp.isPlaying();
-    			mp.pause();
+    			if (wasPlayingWhenTransientLoss){
+    				mp.pause();
+    			}
     		}
     		else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK){
     			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 5, 0);
