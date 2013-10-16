@@ -73,22 +73,24 @@ public class AudioParser extends AsyncTask<String, Void, Bitmap> {
     		double screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
     		double screenDensityDPI = Resources.getSystem().getDisplayMetrics().densityDpi;
             double screenDiagonal = Math.sqrt((screenWidth * screenWidth) + (screenHeight * screenHeight)) / screenDensityDPI;
-    		   		
+
 			if (screenDiagonal <= 3.0 ){
 				imageURL = imageURL.replace("300.jpg", "200.jpg");
 			}
-			else if (screenDiagonal >= 7.5 && screenDiagonal < 9.0){
+			else if (screenDiagonal >= 6.85 && screenDiagonal < 9.0 || screenDensityDPI >= 300.0 && screenDensityDPI < 400.0){
 				imageURL = imageURL.replace("300.jpg", "400.jpg");
 			}
-			else if (screenDiagonal >= 9.0){
+			else if (screenDiagonal >= 9.0 || screenDensityDPI >= 400.0){
 				imageURL = imageURL.replace("300.jpg", "500.jpg");
 			}
 
    			albumImage = BitmapFactory.decodeStream((InputStream)new URL(imageURL).getContent());
    			albumImageStore = albumImage;
+    	} catch (NullPointerException e) {
 		} catch (JSONException e) {
 		} catch (MalformedURLException e) {
 		} catch (IOException e) {
+		} catch (RuntimeException e) {
 		}
     	return albumImage;
     }

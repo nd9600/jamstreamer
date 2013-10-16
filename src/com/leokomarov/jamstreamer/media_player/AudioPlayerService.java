@@ -183,6 +183,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
   
     @Override
 	public boolean onError(MediaPlayer mp, int what, int extra) {
+    	android.util.Log.v("onError","Error: " + what + " " + extra);
 		return true;
 	}
     
