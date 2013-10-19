@@ -11,3 +11,4 @@ bin/R.txt
 bin/proguard.txt
 libs/gson-2.2.4.jar
 gen/com/actionbarsherlock
+proguard
