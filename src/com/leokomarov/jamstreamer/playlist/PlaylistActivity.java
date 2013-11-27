@@ -43,7 +43,9 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
     private ArrayList<HashMap<String, String>> restoreTracklist(Bundle savedInstanceState){
     	if (savedInstanceState != null) {
         	@SuppressWarnings("unchecked")
-			ArrayList<HashMap<String, String>> trackList = (ArrayList<HashMap<String,String>>)savedInstanceState.get(TAG_TRACKLIST);
+			//ArrayList<HashMap<String, String>> trackList = (ArrayList<HashMap<String,String>>)savedInstanceState.get(TAG_TRACKLIST);
+        	ArrayList<HashMap<String, String>> trackList = (ArrayList<HashMap<String, String>>)savedInstanceState.getSerializable(TAG_TRACKLIST);
+        	android.util.Log.v("PlaylistActivity","Restored trackList from savedInstanceState:" + trackList);
         	return trackList;
         } 
         else {
@@ -51,7 +53,8 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
     	    		getString(R.string.trackPreferencesFile), MODE_PRIVATE);
         	PlaylistList trackPreferencesObject = trackPreferences.getObject("tracks", PlaylistList.class);
         	if (trackPreferencesObject != null){
-        		return trackPreferencesObject.trackList;
+        		android.util.Log.v("PlaylistActivity","Restored trackList from ComplexPreferences:" + trackPreferencesObject.trackList);
+        		return trackPreferencesObject.trackList;        		
         	}
         	else {
         		return null;
@@ -88,8 +91,9 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
             firstrunEditor.commit();
 		}     
         
-        if (restoreTracklist(savedInstanceState) != null ){
-        	trackList = restoreTracklist(savedInstanceState);
+        ArrayList<HashMap<String, String>> restoredTracklist = restoreTracklist(savedInstanceState);
+        if (restoredTracklist != null ){
+        	trackList = restoredTracklist;
         }
         
         PlaylistLV = getListView();
@@ -258,7 +262,8 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 	@Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
     	super.onSaveInstanceState(savedInstanceState);
-    	ArrayList<HashMap<String, String>> trackList = restoreTracklist(savedInstanceState);
+    	trackList = restoreTracklist(savedInstanceState);
+		android.util.Log.v("PlaylistActivity","Putting trackList in savedInstanceState:" + trackList);
     	savedInstanceState.putSerializable(TAG_TRACKLIST, trackList); 
     }
     

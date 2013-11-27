@@ -25,6 +25,15 @@
 -optimizationpasses 5
 
 -keep class * extends android.app.Activity
+-keep class android.support.v4.app.** { *; } 
+-keep interface android.support.v4.app.** { *; } 
+-keep class com.actionbarsherlock.** { *; } 
+-keep interface com.actionbarsherlock.** { *; } 
+-keepattributes *Annotation*
+-keepclassmembers class **.R$* {
+    public static <fields>;
+}
+
 -assumenosideeffects class android.util.Log {
     public static *** d(...);
     public static *** v(...);

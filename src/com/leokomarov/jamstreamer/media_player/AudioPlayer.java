@@ -116,6 +116,7 @@ public class AudioPlayer extends SherlockActivity {
 				else if(AudioPlayerService.mp != null) {
 					int audioFocusResult = AudioPlayerService.audioManager.requestAudioFocus(AudioPlayerService.onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 					if (audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+						android.util.Log.v("AudioPlayer","Audio focus granted");
 						AudioPlayerService.mp.start();
 				    	button_play.setImageResource(R.drawable.button_pause);
 					}

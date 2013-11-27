@@ -306,8 +306,6 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		TracksByNameAdapter.TracksByNameCheckboxList.clear();
-    	TracksByNameAdapter.TracksByNameCheckboxCount = 0;
 	    if (requestCode == 1) {
 	    	PlaylistAdapter.PlaylistCheckboxList.clear();
 	    	PlaylistAdapter.PlaylistCheckboxCount = 0;

@@ -191,6 +191,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     public void onPrepared(MediaPlayer mp) {
 		int audioFocusResult = audioManager.requestAudioFocus(onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 		if (audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+			android.util.Log.v("AudioPlayerService","Audio focus granted");
 			originalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 			mp.start();
 	        AudioPlayer.songProgressBar.setProgress(0);
@@ -228,6 +229,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 			mp.seekTo(0);
 		}
     	else {
+    		android.util.Log.v("AudioPlayerService","Audio focus abandoned");
         	mp.reset();
             audioManager.abandonAudioFocus(onAudioFocusChangeListener);
             wifiLock.release();
@@ -265,31 +267,52 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     protected static OnAudioFocusChangeListener onAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {    
     	@Override
     	public void onAudioFocusChange(int focusChange) {
-    		lastKnownAudioFocusState = focusChange;
+    		android.util.Log.v("AudioPlayerService","####################");
+    		android.util.Log.v("AudioPlayerService","focusChange = " + focusChange);
+    		android.util.Log.v("AudioPlayerService","lastKnownAudioFocusState = " + lastKnownAudioFocusState);
+    		android.util.Log.v("AudioPlayerService","AudioManager.AUDIOFOCUS_GAIN = " + AudioManager.AUDIOFOCUS_GAIN);
+    		android.util.Log.v("AudioPlayerService","AudioManager.AUDIOFOCUS_LOSS_TRANSIENT = " + AudioManager.AUDIOFOCUS_LOSS_TRANSIENT);	
+    		
     		if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+    			android.util.Log.v("AudioPlayerService","Audio focus gained");
+    			android.util.Log.v("AudioPlayerService","wasPlayingWhenTransientLoss = " + wasPlayingWhenTransientLoss);
+    			if (lastKnownAudioFocusState == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+    				android.util.Log.v("AudioPlayerService","lastKnownAudioFocusState == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT");
+    			}
+    			if (wasPlayingWhenTransientLoss) {
+    				android.util.Log.v("AudioPlayerService","wasPlayingWhenTransientLoss");
+    			}
 				if (lastKnownAudioFocusState == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT && wasPlayingWhenTransientLoss) {
+					android.util.Log.v("AudioPlayerService","Audio focus gained from transient loss");
 	    			originalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 	    			mp.start();
 				}
 				else if (lastKnownAudioFocusState == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+					android.util.Log.v("AudioPlayerService","Audio focus gained from duck");
 					audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume, 0);
 	    		}     
 			}
     		else if (focusChange == AudioManager.AUDIOFOCUS_LOSS){
     			audioManager.abandonAudioFocus(onAudioFocusChangeListener);
+    			android.util.Log.v("AudioPlayerService","Audio focus lost");
     			if (mp.isPlaying()){
     				mp.pause();
     			}
     		}
     		else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT){
+    			android.util.Log.v("AudioPlayerService","Audio focus lost transiently");
+    			//wasPlayingWhenTransientLoss = true;
     			wasPlayingWhenTransientLoss = mp.isPlaying();
+    			android.util.Log.v("AudioPlayerService","wasPlayingWhenTransientLoss = " + wasPlayingWhenTransientLoss);
     			if (wasPlayingWhenTransientLoss){
     				mp.pause();
     			}
     		}
     		else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK){
+    			android.util.Log.v("AudioPlayerService","Audio focus ducked");
     			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 5, 0);
     		}
+    		lastKnownAudioFocusState = focusChange;
     	}	
     };
     

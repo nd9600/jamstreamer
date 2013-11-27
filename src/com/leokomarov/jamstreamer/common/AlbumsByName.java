@@ -319,8 +319,6 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		AlbumsByNameAdapter.AlbumsByNameCheckboxList.clear();
-		AlbumsByNameAdapter.AlbumsByNameCheckboxCount = 0;
 		if (requestCode == 1) {
 	    	PlaylistAdapter.PlaylistCheckboxList.clear();
 	    	PlaylistAdapter.PlaylistCheckboxCount = 0;
@@ -383,7 +381,6 @@ class AlbumsByNameTrackParser extends AsyncTask<String, Void, JSONObject>  {
 			json = sb.toString();
             jObj = new JSONObject(json);
         } catch (SocketTimeoutException e) {
-        	Toast.makeText(this.context, "Jamendo has timed out, please retry", Toast.LENGTH_SHORT).show();
         } catch (JSONException e) {
 		} catch (UnsupportedEncodingException e) {
 		} catch (ClientProtocolException e) {
