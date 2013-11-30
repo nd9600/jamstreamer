@@ -74,6 +74,9 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 			searchTerm = intent.getStringExtra(TracksSearch.TAG_TRACK_NAME);
 			unformattedURL = getResources().getString(R.string.tracksByNameJSONURL);
 		}
+		else if (hierarchy.equals("topTracksPerWeek")){
+			unformattedURL = getResources().getString(R.string.tracksByPopularityPerWeek);
+		}
 		String url = String.format(unformattedURL, searchTerm).replace("&amp;", "&");
 		JSONParser jParser = new JSONParser(this);
 		jParser.execute(url);
@@ -108,7 +111,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 					}
 				}
 			}
-			else if (hierarchy.equals("tracks")){
+			else if (hierarchy.equals("tracks") || hierarchy.equals("topTracksPerWeek")){
 				for(int i = 0; i < results.length(); i++) {
 					JSONObject trackInfo= results.getJSONObject(i);
 					
@@ -182,7 +185,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	    					newTrackList.addAll(trackList);
 	    					indexPosition = oldTrackListSize + position - 1;
 	    				}
-	    				else if (hierarchy.equals("tracks")){
+	    				else if (hierarchy.equals("tracks") || hierarchy.equals("topTracksPerWeek")){
 	    					newTrackList.add(trackList.get(position - 1));
 	    					indexPosition = oldTrackListSize;
 	    				}

@@ -9,9 +9,10 @@
     
     <string name="searchIcon">Search icon</string>
     <string name="nextIcon">Next icon</string>
-    <string name="artistsFound">Artists</string>
-    <string name="albumsFound">Albums</string>
-    <string name="tracksFound">Tracks</string>
+    <string name="mainArtists">Artists</string>
+    <string name="mainAlbums">Albums</string>
+    <string name="mainTracks">Tracks</string>
+    <string name="mainTopTracksWeek">Top tracks this week</string>
     
     <string name="playlist">Playlist</string>
     <string name="backwardButton">Backward</string>
@@ -32,6 +33,10 @@
     <string name="addAlbumToPlaylistCAB">Add album(s)</string>
     <string name="playlistRemoveCAB">Remove track(s)</string>
     <string name="deletePlaylistCAB">Delete playlist</string>
+    
+    <string name="tracksByPopularityPerWeek">http://api.jamendo.com/v3.0/tracks/?client_id=19482a65&amp;format=jsonpretty&amp;order=popularity_week&amp;limit=25&amp;groupby=artist_id</string>
+    <string name="tracksByListensPerWeek">http://api.jamendo.com/v3.0/tracks/?client_id=19482a65&amp;format=jsonpretty&amp;order=listens_week&amp;limit=25</string>
+    <string name="tracksByDownloadsPerWeek">http://api.jamendo.com/v3.0/tracks/?client_id=19482a65&amp;format=jsonpretty&amp;order=downloads_week&amp;limit=25</string>
     
     <string name="artistsByNameJSONURL">http://api.jamendo.com/v3.0/artists/?client_id=19482a65&amp;format=jsonpretty&amp;order=popularity_total&amp;limit=25&amp;namesearch=%1$s</string>
     <string name="albumsByArtistIDJSONURL">http://api.jamendo.com/v3.0/artists/albums?client_id=19482a65&amp;format=jsonpretty&amp;order=id&amp;limit=25&amp;id=%1$s</string>

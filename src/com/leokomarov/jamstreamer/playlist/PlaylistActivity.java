@@ -45,7 +45,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
         	@SuppressWarnings("unchecked")
 			//ArrayList<HashMap<String, String>> trackList = (ArrayList<HashMap<String,String>>)savedInstanceState.get(TAG_TRACKLIST);
         	ArrayList<HashMap<String, String>> trackList = (ArrayList<HashMap<String, String>>)savedInstanceState.getSerializable(TAG_TRACKLIST);
-        	android.util.Log.v("PlaylistActivity","Restored trackList from savedInstanceState:" + trackList);
+        	android.util.Log.v("PlaylistActivity","Restored trackList from savedInstanceState:" + trackList.size());
         	return trackList;
         } 
         else {
@@ -53,7 +53,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
     	    		getString(R.string.trackPreferencesFile), MODE_PRIVATE);
         	PlaylistList trackPreferencesObject = trackPreferences.getObject("tracks", PlaylistList.class);
         	if (trackPreferencesObject != null){
-        		android.util.Log.v("PlaylistActivity","Restored trackList from ComplexPreferences:" + trackPreferencesObject.trackList);
+        		android.util.Log.v("PlaylistActivity","Restored trackList from ComplexPreferences:" + trackPreferencesObject.trackList.size());
         		return trackPreferencesObject.trackList;        		
         	}
         	else {

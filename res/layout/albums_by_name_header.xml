@@ -11,7 +11,7 @@
         android:paddingBottom="5dp"
         android:paddingTop="5dp"
         android:paddingLeft="5dp"
-        android:text="@string/albumsFound"
+        android:text="@string/mainAlbums"
         android:textColor="#ffffff"
         android:textSize="32sp"
         android:textStyle="bold" />

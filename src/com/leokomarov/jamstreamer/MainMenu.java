@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import com.actionbarsherlock.app.SherlockActivity;
+import com.leokomarov.jamstreamer.common.TracksByName;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.searches.AlbumsSearch;
 import com.leokomarov.jamstreamer.searches.ArtistsSearch;
@@ -54,6 +55,12 @@ public class MainMenu extends SherlockActivity {
     	putHierarchy("tracks");
 		Intent trackIntent = new Intent(this, TracksSearch.class);
 		startActivity(trackIntent);	
+	}
+    
+    public void topTracksWeekMainButton(View view){
+    	putHierarchy("topTracksPerWeek");
+		Intent topTracksWeekIntent = new Intent(this, TracksByName.class);
+		startActivity(topTracksWeekIntent);	
 	}
     
 	public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) { 

@@ -17,7 +17,7 @@
         android:paddingBottom="5dp"
         android:paddingLeft="5dp"
         android:paddingTop="5dp"
-        android:text="@string/artistsFound"
+        android:text="@string/mainArtists"
         android:textColor="@drawable/text_highlighter"
         android:textSize="32sp" />
 
@@ -41,7 +41,7 @@
         android:paddingBottom="5dp"
         android:paddingLeft="5dp"
         android:paddingTop="9dp"
-        android:text="@string/albumsFound"
+        android:text="@string/mainAlbums"
         android:textColor="@drawable/text_highlighter"
         android:textSize="32sp" />
     
@@ -59,7 +59,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/main_separator_2"
         android:layout_alignParentLeft="true"
-        android:text="@string/tracksFound"
+        android:text="@string/mainTracks"
         android:background="@drawable/background_highlighter"
         android:textColor="@drawable/text_highlighter"
         android:textSize="32sp"
@@ -77,12 +77,37 @@
         android:layout_below="@id/main_tracksText"
         android:visibility="visible"
         android:background="#d3d3d3"/>  
+        
+    <TextView
+        android:id="@+id/main_topTracksWeekText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/main_separator_3"
+        android:layout_alignParentLeft="true"
+        android:text="@string/mainTopTracksWeek"
+        android:background="@drawable/background_highlighter"
+        android:textColor="@drawable/text_highlighter"
+        android:textSize="32sp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:clickable="true"
+        android:onClick="topTracksWeekMainButton" />
+    
+    <View
+        android:id="@+id/main_separator_4"
+        android:layout_width="fill_parent"
+        android:layout_height="0.5dp"
+        android:layout_below="@id/main_topTracksWeekText"
+        android:visibility="visible"
+        android:background="#d3d3d3"/>  
     
     <ImageButton
         android:id="@+id/mainMenu_btnPlaylist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/main_separator_3"
+        android:layout_below="@id/main_separator_4"
         android:layout_alignParentRight="true"
         android:paddingTop="5dp"
         android:background="@null"
