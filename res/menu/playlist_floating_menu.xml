@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item
+        android:id="@+id/playlistFloating_viewArtist"
+        android:title="@string/viewArtistFloatingText">
+    </item>
+    
+    <item
+        android:id="@+id/playlistFloating_viewAlbum"
+        android:title="@string/viewAlbumFloatingText">
+    </item>
+</menu> 

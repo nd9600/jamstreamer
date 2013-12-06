@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -104,6 +105,10 @@ public class ArtistsParser extends SherlockListActivity implements JSONParser.Ca
 			lv.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+					SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
+			    	SharedPreferences.Editor hierarchyEditor = hierarchyPreference.edit();
+			    	hierarchyEditor.putString("hierarchy", "artists");
+					hierarchyEditor.commit();
 					String artistID = ((TextView) view.findViewById(R.id.artists_list_artists_ids)).getText().toString();
 
 					Intent in = new Intent(ArtistsParser.this, AlbumsByName.class);

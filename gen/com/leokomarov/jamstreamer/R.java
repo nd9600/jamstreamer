@@ -986,11 +986,12 @@ containing a value of this type.
         public static final int abs__title=0x7f04001b;
         public static final int abs__up=0x7f04000b;
         public static final int addAlbumToPlaylist=0x7f040067;
-        public static final int addTrackToPlaylist=0x7f04006a;
+        public static final int addTrackToPlaylist=0x7f04006d;
         public static final int albumArtImageview=0x7f040046;
         public static final int albumDetailsHeader=0x7f040042;
         public static final int albumTitle=0x7f040043;
         public static final int albumsByNameField=0x7f040037;
+        public static final int albumsFloating_viewArtist=0x7f040068;
         public static final int albumsSearchButton=0x7f040038;
         public static final int albums_by_nameHeader=0x7f040035;
         public static final int albums_by_name_albumArtist=0x7f040034;
@@ -1012,7 +1013,7 @@ containing a value of this type.
         public static final int btnPrevious=0x7f04004c;
         public static final int btnRepeat=0x7f04004b;
         public static final int btnShuffle=0x7f040051;
-        public static final int deletePlaylist=0x7f040069;
+        public static final int deletePlaylist=0x7f04006a;
         public static final int disableHome=0x7f040009;
         public static final int edit_query=0x7f040026;
         public static final int headlines_fragment=0x7f04005b;
@@ -1029,10 +1030,12 @@ containing a value of this type.
         public static final int main_tracksText=0x7f040056;
         public static final int normal=0x7f040001;
         public static final int player_footer_bg=0x7f040048;
+        public static final int playlistFloating_viewAlbum=0x7f04006c;
+        public static final int playlistFloating_viewArtist=0x7f04006b;
         public static final int playlist_checkBox=0x7f04005d;
         public static final int playlist_trackArtistAndAlbum=0x7f04005f;
         public static final int playlist_trackNameAndDuration=0x7f04005e;
-        public static final int removePlaylistItem=0x7f040068;
+        public static final int removePlaylistItem=0x7f040069;
         public static final int showCustom=0x7f040008;
         public static final int showHome=0x7f040005;
         public static final int showTitle=0x7f040007;
@@ -1045,6 +1048,8 @@ containing a value of this type.
         public static final int tabMode=0x7f040003;
         public static final int timerDisplay=0x7f040047;
         public static final int tracksByNameField=0x7f040065;
+        public static final int tracksFloating_viewAlbum=0x7f04006f;
+        public static final int tracksFloating_viewArtist=0x7f04006e;
         public static final int tracksSearchButton=0x7f040066;
         public static final int tracks_by_name_btnPlaylist=0x7f040064;
         public static final int tracks_by_name_checkBox=0x7f040060;
@@ -1099,8 +1104,11 @@ containing a value of this type.
     }
     public static final class menu {
         public static final int albums_contextual_menu=0x7f0b0000;
-        public static final int playlist_contextual_menu=0x7f0b0001;
-        public static final int tracks_contextual_menu=0x7f0b0002;
+        public static final int albums_floating_menu=0x7f0b0001;
+        public static final int playlist_contextual_menu=0x7f0b0002;
+        public static final int playlist_floating_menu=0x7f0b0003;
+        public static final int tracks_contextual_menu=0x7f0b0004;
+        public static final int tracks_floating_menu=0x7f0b0005;
     }
     public static final class string {
         /**  Content description for the action bar "home" affordance. [CHAR LIMIT=NONE] 
@@ -1142,9 +1150,10 @@ containing a value of this type.
         /**  Description of a share target (both in the list of such or the default share button) in a ShareActionProvider (share UI). [CHAR LIMIT=NONE] 
          */
         public static final int abs__shareactionprovider_share_with_application=0x7f090007;
-        public static final int addAlbumToPlaylistCAB=0x7f090027;
-        public static final int addTrackToPlaylistCAB=0x7f090026;
+        public static final int addAlbumToPlaylistCAB=0x7f090029;
+        public static final int addTrackToPlaylistCAB=0x7f090028;
         public static final int albumsByArtistIDJSONURL=0x7f09002e;
+        public static final int albumsByArtistNameJSONURL=0x7f090031;
         public static final int albumsByNameFieldText=0x7f090023;
         public static final int albumsByNameJSONURL=0x7f09002f;
         public static final int appName=0x7f09000d;
@@ -1153,7 +1162,7 @@ containing a value of this type.
         public static final int backwardButton=0x7f090019;
         public static final int buttonText=0x7f090025;
         public static final int currentTrackPreferences=0x7f09000f;
-        public static final int deletePlaylistCAB=0x7f090029;
+        public static final int deletePlaylistCAB=0x7f09002b;
         public static final int forwardButton=0x7f09001e;
         public static final int hierarchyPreferences=0x7f090011;
         public static final int indexPositionPreferences=0x7f090010;
@@ -1167,20 +1176,21 @@ containing a value of this type.
         public static final int playButton=0x7f09001b;
         public static final int playlist=0x7f090018;
         public static final int playlistButton=0x7f09001f;
-        public static final int playlistRemoveCAB=0x7f090028;
+        public static final int playlistRemoveCAB=0x7f09002a;
         public static final int previousButton=0x7f09001a;
         public static final int repeatButton=0x7f090020;
         public static final int searchIcon=0x7f090012;
         public static final int shuffleButton=0x7f090021;
-        public static final int trackByIDURL=0x7f090032;
-        public static final int trackInformation=0x7f090033;
+        public static final int trackByIDURL=0x7f090034;
+        public static final int trackInformation=0x7f090035;
         public static final int trackPreferencesFile=0x7f09000e;
         public static final int tracksByAlbumIDJSONURL=0x7f090030;
-        public static final int tracksByDownloadsPerWeek=0x7f09002c;
-        public static final int tracksByListensPerWeek=0x7f09002b;
+        public static final int tracksByAlbumNameJSONURL=0x7f090032;
         public static final int tracksByNameFieldText=0x7f090024;
-        public static final int tracksByNameJSONURL=0x7f090031;
-        public static final int tracksByPopularityPerWeek=0x7f09002a;
+        public static final int tracksByNameJSONURL=0x7f090033;
+        public static final int tracksByPopularityPerWeek=0x7f09002c;
+        public static final int viewAlbumFloatingText=0x7f090027;
+        public static final int viewArtistFloatingText=0x7f090026;
     }
     public static final class style {
         /** 

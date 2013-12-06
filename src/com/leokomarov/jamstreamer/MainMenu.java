@@ -8,6 +8,7 @@ import android.widget.ImageButton;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.leokomarov.jamstreamer.common.TracksByName;
+import com.leokomarov.jamstreamer.common.TracksByNameAdapter;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.searches.AlbumsSearch;
 import com.leokomarov.jamstreamer.searches.ArtistsSearch;
@@ -60,10 +61,18 @@ public class MainMenu extends SherlockActivity {
     public void topTracksWeekMainButton(View view){
     	putHierarchy("topTracksPerWeek");
 		Intent topTracksWeekIntent = new Intent(this, TracksByName.class);
-		startActivity(topTracksWeekIntent);	
+		startActivityForResult(topTracksWeekIntent, 1);	
 	}
     
-	public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) { 
+    @Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	    if (requestCode == 1) {
+	    	TracksByNameAdapter.TracksByNameCheckboxList.clear();
+	    	TracksByNameAdapter.TracksByNameCheckboxCount = 0;
+	    }
+	}
+    
+    public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) { 
 	        int itemId = item.getItemId();
 			if (itemId == android.R.id.home) {
 				onBackPressed();

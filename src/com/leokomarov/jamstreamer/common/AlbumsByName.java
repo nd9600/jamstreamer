@@ -25,14 +25,15 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.SparseBooleanArray;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -53,7 +54,7 @@ import com.leokomarov.jamstreamer.searches.ArtistsParser;
 public class AlbumsByName extends SherlockListActivity implements JSONParser.CallbackInterface, AlbumsByNameAdapter.CallbackInterface,
 		AlbumsByNameTrackParser.CallbackInterface {
 	private String TAG_RESULTS = "results";
-	private String TAG_ARTIST_NAME = "artist_name";
+	private static String TAG_ARTIST_NAME = "artist_name";
 	protected static String TAG_ALBUM_ID = "id";
 	private String TAG_ALBUM_NAME = "name";
 	private String TAG_TRACK_ID = "id";
@@ -70,6 +71,13 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 	private int albumsToAddLoop = 0;
 	private int onTrackRequestCompletedLoop = 0;
 	
+	private void putHierarchy(String hierarchy){
+		SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
+    	SharedPreferences.Editor hierarchyEditor = hierarchyPreference.edit();
+    	hierarchyEditor.putString("hierarchy", hierarchy);
+		hierarchyEditor.commit();
+	}
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -81,6 +89,8 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 		String hierarchy = hierarchyPreference.getString("hierarchy", "none");
 		String searchTerm = new String();
 		String unformattedURL = new String();
+		android.util.Log.v("AlbumsByName" +
+				"", "hierarchy is " + hierarchy);
 		if (hierarchy.equals("artists")){
 			searchTerm = intent.getStringExtra(ArtistsParser.TAG_ARTIST_ID);
 			unformattedURL = getResources().getString(R.string.albumsByArtistIDJSONURL);
@@ -89,8 +99,24 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 			searchTerm = intent.getStringExtra(AlbumsSearch.TAG_ALBUM_NAME);
 			unformattedURL = getResources().getString(R.string.albumsByNameJSONURL);
 		}
+		else if (hierarchy.equals("tracks")){
+			searchTerm = intent.getStringExtra(TracksByName.TAG_ALBUM_NAME);
+			unformattedURL = getResources().getString(R.string.albumsByNameJSONURL);
+		}
+		else if (hierarchy.equals("tracksFloatingMenuArtist")){
+			searchTerm = intent.getStringExtra(TracksByName.TAG_ARTIST_NAME);
+			unformattedURL = getResources().getString(R.string.albumsByArtistNameJSONURL);
+		}
+		else if (hierarchy.equals("albumsFloatingMenuArtist")){
+			searchTerm = intent.getStringExtra(AlbumsByName.TAG_ARTIST_NAME);
+			unformattedURL = getResources().getString(R.string.albumsByArtistNameJSONURL);
+		}
+		else if (hierarchy.equals("playlistFloatingMenuArtist")){
+			searchTerm = intent.getStringExtra(PlaylistActivity.TAG_ARTIST_NAME);
+			unformattedURL = getResources().getString(R.string.albumsByArtistNameJSONURL);
+		}
 		
-    	String url = String.format(unformattedURL, searchTerm).replace("&amp;", "&");
+    	String url = String.format(unformattedURL, searchTerm).replace("&amp;", "&").replace(" ", "+");
 		JSONParser jParser = new JSONParser(this);
 		jParser.execute(url);
 	}
@@ -101,7 +127,7 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 			results = json.getJSONArray(TAG_RESULTS);
 			SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
 			String hierarchy = hierarchyPreference.getString("hierarchy", "none");
-			if (hierarchy.equals("artists")){
+			if (hierarchy.equals("artists") || hierarchy.equals("albumsFloatingMenuArtist") || hierarchy.equals("tracksFloatingMenuArtist") || hierarchy.equals("playlistFloatingMenuArtist")){
 				for(int i = 0; i < results.length(); i++) {
 					JSONArray albumsArray = results.getJSONObject(i).getJSONArray("albums");
 					String artistName = results.getJSONObject(i).getString("name");
@@ -112,8 +138,8 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 						String albumName = albumInfo.getString(TAG_ALBUM_NAME);
 						String albumID = albumInfo.getString(TAG_ALBUM_ID);
 						map.put("albumArtist", artistName);
-						map.put(TAG_ALBUM_NAME, albumName);
-						map.put(TAG_ALBUM_ID, albumID);
+						map.put("albumName", albumName);
+						map.put("albumID", albumID);
 						albumList.add(map);
 					}
 				}
@@ -127,8 +153,8 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 					String albumName = albumInfo.getString(TAG_ALBUM_NAME);
 					String albumID = albumInfo.getString(TAG_ALBUM_ID);		
 					map.put("albumArtist", artistName);
-					map.put(TAG_ALBUM_NAME, albumName);
-					map.put(TAG_ALBUM_ID, albumID);
+					map.put("albumName", albumName);
+					map.put("albumID", albumID);
 					albumList.add(map);
 				}
 			}
@@ -154,6 +180,7 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 	    	
 	    	AlbumsByNameListAdapter = new AlbumsByNameAdapter(this, this, AlbumsByNameModel );	
 	    	setListAdapter(AlbumsByNameListAdapter);
+	    	registerForContextMenu(AlbumsByNameLV);
 			
 			button_playlist = (ImageButton) findViewById(R.id.albums_by_name_btnPlaylist);    	
 	    	button_playlist.setOnClickListener(new View.OnClickListener() {
@@ -167,35 +194,42 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 	    	AlbumsByNameLV.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					String albumID = albumList.get(position - 1).get(TAG_ALBUM_ID);
+					putHierarchy("albums");
+					String albumID = albumList.get(position - 1).get("albumID");
 					Intent in = new Intent(getApplicationContext(), TracksByName.class);
 					in.putExtra(TAG_ALBUM_ID, albumID);
 					startActivityForResult(in, 2);
 				}
 			});
-	    	
-	    	AlbumsByNameLV.setOnItemLongClickListener(new OnItemLongClickListener() {
-				@Override
-				public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-					view.setFocusable(false);
-					boolean returnValue;
-					if (mActionMode == null){
-						mActionMode = startActionMode(mActionModeCallback);
-						returnValue = false;
-					}
-					else{
-						returnValue = true;
-					}
-					
-					CheckBox checkbox = (CheckBox) view.findViewById(R.id.albums_by_name_checkBox);
-					checkbox.setChecked(! checkbox.isChecked());
-					
-					return returnValue;
-				}
-	    	}); 
-	    	
+	    		    	
 		}
 	}
+	
+	@Override
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, view, menuInfo);
+        getMenuInflater().inflate(R.menu.albums_floating_menu , menu);
+    }
+	
+	@Override
+	public boolean onContextItemSelected(android.view.MenuItem item) {
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        int indexPosition = info.position - 1;
+ 
+        int menuID = item.getItemId();
+		if (menuID == R.id.albumsFloating_viewArtist) {
+			putHierarchy("albumsFloatingMenuArtist");
+			
+			String artistName = albumList.get(indexPosition).get("albumArtist");
+			Intent artistsIntent = new Intent(getApplicationContext(), AlbumsByName.class);
+			artistsIntent.putExtra(TAG_ARTIST_NAME, artistName);
+			startActivityForResult(artistsIntent, 3);
+			return true;
+		} else {
+			return false;
+		}
+		
+    }
 	
 	public void callActionBar(){
 		if (mActionMode == null) {
@@ -326,6 +360,10 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 		if (requestCode == 2) {
 	    	TracksByNameAdapter.TracksByNameCheckboxList.clear();
 	    	TracksByNameAdapter.TracksByNameCheckboxCount = 0;
+	    }
+		if (requestCode == 3) {
+			AlbumsByNameAdapter.AlbumsByNameCheckboxList.clear();
+	    	AlbumsByNameAdapter.AlbumsByNameCheckboxCount = 0;
 	    }
 	}
 	

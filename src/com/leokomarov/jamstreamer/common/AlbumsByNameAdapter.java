@@ -26,7 +26,7 @@ class AlbumsByNameModel {
 	  }
 	  	  
 	  public String getAlbumName(){
-		  return albumMap.get("name");
+		  return albumMap.get("albumName");
 	  }
 	  
 	  public String getAlbumArtist(){

@@ -79,10 +79,16 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         String albumName = trackList.get(indexPosition).get("trackAlbum");
         String artistAndAlbum = artistName + " - "  + albumName;
         
-        AudioPlayer.songTitleLabel.setText(trackName + " - " + artistName);
-		AudioPlayer.albumLabel.setText(albumName);
-		AudioPlayer.songCurrentDurationLabel.setText("0:00");
-		AudioPlayer.songTotalDurationLabel.setText(trackDuration);
+        try {
+        	AudioPlayer.songTitleLabel.setText(trackName + " - " + artistName);
+        	AudioPlayer.albumLabel.setText(albumName);
+        	AudioPlayer.songCurrentDurationLabel.setText("0:00");
+        	AudioPlayer.songTotalDurationLabel.setText(trackDuration);
+        } catch(NullPointerException e){
+        	android.util.Log.e("AudioPlayerService","NullPointerException :" + e.getMessage());
+        	android.util.Log.e("AudioPlayerService","trackList.get(indexPosition) :" + trackList.get(indexPosition));
+        }
+        	
 		if (AudioParser.albumImageStore != null){
 			AudioPlayer.albumArt.setImageBitmap(AudioParser.albumImageStore);
 		}
@@ -116,10 +122,10 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             builder.setContentIntent(contentIntent);
         	startForeground(46798, builder.getNotification());
     		mp.prepareAsync();
-    	} catch(FileNotFoundException e){
+    	} catch (FileNotFoundException e){
     	} catch (IllegalArgumentException e) {
     	} catch (IllegalStateException e) {
-    	} catch(RuntimeException e){
+    	} catch (RuntimeException e){
     	} catch (IOException e) {
     	} catch (Exception e) {
     	} 	

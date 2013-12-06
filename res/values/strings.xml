@@ -29,20 +29,23 @@
     <string name="albumsByNameFieldText">Enter an album</string>
     <string name="tracksByNameFieldText">Enter a track</string>
     <string name="buttonText">Search</string>
+    <string name="viewArtistFloatingText">View artist</string>
+    <string name="viewAlbumFloatingText">View album</string>
     <string name="addTrackToPlaylistCAB">Add track(s)</string>
     <string name="addAlbumToPlaylistCAB">Add album(s)</string>
     <string name="playlistRemoveCAB">Remove track(s)</string>
     <string name="deletePlaylistCAB">Delete playlist</string>
     
     <string name="tracksByPopularityPerWeek">http://api.jamendo.com/v3.0/tracks/?client_id=19482a65&amp;format=jsonpretty&amp;order=popularity_week&amp;limit=25&amp;groupby=artist_id</string>
-    <string name="tracksByListensPerWeek">http://api.jamendo.com/v3.0/tracks/?client_id=19482a65&amp;format=jsonpretty&amp;order=listens_week&amp;limit=25</string>
-    <string name="tracksByDownloadsPerWeek">http://api.jamendo.com/v3.0/tracks/?client_id=19482a65&amp;format=jsonpretty&amp;order=downloads_week&amp;limit=25</string>
-    
+        
     <string name="artistsByNameJSONURL">http://api.jamendo.com/v3.0/artists/?client_id=19482a65&amp;format=jsonpretty&amp;order=popularity_total&amp;limit=25&amp;namesearch=%1$s</string>
     <string name="albumsByArtistIDJSONURL">http://api.jamendo.com/v3.0/artists/albums?client_id=19482a65&amp;format=jsonpretty&amp;order=id&amp;limit=25&amp;id=%1$s</string>
     
     <string name="albumsByNameJSONURL">http://api.jamendo.com/v3.0/albums?client_id=19482a65&amp;format=jsonpretty&amp;order=popularity_total&amp;limit=25&amp;namesearch=%1$s</string>
     <string name="tracksByAlbumIDJSONURL">http://api.jamendo.com/v3.0/albums/tracks?client_id=19482a65&amp;format=jsonpretty&amp;order=track_position&amp;limit=25&amp;id=%1$s</string>
+    
+    <string name="albumsByArtistNameJSONURL">http://api.jamendo.com/v3.0/artists/albums?client_id=19482a65&amp;format=jsonpretty&amp;order=id&amp;limit=25&amp;name=%1$s</string>
+    <string name="tracksByAlbumNameJSONURL">http://api.jamendo.com/v3.0/albums/tracks?client_id=19482a65&amp;format=jsonpretty&amp;order=track_position&amp;limit=25&amp;name=%1$s</string>
     
     <string name="tracksByNameJSONURL">http://api.jamendo.com/v3.0/tracks?client_id=19482a65&amp;format=jsonpretty&amp;order=popularity_total&amp;limit=25&amp;namesearch=%1$s</string>
     <string name="trackByIDURL">http://api.jamendo.com/v3.0/tracks/file?client_id=19482a65&amp;audioformat=mp31&amp;id=%1$s</string>

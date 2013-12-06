@@ -10,14 +10,15 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.SparseBooleanArray;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -28,11 +29,17 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.leokomarov.jamstreamer.ComplexPreferences;
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.common.AlbumsByName;
+import com.leokomarov.jamstreamer.common.AlbumsByNameAdapter;
+import com.leokomarov.jamstreamer.common.TracksByName;
+import com.leokomarov.jamstreamer.common.TracksByNameAdapter;
 import com.leokomarov.jamstreamer.media_player.AudioPlayer;
 import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
 
 public class PlaylistActivity extends SherlockListActivity implements PlaylistAdapter.CallbackInterface {
 	private final String TAG_TRACKLIST = "trackListSaved";
+	public static String TAG_ARTIST_NAME = "artist_name";
+	public static String TAG_ALBUM_NAME = "name";
 	private ArrayList<HashMap<String, String>> trackList = new ArrayList<HashMap<String, String>>();
 	private ListView PlaylistLV;
 	private ArrayAdapter<PlaylistModel> PlaylistListAdapter;
@@ -45,7 +52,9 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
         	@SuppressWarnings("unchecked")
 			//ArrayList<HashMap<String, String>> trackList = (ArrayList<HashMap<String,String>>)savedInstanceState.get(TAG_TRACKLIST);
         	ArrayList<HashMap<String, String>> trackList = (ArrayList<HashMap<String, String>>)savedInstanceState.getSerializable(TAG_TRACKLIST);
-        	android.util.Log.v("PlaylistActivity","Restored trackList from savedInstanceState:" + trackList.size());
+        	if (trackList != null){
+        		android.util.Log.v("PlaylistActivity","Restored trackList from savedInstanceState: " + trackList.size());
+        	}
         	return trackList;
         } 
         else {
@@ -53,7 +62,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
     	    		getString(R.string.trackPreferencesFile), MODE_PRIVATE);
         	PlaylistList trackPreferencesObject = trackPreferences.getObject("tracks", PlaylistList.class);
         	if (trackPreferencesObject != null){
-        		android.util.Log.v("PlaylistActivity","Restored trackList from ComplexPreferences:" + trackPreferencesObject.trackList.size());
+        		android.util.Log.v("PlaylistActivity","Restored trackList from ComplexPreferences: " + trackPreferencesObject.trackList.size());
         		return trackPreferencesObject.trackList;        		
         	}
         	else {
@@ -76,7 +85,14 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 		trackPreferences.commit();
 	}
     
-    @Override
+	private void putHierarchy(String hierarchy){
+		SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
+    	SharedPreferences.Editor hierarchyEditor = hierarchyPreference.edit();
+    	hierarchyEditor.putString("hierarchy", hierarchy);
+		hierarchyEditor.commit();
+	}
+	
+	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);     
@@ -107,6 +123,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
     	
     	PlaylistListAdapter = new PlaylistAdapter(this, this, PlaylistModel);	
     	setListAdapter(PlaylistListAdapter);
+    	registerForContextMenu(PlaylistLV);
     	
     	PlaylistLV.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -129,29 +146,43 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
                 finish();
             }
         });
-    	   	
-    	PlaylistLV.setOnItemLongClickListener(new OnItemLongClickListener() {
-			@Override
-			public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-				view.setFocusable(false);
-				boolean returnValue;
-				if (mActionMode == null){
-					mActionMode = startActionMode(mActionModeCallback);
-					returnValue = false;
-				}
-				else{
-					returnValue = true;
-				}
-				
-				CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
-				checkbox.setChecked(! checkbox.isChecked());
-				
-				return returnValue;
-			}
-    	}); 
+    	
     }
 	
-	public void callActionBar(){
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, view, menuInfo);
+        getMenuInflater().inflate(R.menu.playlist_floating_menu , menu);
+    }
+	
+	@Override
+	public boolean onContextItemSelected(android.view.MenuItem item) {
+		trackList = restoreTracklist(null);
+        AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();   
+        int indexPosition = info.position - 1;
+        
+        int menuID = item.getItemId();
+		if (menuID == R.id.playlistFloating_viewArtist) {
+			putHierarchy("playlistFloatingMenuArtist");
+			String artistName = trackList.get(indexPosition).get("trackArtist");
+			Intent artistsIntent = new Intent(getApplicationContext(), AlbumsByName.class);
+			artistsIntent.putExtra(TAG_ARTIST_NAME, artistName);
+			startActivityForResult(artistsIntent, 2);
+			return true;
+		} else if (menuID == R.id.playlistFloating_viewAlbum) {
+			putHierarchy("playlistFloatingMenuAlbum");
+			String albumName = trackList.get(indexPosition).get("trackAlbum");
+			Intent albumsIntent = new Intent(getApplicationContext(), TracksByName.class);
+			albumsIntent.putExtra(TAG_ALBUM_NAME, albumName);
+			startActivityForResult(albumsIntent, 3);
+			return true;
+		} else {
+			return false;
+		}
+		
+    }
+    
+    public void callActionBar(){
 		if (mActionMode == null) {
 			mActionMode = startActionMode(mActionModeCallback);
 		}
@@ -257,13 +288,23 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 	    	PlaylistAdapter.PlaylistCheckboxList.clear();
 	    	PlaylistAdapter.PlaylistCheckboxCount = 0;
 	    }
+		if (requestCode == 2) {
+	    	AlbumsByNameAdapter.AlbumsByNameCheckboxList.clear();
+	    	AlbumsByNameAdapter.AlbumsByNameCheckboxCount = 0;
+	    }
+	    if (requestCode == 3) {
+	    	TracksByNameAdapter.TracksByNameCheckboxList.clear();
+	    	TracksByNameAdapter.TracksByNameCheckboxCount = 0;
+	    }
 	}
 	
 	@Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
     	super.onSaveInstanceState(savedInstanceState);
-    	trackList = restoreTracklist(savedInstanceState);
-		android.util.Log.v("PlaylistActivity","Putting trackList in savedInstanceState:" + trackList);
+    	trackList = restoreTracklist(null);
+    	if (trackList != null){
+    		android.util.Log.v("PlaylistActivity","Restored trackList from savedInstanceState: " + trackList.size());
+    	}
     	savedInstanceState.putSerializable(TAG_TRACKLIST, trackList); 
     }
     
