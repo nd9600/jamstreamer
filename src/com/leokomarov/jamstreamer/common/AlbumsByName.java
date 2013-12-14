@@ -34,6 +34,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -214,10 +215,18 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 	@Override
 	public boolean onContextItemSelected(android.view.MenuItem item) {
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        View viewClicked = info.targetView;
         int indexPosition = info.position - 1;
  
         int menuID = item.getItemId();
-		if (menuID == R.id.albumsFloating_viewArtist) {
+        if (menuID == R.id.albumsFloating_selectAlbum){
+        	if (mActionMode == null){
+				mActionMode = startActionMode(mActionModeCallback);
+        	}
+        	CheckBox checkbox = (CheckBox) viewClicked.findViewById(R.id.albums_by_name_checkBox);
+			checkbox.setChecked(! checkbox.isChecked());
+        	return true;
+		} else if (menuID == R.id.albumsFloating_viewArtist) {
 			putHierarchy("albumsFloatingMenuArtist");
 			
 			String artistName = albumList.get(indexPosition).get("albumArtist");

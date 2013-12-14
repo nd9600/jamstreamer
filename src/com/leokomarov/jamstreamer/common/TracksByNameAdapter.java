@@ -119,11 +119,8 @@ public class TracksByNameAdapter extends ArrayAdapter<TracksByNameModel> {
 					if (TracksByNameCheckboxCount == 0){
 						TracksByName.mActionMode.finish();
 	                }
-	                else if (TracksByNameCheckboxCount == 1){
-	                	TracksByName.mActionMode.setTitle("1 track selected");
-	                }
-	                else if(TracksByNameCheckboxCount >= 2){
-	                	TracksByName.mActionMode.setTitle(TracksByNameCheckboxCount + " tracks selected");
+	                else if (TracksByNameCheckboxCount != 0){
+	                	TracksByName.mActionMode.setTitle(TracksByNameCheckboxCount + " selected");
 	                }
 					
 				}

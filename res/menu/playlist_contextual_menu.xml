@@ -4,12 +4,12 @@
         android:id="@+id/removePlaylistItem"
         android:title="@string/playlistRemoveCAB"
         android:icon="@drawable/bin"
-        android:showAsAction="always">
+        android:showAsAction="ifRoom">
     </item>
     
     <item
         android:id="@+id/deletePlaylist"
         android:title="@string/deletePlaylistCAB"
-        android:showAsAction="always">
+        android:showAsAction="ifRoom">
     </item>
 </menu> 

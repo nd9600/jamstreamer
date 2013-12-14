@@ -118,11 +118,8 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistModel> {
 					if (PlaylistCheckboxCount == 0){
 	                	PlaylistActivity.mActionMode.finish();
 	                }
-	                else if (PlaylistCheckboxCount == 1){
-	                	PlaylistActivity.mActionMode.setTitle(PlaylistCheckboxCount + " track selected");
-	                }
-	                else if(PlaylistCheckboxCount >= 2){
-	                	PlaylistActivity.mActionMode.setTitle(PlaylistCheckboxCount + " tracks selected");
+					else if (PlaylistCheckboxCount != 0){
+						PlaylistActivity.mActionMode.setTitle(PlaylistCheckboxCount + " selected");
 	                }
 				}
 			});

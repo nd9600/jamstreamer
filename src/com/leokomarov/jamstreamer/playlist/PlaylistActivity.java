@@ -7,7 +7,6 @@ import java.util.List;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.util.SparseBooleanArray;
 import android.view.ContextMenu;
@@ -19,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -98,15 +98,6 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);     
         setContentView(R.layout.original_empty_list);
         
-        //if FIRSTRUN_PREFERENCE doesn't contain "firstrun" or "firstrun" == false
-        if (! getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE).contains("firstrun") 
-				|| ! getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE).getBoolean("firstrun", true) == false) {
-        	SharedPreferences firstrunPreference = getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE);
-            Editor firstrunEditor = firstrunPreference.edit();
-            firstrunEditor.putBoolean("firstrun", false);
-            firstrunEditor.commit();
-		}     
-        
         ArrayList<HashMap<String, String>> restoredTracklist = restoreTracklist(savedInstanceState);
         if (restoredTracklist != null ){
         	trackList = restoredTracklist;
@@ -159,10 +150,18 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 	public boolean onContextItemSelected(android.view.MenuItem item) {
 		trackList = restoreTracklist(null);
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();   
+        View viewClicked = info.targetView;
         int indexPosition = info.position - 1;
         
         int menuID = item.getItemId();
-		if (menuID == R.id.playlistFloating_viewArtist) {
+        if (menuID == R.id.playlistFloating_selectTrack){
+        	if (mActionMode == null){
+				mActionMode = startActionMode(mActionModeCallback);
+        	}
+        	CheckBox checkbox = (CheckBox) viewClicked.findViewById(R.id.playlist_checkBox);
+			checkbox.setChecked(! checkbox.isChecked());
+        	return true;
+		} else if (menuID == R.id.playlistFloating_viewArtist) {
 			putHierarchy("playlistFloatingMenuArtist");
 			String artistName = trackList.get(indexPosition).get("trackArtist");
 			Intent artistsIntent = new Intent(getApplicationContext(), AlbumsByName.class);

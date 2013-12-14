@@ -23,6 +23,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -233,7 +234,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	    			in.putExtra("fromNotification", false);
 	    			startActivityForResult(in, 2);	
 	    		}
-	    		});
+	    	});
     	
 		}
 	}
@@ -241,16 +242,24 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	@Override
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, view, menuInfo);
-        getMenuInflater().inflate(R.menu.tracks_floating_menu , menu);
+        getMenuInflater().inflate(R.menu.tracks_floating_menu , menu);       
     }
 	
 	@Override
 	public boolean onContextItemSelected(android.view.MenuItem item) {
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        View viewClicked = info.targetView;
         int indexPosition = info.position - 1;
  
         int menuID = item.getItemId();
-		if (menuID == R.id.tracksFloating_viewArtist) {
+        if (menuID == R.id.tracksFloating_selectTrack){
+        	if (mActionMode == null){
+				mActionMode = startActionMode(mActionModeCallback);
+        	}
+        	CheckBox checkbox = (CheckBox) viewClicked.findViewById(R.id.tracks_by_name_checkBox);
+			checkbox.setChecked(! checkbox.isChecked());
+        	return true;
+		} else if (menuID == R.id.tracksFloating_viewArtist) {
 			putHierarchy("tracksFloatingMenuArtist");
 			String artistName = trackList.get(indexPosition).get("trackArtist");
 			Intent artistsIntent = new Intent(getApplicationContext(), AlbumsByName.class);
@@ -290,7 +299,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 		}
 
 		@Override
-        	public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			int itemId = item.getItemId();
 			if (itemId == R.id.addTrackToPlaylist) {
 				int tracksByNameLVLength = TracksByNameLV.getCount();
@@ -354,10 +363,6 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	    if (requestCode == 3) {
 	    	AlbumsByNameAdapter.AlbumsByNameCheckboxList.clear();
 	    	AlbumsByNameAdapter.AlbumsByNameCheckboxCount = 0;
-	    }
-	    if (requestCode == 4) {
-	    	TracksByNameAdapter.TracksByNameCheckboxList.clear();
-	    	TracksByNameAdapter.TracksByNameCheckboxCount = 0;
 	    }
 	}
 	

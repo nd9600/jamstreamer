@@ -119,12 +119,10 @@ public class AlbumsByNameAdapter extends ArrayAdapter<AlbumsByNameModel> {
 					if (AlbumsByNameCheckboxCount == 0){
 						AlbumsByName.mActionMode.finish();
 	                }
-	                else if (AlbumsByNameCheckboxCount == 1){
-	                	AlbumsByName.mActionMode.setTitle(AlbumsByNameCheckboxCount + " album selected");
+					else if (AlbumsByNameCheckboxCount != 0){
+						AlbumsByName.mActionMode.setTitle(AlbumsByNameCheckboxCount + " selected");
 	                }
-	                else if(AlbumsByNameCheckboxCount >= 2){
-	                	AlbumsByName.mActionMode.setTitle(AlbumsByNameCheckboxCount + " albums selected");
-	                }
+
 				}
 			});
       

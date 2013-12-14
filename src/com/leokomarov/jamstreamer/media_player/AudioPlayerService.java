@@ -79,29 +79,24 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         String albumName = trackList.get(indexPosition).get("trackAlbum");
         String artistAndAlbum = artistName + " - "  + albumName;
         
-        try {
-        	AudioPlayer.songTitleLabel.setText(trackName + " - " + artistName);
-        	AudioPlayer.albumLabel.setText(albumName);
-        	AudioPlayer.songCurrentDurationLabel.setText("0:00");
-        	AudioPlayer.songTotalDurationLabel.setText(trackDuration);
-        } catch(NullPointerException e){
-        	android.util.Log.e("AudioPlayerService","NullPointerException :" + e.getMessage());
-        	android.util.Log.e("AudioPlayerService","trackList.get(indexPosition) :" + trackList.get(indexPosition));
-        }
-        	
-		if (AudioParser.albumImageStore != null){
-			AudioPlayer.albumArt.setImageBitmap(AudioParser.albumImageStore);
-		}
-		BitmapDrawable albumImageDrawable = ((BitmapDrawable)AudioPlayer.albumArt.getDrawable());
-		
-		if (albumImageDrawable == null | ! artistAndAlbumStore.equals(artistAndAlbum)){
-			AudioParser jParser = new AudioParser();
-			jParser.execute(trackInfoURL, artistName + " - "  + albumName);
-			artistAndAlbumStore = artistName + " - "  + albumName;
-		}
-          	
     	mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
     	try {
+    		AudioPlayer.songTitleLabel.setText(trackName + " - " + artistName);
+            AudioPlayer.albumLabel.setText(albumName);
+            AudioPlayer.songCurrentDurationLabel.setText("0:00");
+            AudioPlayer.songTotalDurationLabel.setText(trackDuration);
+
+    		if (AudioParser.albumImageStore != null){
+    			AudioPlayer.albumArt.setImageBitmap(AudioParser.albumImageStore);
+    		}
+    		BitmapDrawable albumImageDrawable = ((BitmapDrawable)AudioPlayer.albumArt.getDrawable());
+    		
+    		if (albumImageDrawable == null | ! artistAndAlbumStore.equals(artistAndAlbum)){
+    			AudioParser jParser = new AudioParser();
+    			jParser.execute(trackInfoURL, artistName + " - "  + albumName);
+    			artistAndAlbumStore = artistName + " - "  + albumName;
+    		}
+    		
     		mp.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
     		wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, "myWifiLock");
     		wifiLock.acquire();
@@ -122,6 +117,9 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             builder.setContentIntent(contentIntent);
         	startForeground(46798, builder.getNotification());
     		mp.prepareAsync();
+    	} catch(NullPointerException e){
+        	android.util.Log.e("AudioPlayerService","NullPointerException :" + e.getMessage());
+        	android.util.Log.e("AudioPlayerService","trackList.get(indexPosition) :" + trackList.get(indexPosition));
     	} catch (FileNotFoundException e){
     	} catch (IllegalArgumentException e) {
     	} catch (IllegalStateException e) {
@@ -272,50 +270,29 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     
     protected static OnAudioFocusChangeListener onAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {    
     	@Override
-    	public void onAudioFocusChange(int focusChange) {
-    		android.util.Log.v("AudioPlayerService","####################");
-    		android.util.Log.v("AudioPlayerService","focusChange = " + focusChange);
-    		android.util.Log.v("AudioPlayerService","lastKnownAudioFocusState = " + lastKnownAudioFocusState);
-    		android.util.Log.v("AudioPlayerService","AudioManager.AUDIOFOCUS_GAIN = " + AudioManager.AUDIOFOCUS_GAIN);
-    		android.util.Log.v("AudioPlayerService","AudioManager.AUDIOFOCUS_LOSS_TRANSIENT = " + AudioManager.AUDIOFOCUS_LOSS_TRANSIENT);	
-    		
+    	public void onAudioFocusChange(int focusChange) { 		
     		if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
-    			android.util.Log.v("AudioPlayerService","Audio focus gained");
-    			android.util.Log.v("AudioPlayerService","wasPlayingWhenTransientLoss = " + wasPlayingWhenTransientLoss);
-    			if (lastKnownAudioFocusState == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
-    				android.util.Log.v("AudioPlayerService","lastKnownAudioFocusState == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT");
-    			}
-    			if (wasPlayingWhenTransientLoss) {
-    				android.util.Log.v("AudioPlayerService","wasPlayingWhenTransientLoss");
-    			}
 				if (lastKnownAudioFocusState == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT && wasPlayingWhenTransientLoss) {
-					android.util.Log.v("AudioPlayerService","Audio focus gained from transient loss");
 	    			originalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 	    			mp.start();
 				}
 				else if (lastKnownAudioFocusState == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
-					android.util.Log.v("AudioPlayerService","Audio focus gained from duck");
 					audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume, 0);
 	    		}     
 			}
     		else if (focusChange == AudioManager.AUDIOFOCUS_LOSS){
     			audioManager.abandonAudioFocus(onAudioFocusChangeListener);
-    			android.util.Log.v("AudioPlayerService","Audio focus lost");
     			if (mp.isPlaying()){
     				mp.pause();
     			}
     		}
     		else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT){
-    			android.util.Log.v("AudioPlayerService","Audio focus lost transiently");
-    			//wasPlayingWhenTransientLoss = true;
     			wasPlayingWhenTransientLoss = mp.isPlaying();
-    			android.util.Log.v("AudioPlayerService","wasPlayingWhenTransientLoss = " + wasPlayingWhenTransientLoss);
     			if (wasPlayingWhenTransientLoss){
     				mp.pause();
     			}
     		}
     		else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK){
-    			android.util.Log.v("AudioPlayerService","Audio focus ducked");
     			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, 5, 0);
     		}
     		lastKnownAudioFocusState = focusChange;

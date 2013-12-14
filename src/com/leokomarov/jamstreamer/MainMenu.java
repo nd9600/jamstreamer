@@ -2,9 +2,11 @@ package com.leokomarov.jamstreamer;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.leokomarov.jamstreamer.common.TracksByName;
@@ -38,6 +40,17 @@ public class MainMenu extends SherlockActivity {
                 startActivityForResult(button_playlistIntent, 1);
             }
     	});
+    	
+    	//if FIRSTRUN_PREFERENCE doesn't contain "firstrun" or "firstrun" == false
+        if (! getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE).contains("firstrun") 
+				|| ! getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE).getBoolean("firstrun", true) == false) {
+        	Toast.makeText(getApplicationContext(),"Long-press on an album or track for options", Toast.LENGTH_LONG).show();
+        	Toast.makeText(getApplicationContext(),"I'd appreciate it if you rate this app. Thanks!", Toast.LENGTH_LONG).show();
+        	SharedPreferences firstrunPreference = getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE);
+            Editor firstrunEditor = firstrunPreference.edit();
+            firstrunEditor.putBoolean("firstrun", false);
+            firstrunEditor.commit();
+		}   
 	}	
 	
 	public void artistsMainButton(View view){
