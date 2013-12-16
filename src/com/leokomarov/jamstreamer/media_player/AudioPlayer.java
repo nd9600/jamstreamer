@@ -46,7 +46,7 @@ public class AudioPlayer extends SherlockActivity {
 	
 	private ArrayList<HashMap<String, String>> getTrackListFromPreferences(){
     	ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-	    		getString(R.string.trackPreferencesFile), MODE_PRIVATE);
+	    		getString(R.string.trackPreferences), MODE_PRIVATE);
 	    PlaylistList trackPreferencesObject = trackPreferences.getObject("tracks", PlaylistList.class);
 	    if (trackPreferencesObject != null){
     		return trackPreferencesObject.trackList;
@@ -84,10 +84,10 @@ public class AudioPlayer extends SherlockActivity {
     	button_previous.setClickable(false);
     	button_repeat.setClickable(false);
     	button_shuffle.setClickable(false);
-    	songProgressBar.setClickable(false);
+    	songProgressBar.setClickable(false);    	
     	
     	if (AudioPlayerService.mp != null && AudioPlayerService.mp.isPlaying()){
-			AudioPlayer.button_play.setImageResource(R.drawable.button_pause);
+			button_play.setImageResource(R.drawable.button_pause);
 		}
     	
     	if (AudioPlayerService.repeatBoolean == true){
@@ -96,6 +96,24 @@ public class AudioPlayer extends SherlockActivity {
 
     	if (AudioPlayerService.shuffleBoolean == true){
     		button_shuffle.setImageResource(R.drawable.img_shuffle_focused);
+    	}
+    	
+    	if (AudioPlayerService.mp != null){
+    		int currentSeconds = AudioPlayerService.mp.getCurrentPosition() / 1000;
+    		String currentDuration = String.format(Locale.US, "%d:%02d", currentSeconds / 60, currentSeconds % 60);
+    		
+    		if (songProgressBar.getMax() != AudioPlayerService.mp.getDuration() / 1000){
+				songProgressBar.setMax(AudioPlayerService.mp.getDuration() / 1000);
+			}
+    		
+    		if (songProgressBar.getProgress() != currentSeconds){
+    			songProgressBar.setProgress(currentSeconds);
+    		}
+            
+    		if (songCurrentDurationLabel.getText().toString() != currentDuration){
+    			songCurrentDurationLabel.setText(currentDuration);
+    			songProgressBar.setProgress(currentSeconds);
+    		}
     	}
 		
 		button_playlist.setOnClickListener(new View.OnClickListener() {
@@ -116,7 +134,6 @@ public class AudioPlayer extends SherlockActivity {
 				else if(AudioPlayerService.mp != null) {
 					int audioFocusResult = AudioPlayerService.audioManager.requestAudioFocus(AudioPlayerService.onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 					if (audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-						android.util.Log.v("AudioPlayer","Audio focus granted");
 						AudioPlayerService.mp.start();
 				    	button_play.setImageResource(R.drawable.button_pause);
 					}
@@ -188,7 +205,7 @@ public class AudioPlayer extends SherlockActivity {
        			}
        			else {
        	            ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(AudioPlayer.this,
-       	    		    getString(R.string.trackPreferencesFile), MODE_PRIVATE);
+       	    		    getString(R.string.trackPreferences), MODE_PRIVATE);
        	            SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
        	            SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
        	    		
@@ -287,7 +304,7 @@ public class AudioPlayer extends SherlockActivity {
 	    	int indexPosition;
 			if (AudioPlayerService.shuffleBoolean == true){
 				ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-					getString(R.string.trackPreferencesFile), MODE_PRIVATE);
+					getString(R.string.trackPreferences), MODE_PRIVATE);
 				PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
 				trackList = shuffledTrackPreferencesObject.trackList;
 				indexPosition = indexPositionPreference.getInt("shuffledIndexPosition", 0);
@@ -301,16 +318,11 @@ public class AudioPlayer extends SherlockActivity {
 	        String artistName = trackList.get(indexPosition).get("trackArtist");
 	        String trackDuration = trackList.get(indexPosition).get("trackDuration");
 	        String albumName = trackList.get(indexPosition).get("trackAlbum");
-	        int currentSeconds = AudioPlayerService.mp.getCurrentPosition() / 1000;
 	        
 	        songTitleLabel.setText(trackName + " - " + artistName);
 			albumLabel.setText(albumName);
 			songTotalDurationLabel.setText(trackDuration);
-			songProgressBar.setProgress(currentSeconds);
-
-			if (songProgressBar.getMax() != AudioPlayerService.mp.getDuration() / 1000){
-				songProgressBar.setMax(AudioPlayerService.mp.getDuration() / 1000); 
-			}
+			
 			if (AudioParser.albumImageStore != null){
 				albumArt.setImageBitmap(AudioParser.albumImageStore);
 			}
@@ -332,6 +344,9 @@ public class AudioPlayer extends SherlockActivity {
 	private static Runnable mUpdateTime = new Runnable() {
         public void run() {
             int currentSeconds = AudioPlayerService.mp.getCurrentPosition() / 1000;
+            if (songProgressBar.getMax() != AudioPlayerService.mp.getDuration() / 1000){
+				songProgressBar.setMax(AudioPlayerService.mp.getDuration() / 1000);
+			}
             
             if (currentSeconds >= 0 && AudioPlayerService.mp != null ){
             	if (AudioPlayerService.mp.isPlaying()){
@@ -340,7 +355,7 @@ public class AudioPlayer extends SherlockActivity {
             		songProgressBar.setProgress(currentSeconds);
             		mHandler.postDelayed(this, 1000);
             	}
-            }            
+            } 
         }
      };
 	

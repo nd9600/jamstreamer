@@ -52,17 +52,13 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
         	@SuppressWarnings("unchecked")
 			//ArrayList<HashMap<String, String>> trackList = (ArrayList<HashMap<String,String>>)savedInstanceState.get(TAG_TRACKLIST);
         	ArrayList<HashMap<String, String>> trackList = (ArrayList<HashMap<String, String>>)savedInstanceState.getSerializable(TAG_TRACKLIST);
-        	if (trackList != null){
-        		android.util.Log.v("PlaylistActivity","Restored trackList from savedInstanceState: " + trackList.size());
-        	}
         	return trackList;
         } 
         else {
         	ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-    	    		getString(R.string.trackPreferencesFile), MODE_PRIVATE);
+    	    		getString(R.string.trackPreferences), MODE_PRIVATE);
         	PlaylistList trackPreferencesObject = trackPreferences.getObject("tracks", PlaylistList.class);
         	if (trackPreferencesObject != null){
-        		android.util.Log.v("PlaylistActivity","Restored trackList from ComplexPreferences: " + trackPreferencesObject.trackList.size());
         		return trackPreferencesObject.trackList;        		
         	}
         	else {
@@ -74,7 +70,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
     
 	private void shuffleTrackList(){
 		ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-			getString(R.string.trackPreferencesFile), MODE_PRIVATE);	
+			getString(R.string.trackPreferences), MODE_PRIVATE);	
 		PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("tracks", PlaylistList.class);
 		ArrayList<HashMap<String, String>> trackList = shuffledTrackPreferencesObject.trackList;
 		
@@ -203,7 +199,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 	    @Override
 	    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 	    	ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(PlaylistActivity.this, 
-        	    	getString(R.string.trackPreferencesFile), MODE_PRIVATE);;
+        	    	getString(R.string.trackPreferences), MODE_PRIVATE);;
         	    PlaylistList trackListObject = new PlaylistList();
                 int itemId = item.getItemId();
 				if (itemId == R.id.removePlaylistItem) {
@@ -301,9 +297,6 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
     public void onSaveInstanceState(Bundle savedInstanceState) {
     	super.onSaveInstanceState(savedInstanceState);
     	trackList = restoreTracklist(null);
-    	if (trackList != null){
-    		android.util.Log.v("PlaylistActivity","Restored trackList from savedInstanceState: " + trackList.size());
-    	}
     	savedInstanceState.putSerializable(TAG_TRACKLIST, trackList); 
     }
     

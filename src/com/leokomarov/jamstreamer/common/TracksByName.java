@@ -174,7 +174,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	    	setListAdapter(TracksByNameListAdapter);
 	    	registerForContextMenu(TracksByNameLV);
 	    	final ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-	    		getString(R.string.trackPreferencesFile), MODE_PRIVATE);;
+	    		getString(R.string.trackPreferences), MODE_PRIVATE);;
 	    		
 	    	button_playlist = (ImageButton) findViewById(R.id.tracks_by_name_btnPlaylist);    	
 	    	button_playlist.setOnClickListener(new View.OnClickListener() {
@@ -311,7 +311,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 					 }
 				}
 				ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(TracksByName.this,
-	    	    	getString(R.string.trackPreferencesFile), MODE_PRIVATE);;
+	    	    	getString(R.string.trackPreferences), MODE_PRIVATE);;
 				
 				ArrayList<HashMap<String, String>> newTrackList = new ArrayList<HashMap<String, String>>();
     	    	if (trackPreferences.getObject("tracks", PlaylistList.class) != null){

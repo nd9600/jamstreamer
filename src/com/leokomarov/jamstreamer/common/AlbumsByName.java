@@ -90,8 +90,6 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 		String hierarchy = hierarchyPreference.getString("hierarchy", "none");
 		String searchTerm = new String();
 		String unformattedURL = new String();
-		android.util.Log.v("AlbumsByName" +
-				"", "hierarchy is " + hierarchy);
 		if (hierarchy.equals("artists")){
 			searchTerm = intent.getStringExtra(ArtistsParser.TAG_ARTIST_ID);
 			unformattedURL = getResources().getString(R.string.albumsByArtistIDJSONURL);
@@ -329,7 +327,7 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
     	    
     	    if (onTrackRequestCompletedLoop == albumsToAddLoop){
     	    	ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(AlbumsByName.this,
-    	    		getString(R.string.trackPreferencesFile), MODE_PRIVATE);;
+    	    		getString(R.string.trackPreferences), MODE_PRIVATE);;
     	    		
     	        ArrayList<HashMap<String, String>> newTrackList = new ArrayList<HashMap<String, String>>();
     	    	if (trackPreferences.getObject("tracks", PlaylistList.class) != null){

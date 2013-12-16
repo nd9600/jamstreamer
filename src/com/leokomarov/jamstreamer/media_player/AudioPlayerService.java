@@ -40,7 +40,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
 	private ArrayList<HashMap<String, String>> getTrackListFromPreferences(){
     	ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-	    		getString(R.string.trackPreferencesFile), MODE_PRIVATE);
+	    		getString(R.string.trackPreferences), MODE_PRIVATE);
 	    PlaylistList trackPreferencesObject = trackPreferences.getObject("tracks", PlaylistList.class);
 	    if (trackPreferencesObject != null){
     		return trackPreferencesObject.trackList;
@@ -54,79 +54,83 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 		ArrayList<HashMap<String, String>> trackList = new ArrayList<HashMap<String, String>>();
 		if (AudioPlayerService.shuffleBoolean == true){
 			ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-				getString(R.string.trackPreferencesFile), MODE_PRIVATE);
+				getString(R.string.trackPreferences), MODE_PRIVATE);
 			PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
 			trackList = shuffledTrackPreferencesObject.trackList;
 		}
 		else {
 			trackList = getTrackListFromPreferences();
 		}
-    	int trackID = Integer.parseInt(trackList.get(indexPosition).get("trackID"));
-    	
-    	SharedPreferences currentTrackPreference = getSharedPreferences(getString(R.string.currentTrackPreferences), 0);
-    	SharedPreferences.Editor currentTrackEditor = currentTrackPreference.edit();
-    	currentTrackEditor.putInt("currentTrack", trackID);
-        currentTrackEditor.commit();
-        
-    	String unformattedURL = getResources().getString(R.string.trackByIDURL);
-    	String url = String.format(unformattedURL, trackID).replace("&amp;", "&");
-    	String unformattedTrackInfoURL = getResources().getString(R.string.trackInformation);
-    	String trackInfoURL = String.format(unformattedTrackInfoURL, trackID).replace("&amp;", "&");
-    	
-    	String trackName = trackList.get(indexPosition).get("trackName");
-        String artistName = trackList.get(indexPosition).get("trackArtist");
-        String trackDuration = trackList.get(indexPosition).get("trackDuration");
-        String albumName = trackList.get(indexPosition).get("trackAlbum");
-        String artistAndAlbum = artistName + " - "  + albumName;
-        
-    	mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
-    	try {
-    		AudioPlayer.songTitleLabel.setText(trackName + " - " + artistName);
-            AudioPlayer.albumLabel.setText(albumName);
-            AudioPlayer.songCurrentDurationLabel.setText("0:00");
-            AudioPlayer.songTotalDurationLabel.setText(trackDuration);
+				
+		if (trackList != null && trackList.size() != 0){
+			int trackID = Integer.parseInt(trackList.get(indexPosition).get("trackID"));
+	    	
+	    	SharedPreferences currentTrackPreference = getSharedPreferences(getString(R.string.currentTrackPreferences), 0);
+	    	SharedPreferences.Editor currentTrackEditor = currentTrackPreference.edit();
+	    	currentTrackEditor.putInt("currentTrack", trackID);
+	        currentTrackEditor.commit();
+	        
+	    	String unformattedURL = getResources().getString(R.string.trackByIDURL);
+	    	String url = String.format(unformattedURL, trackID).replace("&amp;", "&");
+	    	String unformattedTrackInfoURL = getResources().getString(R.string.trackInformation);
+	    	String trackInfoURL = String.format(unformattedTrackInfoURL, trackID).replace("&amp;", "&");
+	    	
+	    	String trackName = trackList.get(indexPosition).get("trackName");
+	        String artistName = trackList.get(indexPosition).get("trackArtist");
+	        String trackDuration = trackList.get(indexPosition).get("trackDuration");
+	        String albumName = trackList.get(indexPosition).get("trackAlbum");
+	        String artistAndAlbum = artistName + " - "  + albumName;
+	        
+	    	mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
+	    	try {
+	    		AudioPlayer.songTitleLabel.setText(trackName + " - " + artistName);
+	            AudioPlayer.albumLabel.setText(albumName);
+	            AudioPlayer.songCurrentDurationLabel.setText("0:00");
+	            AudioPlayer.songTotalDurationLabel.setText(trackDuration);
 
-    		if (AudioParser.albumImageStore != null){
-    			AudioPlayer.albumArt.setImageBitmap(AudioParser.albumImageStore);
-    		}
-    		BitmapDrawable albumImageDrawable = ((BitmapDrawable)AudioPlayer.albumArt.getDrawable());
-    		
-    		if (albumImageDrawable == null | ! artistAndAlbumStore.equals(artistAndAlbum)){
-    			AudioParser jParser = new AudioParser();
-    			jParser.execute(trackInfoURL, artistName + " - "  + albumName);
-    			artistAndAlbumStore = artistName + " - "  + albumName;
-    		}
-    		
-    		mp.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
-    		wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, "myWifiLock");
-    		wifiLock.acquire();
-    		mp.setDataSource(url);
-    		mp.setOnCompletionListener(this);
-        	mp.setOnPreparedListener(this);
-        	mp.setOnErrorListener(this);
-        	AudioPlayer.button_play.setImageResource(R.drawable.button_pause);
-			
-    		NotificationCompat.Builder builder = new NotificationCompat.Builder(this);  
-        	builder.setSmallIcon(R.drawable.img_ic_launcher);
-            builder.setContentTitle("JamStreamer");  
-            builder.setContentText("" + trackName + " - " + artistName);  
-            Intent notificationIntent = new Intent(this, AudioPlayer.class);  
-            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            notificationIntent.putExtra("fromNotification", true);
-            PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);  
-            builder.setContentIntent(contentIntent);
-        	startForeground(46798, builder.getNotification());
-    		mp.prepareAsync();
-    	} catch(NullPointerException e){
-        	android.util.Log.e("AudioPlayerService","NullPointerException :" + e.getMessage());
-        	android.util.Log.e("AudioPlayerService","trackList.get(indexPosition) :" + trackList.get(indexPosition));
-    	} catch (FileNotFoundException e){
-    	} catch (IllegalArgumentException e) {
-    	} catch (IllegalStateException e) {
-    	} catch (RuntimeException e){
-    	} catch (IOException e) {
-    	} catch (Exception e) {
-    	} 	
+	    		if (AudioParser.albumImageStore != null){
+	    			AudioPlayer.albumArt.setImageBitmap(AudioParser.albumImageStore);
+	    		}
+	    		BitmapDrawable albumImageDrawable = ((BitmapDrawable)AudioPlayer.albumArt.getDrawable());
+	    		
+	    		if (albumImageDrawable == null | ! artistAndAlbumStore.equals(artistAndAlbum)){
+	    			AudioParser jParser = new AudioParser();
+	    			jParser.execute(trackInfoURL, artistName + " - "  + albumName);
+	    			artistAndAlbumStore = artistName + " - "  + albumName;
+	    		}
+	    		
+	    		mp.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+	    		wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, "myWifiLock");
+	    		wifiLock.acquire();
+	    		mp.setDataSource(url);
+	    		mp.setOnCompletionListener(this);
+	        	mp.setOnPreparedListener(this);
+	        	mp.setOnErrorListener(this);
+	        	AudioPlayer.button_play.setImageResource(R.drawable.button_pause);
+				
+	    		NotificationCompat.Builder builder = new NotificationCompat.Builder(this);  
+	        	builder.setSmallIcon(R.drawable.img_ic_launcher);
+	            builder.setContentTitle(trackName);  
+	            builder.setContentText(artistName + " - " + albumName);  
+	            Intent notificationIntent = new Intent(this, AudioPlayer.class);  
+	            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+	            notificationIntent.putExtra("fromNotification", true);
+	            PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);  
+	            builder.setContentIntent(contentIntent);
+	        	startForeground(46798, builder.getNotification());
+	    		mp.prepareAsync();
+	    	} catch(NullPointerException e){
+	        	android.util.Log.e("AudioPlayerService","NullPointerException :" + e.getMessage());
+	        	android.util.Log.e("AudioPlayerService","trackList.get(indexPosition) :" + trackList.get(indexPosition));
+	    	} catch (FileNotFoundException e){
+	    	} catch (IllegalArgumentException e) {
+	    	} catch (IllegalStateException e) {
+	    	} catch (RuntimeException e){
+	    	} catch (IOException e) {
+	    	} catch (Exception e) {
+	    	}
+		}
+	
     }
     
     @Override
@@ -142,7 +146,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     	int indexPosition;
 		if (AudioPlayerService.shuffleBoolean == true){
 			ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-				getString(R.string.trackPreferencesFile), MODE_PRIVATE);
+				getString(R.string.trackPreferences), MODE_PRIVATE);
 			PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
 			trackList = shuffledTrackPreferencesObject.trackList;
 			indexPosition = indexPositionPreference.getInt("shuffledIndexPosition", 0);
@@ -161,7 +165,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         	playSong(indexPosition);        	
         }
     	else {
-        	if (trackID == currentTrackID ){
+        	if (trackID == currentTrackID){
        			String trackName = trackList.get(indexPosition).get("trackName");
        	        String trackDuration = trackList.get(indexPosition).get("trackDuration");
        	        String artistName = trackList.get(indexPosition).get("trackArtist");
@@ -169,9 +173,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
        	        AudioPlayer.songTitleLabel.setText(trackName + " - " + artistName);
        			AudioPlayer.albumLabel.setText(albumName);
        			AudioPlayer.songTotalDurationLabel.setText(trackDuration);
-       			AudioPlayer.albumArt.setImageBitmap(AudioParser.albumImageStore);
-
-       			mp.seekTo(0);       			
+       			AudioPlayer.albumArt.setImageBitmap(AudioParser.albumImageStore);			
         	}
         	else {
         		mp.stop();
@@ -195,7 +197,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     public void onPrepared(MediaPlayer mp) {
 		int audioFocusResult = audioManager.requestAudioFocus(onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 		if (audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-			android.util.Log.v("AudioPlayerService","Audio focus granted");
 			originalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 			mp.start();
 	        AudioPlayer.songProgressBar.setProgress(0);
@@ -214,17 +215,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-    	AudioPlayer.button_play.setClickable(false);
-    	AudioPlayer.button_forward.setClickable(false);
-    	AudioPlayer.button_backward.setClickable(false);
-    	AudioPlayer.button_next.setClickable(false);
-        AudioPlayer.button_previous.setClickable(false);
-        AudioPlayer.button_repeat.setClickable(false);
-        AudioPlayer.button_shuffle.setClickable(false);
-        AudioPlayer.songProgressBar.setClickable(false);
-    	AudioPlayer.button_play.setImageResource(R.drawable.button_play);
-    	stopForeground(true);
-    	
     	if ( mp.isPlaying() ){
     		mp.stop();
     	}
@@ -233,21 +223,33 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 			mp.seekTo(0);
 		}
     	else {
-    		android.util.Log.v("AudioPlayerService","Audio focus abandoned");
-        	mp.reset();
             audioManager.abandonAudioFocus(onAudioFocusChangeListener);
-            wifiLock.release();
+            if (wifiLock.isHeld()){
+            	wifiLock.release();
+            }
+            stopForeground(true);
+            AudioPlayer.button_play.setImageResource(R.drawable.button_play);
 
             ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-    		    getString(R.string.trackPreferencesFile), MODE_PRIVATE);
+    		    getString(R.string.trackPreferences), MODE_PRIVATE);
             SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
             SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
     		
     		if (shuffleBoolean == false){
     			ArrayList<HashMap<String, String>> trackList = getTrackListFromPreferences();
     			int indexPosition = indexPositionPreference.getInt("indexPosition", -1);
-    			
+    			    			
     			if (indexPosition + 1 <= trackList.size() - 1){
+    				AudioPlayer.button_play.setClickable(false);
+    		    	AudioPlayer.button_forward.setClickable(false);
+    		    	AudioPlayer.button_backward.setClickable(false);
+    		    	AudioPlayer.button_next.setClickable(false);
+    		        AudioPlayer.button_previous.setClickable(false);
+    		        AudioPlayer.button_repeat.setClickable(false);
+    		        AudioPlayer.button_shuffle.setClickable(false);
+    		        AudioPlayer.songProgressBar.setClickable(false);
+    		    	AudioPlayer.button_play.setImageResource(R.drawable.button_play);
+    				mp.reset();
     				indexPosition++;
     				indexPositionEditor.putInt("indexPosition", indexPosition);
     				indexPositionEditor.commit();
@@ -258,7 +260,18 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     			PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
     			ArrayList<HashMap<String, String>> shuffledTracklist = shuffledTrackPreferencesObject.trackList;
     			int shuffledIndexPosition = indexPositionPreference.getInt("shuffledIndexPosition", -1);
+    			
     			if (shuffledIndexPosition + 1 <= shuffledTracklist.size() - 1){
+    				AudioPlayer.button_play.setClickable(false);
+    		    	AudioPlayer.button_forward.setClickable(false);
+    		    	AudioPlayer.button_backward.setClickable(false);
+    		    	AudioPlayer.button_next.setClickable(false);
+    		        AudioPlayer.button_previous.setClickable(false);
+    		        AudioPlayer.button_repeat.setClickable(false);
+    		        AudioPlayer.button_shuffle.setClickable(false);
+    		        AudioPlayer.songProgressBar.setClickable(false);
+    		    	AudioPlayer.button_play.setImageResource(R.drawable.button_play);
+    				mp.reset();
     				shuffledIndexPosition++;
     				indexPositionEditor.putInt("shuffledIndexPosition", shuffledIndexPosition);
     				indexPositionEditor.commit();

@@ -2,10 +2,11 @@
 <resources>
     <string name="appName">JamStreamer</string>
     
-    <string name="trackPreferencesFile">track_preferences</string>
+    <string name="trackPreferences">track_preferences</string>
     <string name="currentTrackPreferences">currentTrack_preferences</string>
     <string name="indexPositionPreferences">indexPosition_preferences</string>
     <string name="hierarchyPreferences">hierarchy_preferences</string>
+    <string name="playingWhileOrientationChangePreferences">playingWhileOrientationChange_preferences</string>
     
     <string name="mainArtists">Artists</string>
     <string name="mainAlbums">Albums</string>
