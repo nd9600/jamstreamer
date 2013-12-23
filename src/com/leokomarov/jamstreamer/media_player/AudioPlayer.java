@@ -343,19 +343,21 @@ public class AudioPlayer extends SherlockActivity {
 
 	private static Runnable mUpdateTime = new Runnable() {
         public void run() {
-            int currentSeconds = AudioPlayerService.mp.getCurrentPosition() / 1000;
-            if (songProgressBar.getMax() != AudioPlayerService.mp.getDuration() / 1000){
-				songProgressBar.setMax(AudioPlayerService.mp.getDuration() / 1000);
-			}
+        	if (AudioPlayerService.mp != null){
+        		int currentSeconds = AudioPlayerService.mp.getCurrentPosition() / 1000;
+        		if (songProgressBar.getMax() != AudioPlayerService.mp.getDuration() / 1000){
+        			songProgressBar.setMax(AudioPlayerService.mp.getDuration() / 1000);
+        		}
             
-            if (currentSeconds >= 0 && AudioPlayerService.mp != null ){
-            	if (AudioPlayerService.mp.isPlaying()){
-            		String currentDuration = String.format(Locale.US, "%d:%02d", currentSeconds / 60, currentSeconds % 60);
-            		songCurrentDurationLabel.setText(currentDuration);
-            		songProgressBar.setProgress(currentSeconds);
-            		mHandler.postDelayed(this, 1000);
-            	}
-            } 
+        		if (currentSeconds >= 0 && AudioPlayerService.mp != null ){
+        			if (AudioPlayerService.mp.isPlaying()){
+        				String currentDuration = String.format(Locale.US, "%d:%02d", currentSeconds / 60, currentSeconds % 60);
+        				songCurrentDurationLabel.setText(currentDuration);
+        				songProgressBar.setProgress(currentSeconds);
+        				mHandler.postDelayed(this, 1000);
+        			}
+        		}
+        	}
         }
      };
 	

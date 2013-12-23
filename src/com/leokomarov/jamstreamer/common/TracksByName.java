@@ -54,6 +54,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	private ArrayAdapter<TracksByNameModel>TracksByNameListAdapter;
 	private List<TracksByNameModel> TracksByNameModel = new ArrayList<TracksByNameModel>();
 	protected static ActionMode mActionMode;
+	protected static boolean selectAll;
 	private JSONArray results;
 	private ArrayList<HashMap<String, String>> trackList = new ArrayList<HashMap<String, String>>();
 	private ImageButton button_playlist;
@@ -70,6 +71,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 		super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.original_empty_list);
+        selectAll = false;
 		
 		Intent intent = getIntent();
 		SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);

@@ -1,5 +1,7 @@
 package com.leokomarov.jamstreamer;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -11,6 +13,7 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.leokomarov.jamstreamer.common.TracksByName;
 import com.leokomarov.jamstreamer.common.TracksByNameAdapter;
+import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.searches.AlbumsSearch;
 import com.leokomarov.jamstreamer.searches.ArtistsSearch;
@@ -84,6 +87,25 @@ public class MainMenu extends SherlockActivity {
 	    	TracksByNameAdapter.TracksByNameCheckboxCount = 0;
 	    }
 	}
+    
+    @Override
+    public void onBackPressed() {
+        new AlertDialog.Builder(this)
+        	.setMessage("Are you sure you want to exit?")
+        	.setCancelable(false)
+        	.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        	
+        		public void onClick(DialogInterface dialog, int id) {
+        			stopService(new Intent(MainMenu.this, AudioPlayerService.class));
+        			MainMenu.this.finish();
+        			//AudioPlayer.this.finish();
+        		}
+        })
+        .setNegativeButton("No", null)
+        .show();
+    }
+
+
     
     public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) { 
 	        int itemId = item.getItemId();
