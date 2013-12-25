@@ -55,6 +55,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	private List<TracksByNameModel> TracksByNameModel = new ArrayList<TracksByNameModel>();
 	protected static ActionMode mActionMode;
 	protected static boolean selectAll;
+	protected static boolean selectAllPressed;
 	private JSONArray results;
 	private ArrayList<HashMap<String, String>> trackList = new ArrayList<HashMap<String, String>>();
 	private ImageButton button_playlist;
@@ -71,6 +72,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 		super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.original_empty_list);
+        selectAllPressed = false;
         selectAll = false;
 		
 		Intent intent = getIntent();
@@ -255,6 +257,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
  
         int menuID = item.getItemId();
         if (menuID == R.id.tracksFloating_selectTrack){
+        	selectAllPressed = false;
         	if (mActionMode == null){
 				mActionMode = startActionMode(mActionModeCallback);
         	}
@@ -280,7 +283,11 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 		}
 		
     }
-
+	
+	public void checkboxTicked(View view){
+    	selectAllPressed = false;
+    }
+	
 	public void callActionBar(){
 		if (mActionMode == null) {
 			mActionMode = startActionMode(mActionModeCallback);
@@ -289,21 +296,69 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 
 	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
 		@Override 
-	    	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-	    		MenuInflater inflater = getSupportMenuInflater();
-	        	inflater.inflate(R.menu.tracks_contextual_menu, menu);
-	        	return true;
-	      }
+	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+	       	return true;
+	    }
 	    
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			return false;
+			menu.clear();
+			MenuInflater inflater = getSupportMenuInflater();
+        	inflater.inflate(R.menu.tracks_contextual_menu, menu);
+        	if (! selectAll){
+	        	menu.findItem(R.id.tracksSelectAllTracks).setTitle("Select all");
+	        }
+	        else if (selectAll){
+	        	menu.findItem(R.id.tracksSelectAllTracks).setTitle("Select none");
+	        }	
+			return true;
 		}
 
 		@Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			int itemId = item.getItemId();
-			if (itemId == R.id.addTrackToPlaylist) {
+			if (itemId == R.id.tracksSelectAllTracks) {
+            	selectAllPressed = true;
+            	selectAll = !selectAll;
+            	mActionMode.invalidate();
+            	
+              	for (int i = 1; i < TracksByNameLV.getCount(); i++) {
+              		View view = TracksByNameLV.getChildAt(i);
+              		int indexPosition = i - 1;
+              		
+              		if (view != null) {
+              			CheckBox checkbox = (CheckBox) view.findViewById(R.id.tracks_by_name_checkBox);
+              			
+              			if (selectAll && ! checkbox.isChecked()){
+              				checkbox.setChecked(true);
+              			}
+              			else if (! selectAll && checkbox.isChecked()){
+              				checkbox.setChecked(false);
+              			}
+              		}
+              		
+              		if (selectAll && ! TracksByNameAdapter.TracksByNameCheckboxList.get(indexPosition, false) ){
+              			TracksByNameAdapter.TracksByNameCheckboxList.put(indexPosition, true);
+              			TracksByNameAdapter.TracksByNameCheckboxCount++;
+					}
+              		else if (! selectAll && TracksByNameAdapter.TracksByNameCheckboxList.get(indexPosition, false) ){
+              			TracksByNameAdapter.TracksByNameCheckboxList.put(indexPosition, false);
+              			TracksByNameAdapter.TracksByNameCheckboxCount--;
+					}
+              	}
+              	if (TracksByNameAdapter.TracksByNameCheckboxCount == 0){
+              		if (mActionMode != null){
+              			mActionMode.finish();
+              		}
+                }
+				else if (TracksByNameAdapter.TracksByNameCheckboxCount != 0){
+					callActionBar();
+					mActionMode.setTitle(TracksByNameAdapter.TracksByNameCheckboxCount + " selected");
+                }
+              	
+               	return true;
+            } else if (itemId == R.id.addTrackToPlaylist) {
+            	selectAllPressed = false;
 				int tracksByNameLVLength = TracksByNameLV.getCount();
 				SparseBooleanArray checkboxList = TracksByNameAdapter.TracksByNameCheckboxList;
 				ArrayList<HashMap<String, String>> tracksToAddList = new ArrayList<HashMap<String, String>>();

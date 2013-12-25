@@ -29,6 +29,7 @@
     <string name="buttonText">Search</string>
     <string name="selectTrack">Select track</string>
     <string name="selectAlbum">Select album</string>
+    <string name="selectAll">Select all</string>
     <string name="viewArtistFloatingText">View artist</string>
     <string name="viewAlbumFloatingText">View album</string>
     <string name="addTrackToPlaylistCAB">Add track(s)</string>

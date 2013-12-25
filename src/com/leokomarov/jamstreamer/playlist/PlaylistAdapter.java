@@ -132,6 +132,16 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistModel> {
 		}
 		
 		ViewHolder holder = (ViewHolder) view.getTag();
+		
+		if (PlaylistActivity.selectAllPressed){
+			if (PlaylistActivity.selectAll && ! holder.checkbox.isChecked()){
+				holder.checkbox.setChecked(true);
+			}
+			else if (! PlaylistActivity.selectAll && holder.checkbox.isChecked()){
+				holder.checkbox.setChecked(false);
+			}
+		}
+		
 		String trackNameAndDuration = list.get(position).getTrackNameAndDuration();
 		String trackArtistAndAlbum = list.get(position).getTrackArtistAndAlbum();
 		holder.trackNameAndDuration.setText(trackNameAndDuration);

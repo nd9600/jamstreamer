@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <item
+        android:id="@+id/playlistSelectAllTracks"
+        android:title="@string/selectAll"
+        android:showAsAction="always">
+    </item>
+    
+    <item
         android:id="@+id/removePlaylistItem"
         android:title="@string/playlistRemoveCAB"
         android:icon="@drawable/bin"

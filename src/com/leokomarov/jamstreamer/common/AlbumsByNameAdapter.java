@@ -16,7 +16,6 @@ import android.widget.TextView;
 import com.leokomarov.jamstreamer.R;
 
 class AlbumsByNameModel {
-
 	  private HashMap<String, String> albumMap;
 	  private boolean selected;
 
@@ -134,6 +133,16 @@ public class AlbumsByNameAdapter extends ArrayAdapter<AlbumsByNameModel> {
 		}
 	  	
 		ViewHolder holder = (ViewHolder) view.getTag();
+		
+		if (AlbumsByName.selectAllPressed){
+			if (AlbumsByName.selectAll && ! holder.checkbox.isChecked()){
+				holder.checkbox.setChecked(true);
+			}
+			else if (! AlbumsByName.selectAll && holder.checkbox.isChecked()){
+				holder.checkbox.setChecked(false);
+			}
+		}
+		
 		String albumName = list.get(position).getAlbumName();
 		String albumArtist = list.get(position).getAlbumArtist();
 		holder.albumName.setText(albumName);

@@ -77,12 +77,12 @@ public class MainMenu extends SherlockActivity {
     public void topTracksWeekMainButton(View view){
     	putHierarchy("topTracksPerWeek");
 		Intent topTracksWeekIntent = new Intent(this, TracksByName.class);
-		startActivityForResult(topTracksWeekIntent, 1);	
+		startActivityForResult(topTracksWeekIntent, 2);	
 	}
     
     @Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-	    if (requestCode == 1) {
+	    if (requestCode == 2) {
 	    	TracksByNameAdapter.TracksByNameCheckboxList.clear();
 	    	TracksByNameAdapter.TracksByNameCheckboxCount = 0;
 	    }
@@ -94,11 +94,9 @@ public class MainMenu extends SherlockActivity {
         	.setMessage("Are you sure you want to exit?")
         	.setCancelable(false)
         	.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-        	
         		public void onClick(DialogInterface dialog, int id) {
         			stopService(new Intent(MainMenu.this, AudioPlayerService.class));
         			MainMenu.this.finish();
-        			//AudioPlayer.this.finish();
         		}
         })
         .setNegativeButton("No", null)

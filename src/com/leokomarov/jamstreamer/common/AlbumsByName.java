@@ -42,6 +42,7 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.leokomarov.jamstreamer.ComplexPreferences;
 import com.leokomarov.jamstreamer.JSONParser;
@@ -71,6 +72,8 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 	private ImageButton button_playlist;
 	private int albumsToAddLoop = 0;
 	private int onTrackRequestCompletedLoop = 0;
+	protected static boolean selectAll;
+	protected static boolean selectAllPressed;
 	
 	private void putHierarchy(String hierarchy){
 		SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
@@ -82,8 +85,10 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        	getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        	setContentView(R.layout.original_empty_list);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        setContentView(R.layout.original_empty_list);
+        selectAllPressed = false;
+        selectAll = false;	
 		
 		Intent intent = getIntent();
 		SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
@@ -218,9 +223,8 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
  
         int menuID = item.getItemId();
         if (menuID == R.id.albumsFloating_selectAlbum){
-        	if (mActionMode == null){
-				mActionMode = startActionMode(mActionModeCallback);
-        	}
+        	selectAllPressed = false;
+        	callActionBar();
         	CheckBox checkbox = (CheckBox) viewClicked.findViewById(R.id.albums_by_name_checkBox);
 			checkbox.setChecked(! checkbox.isChecked());
         	return true;
@@ -247,20 +251,69 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
 		@Override 
 	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-	    	com.actionbarsherlock.view.MenuInflater inflater = getSupportMenuInflater();
-	        inflater.inflate(R.menu.albums_contextual_menu, menu);
 	        return true;
-	        }
+	    }
 	    
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			return false;
+			menu.clear();
+	    	MenuInflater inflater = getSupportMenuInflater();
+	    	inflater.inflate(R.menu.albums_contextual_menu, menu);  
+	        if (! selectAll){
+	        	menu.findItem(R.id.albumsSelectAllTracks).setTitle("Select all");
+	        }
+	        else if (selectAll){
+	        	menu.findItem(R.id.albumsSelectAllTracks).setTitle("Select none");
+	        }	
+			return true;
 		}
 
 		@Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         	int itemId = item.getItemId();
-			if (itemId == R.id.addAlbumToPlaylist) {
+        	if (itemId == R.id.albumsSelectAllTracks) {
+            	selectAllPressed = true;
+            	selectAll = !selectAll;
+            	mActionMode.invalidate();
+            	
+              	for (int i = 1; i < AlbumsByNameLV.getCount(); i++) {
+              		View view = AlbumsByNameLV.getChildAt(i);
+              		int indexPosition = i - 1;
+              		
+              		if (view != null) {
+              			CheckBox checkbox = (CheckBox) view.findViewById(R.id.albums_by_name_checkBox);
+              			
+              			if (selectAll && ! checkbox.isChecked()){
+              				checkbox.setChecked(true);
+              			}
+              			else if (! selectAll && checkbox.isChecked()){
+              				checkbox.setChecked(false);
+              			}
+              		}
+              		
+              		if (selectAll && ! AlbumsByNameAdapter.AlbumsByNameCheckboxList.get(indexPosition, false) ){
+              			AlbumsByNameAdapter.AlbumsByNameCheckboxList.put(indexPosition, true);
+              			AlbumsByNameAdapter.AlbumsByNameCheckboxCount++;
+					}
+              		else if (! selectAll && AlbumsByNameAdapter.AlbumsByNameCheckboxList.get(indexPosition, false) ){
+              			AlbumsByNameAdapter.AlbumsByNameCheckboxList.put(indexPosition, false);
+              			AlbumsByNameAdapter.AlbumsByNameCheckboxCount--;
+					}
+              	}
+              	
+              	if (AlbumsByNameAdapter.AlbumsByNameCheckboxCount == 0){
+              		if (mActionMode != null){
+              			mActionMode.finish();
+              		}
+                }
+				else if (AlbumsByNameAdapter.AlbumsByNameCheckboxCount != 0){
+					callActionBar();
+					mActionMode.setTitle(AlbumsByNameAdapter.AlbumsByNameCheckboxCount + " selected");
+                }
+              	
+               	return true;
+            } else if (itemId == R.id.addAlbumToPlaylist) {
+            	selectAllPressed = false;
 				button_playlist.setClickable(false);
 				int AlbumsByNameLVLength = AlbumsByNameLV.getCount();
 				SparseBooleanArray checkboxList = AlbumsByNameAdapter.AlbumsByNameCheckboxList;

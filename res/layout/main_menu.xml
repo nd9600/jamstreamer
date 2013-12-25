@@ -19,7 +19,7 @@
         android:paddingTop="5dp"
         android:text="@string/mainArtists"
         android:textColor="@drawable/text_highlighter"
-        android:textSize="32sp" />
+        android:textSize="24sp" />
 
     <View
         android:id="@+id/main_separator_1"
@@ -43,7 +43,7 @@
         android:paddingTop="9dp"
         android:text="@string/mainAlbums"
         android:textColor="@drawable/text_highlighter"
-        android:textSize="32sp" />
+        android:textSize="24sp" />
     
     <View
         android:id="@+id/main_separator_2"
@@ -62,7 +62,7 @@
         android:text="@string/mainTracks"
         android:background="@drawable/background_highlighter"
         android:textColor="@drawable/text_highlighter"
-        android:textSize="32sp"
+        android:textSize="24sp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:paddingLeft="5dp"
@@ -87,7 +87,7 @@
         android:text="@string/mainTopTracksWeek"
         android:background="@drawable/background_highlighter"
         android:textColor="@drawable/text_highlighter"
-        android:textSize="32sp"
+        android:textSize="24sp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:paddingLeft="5dp"

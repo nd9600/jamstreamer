@@ -12,7 +12,8 @@
         android:layout_marginLeft="4dp"
         android:layout_marginRight="10dp"
         android:focusable="false"
-        android:visibility="visible" >
+        android:visibility="visible"
+        android:onClick="checkboxTicked" >
     </CheckBox>
     
     <TextView

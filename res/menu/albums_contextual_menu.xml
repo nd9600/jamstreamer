@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <item
+        android:id="@+id/albumsSelectAllTracks"
+        android:title="@string/selectAll"
+        android:showAsAction="always">
+    </item>
+    
+    <item
         android:id="@+id/addAlbumToPlaylist"
         android:title="@string/addAlbumToPlaylistCAB"
         android:showAsAction="always">

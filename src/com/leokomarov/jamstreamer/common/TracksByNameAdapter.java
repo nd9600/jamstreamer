@@ -16,7 +16,6 @@ import android.widget.TextView;
 import com.leokomarov.jamstreamer.R;
 
 class TracksByNameModel {
-
 	  private HashMap<String, String> trackMap;
 	  private boolean selected;
 
@@ -134,6 +133,16 @@ public class TracksByNameAdapter extends ArrayAdapter<TracksByNameModel> {
 		}
 	  	
 		ViewHolder holder = (ViewHolder) view.getTag();
+		
+		if (TracksByName.selectAllPressed){
+			if (TracksByName.selectAll && ! holder.checkbox.isChecked()){
+				holder.checkbox.setChecked(true);
+			}
+			else if (! TracksByName.selectAll && holder.checkbox.isChecked()){
+				holder.checkbox.setChecked(false);
+			}
+		}
+		
 		String trackNameAndDuration = list.get(position).getTrackNameAndDuration();
 		String trackArtistAndAlbum = list.get(position).getTrackArtistAndAlbum();
 		holder.trackNameAndDuration.setText(trackNameAndDuration);

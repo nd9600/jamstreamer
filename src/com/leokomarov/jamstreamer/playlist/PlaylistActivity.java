@@ -41,10 +41,12 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 	public static String TAG_ARTIST_NAME = "artist_name";
 	public static String TAG_ALBUM_NAME = "name";
 	private ArrayList<HashMap<String, String>> trackList = new ArrayList<HashMap<String, String>>();
-	private ListView PlaylistLV;
+	protected static ListView PlaylistLV;
 	private ArrayAdapter<PlaylistModel> PlaylistListAdapter;
 	private List<PlaylistModel> PlaylistModel = new ArrayList<PlaylistModel>();
 	protected static ActionMode mActionMode;
+	protected static boolean selectAll;
+	protected static boolean selectAllPressed;
 	
 	//See ComplexPreferences docs on Github
     private ArrayList<HashMap<String, String>> restoreTracklist(Bundle savedInstanceState){
@@ -93,6 +95,11 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
         super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);     
         setContentView(R.layout.original_empty_list);
+        selectAllPressed = false;
+        selectAll = false;
+        
+        PlaylistAdapter.PlaylistCheckboxList.clear();
+    	PlaylistAdapter.PlaylistCheckboxCount = 0;
         
         ArrayList<HashMap<String, String>> restoredTracklist = restoreTracklist(savedInstanceState);
         if (restoredTracklist != null ){
@@ -133,7 +140,6 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
                 finish();
             }
         });
-    	
     }
 	
     @Override
@@ -151,9 +157,8 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
         
         int menuID = item.getItemId();
         if (menuID == R.id.playlistFloating_selectTrack){
-        	if (mActionMode == null){
-				mActionMode = startActionMode(mActionModeCallback);
-        	}
+        	selectAllPressed = false;
+        	callActionBar();
         	CheckBox checkbox = (CheckBox) viewClicked.findViewById(R.id.playlist_checkBox);
 			checkbox.setChecked(! checkbox.isChecked());
         	return true;
@@ -177,7 +182,11 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 		
     }
     
-    public void callActionBar(){
+    public void checkboxTicked(View view){
+    	selectAllPressed = false;
+    }
+	
+	public void callActionBar(){
 		if (mActionMode == null) {
 			mActionMode = startActionMode(mActionModeCallback);
 		}
@@ -186,90 +195,141 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
 		@Override 
 	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-	    	MenuInflater inflater = getSupportMenuInflater();
-	        inflater.inflate(R.menu.playlist_contextual_menu, menu);
 	        return true;
-	        }
+	    }
 	    
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			return false;
+			menu.clear();
+	    	MenuInflater inflater = getSupportMenuInflater();
+	        inflater.inflate(R.menu.playlist_contextual_menu, menu);  
+	        if (! selectAll){
+	        	menu.findItem(R.id.playlistSelectAllTracks).setTitle("Select all");
+	        }
+	        else if (selectAll){
+	        	menu.findItem(R.id.playlistSelectAllTracks).setTitle("Select none");
+	        }	
+			return true;
 		}
 
 	    @Override
 	    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 	    	ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(PlaylistActivity.this, 
-        	    	getString(R.string.trackPreferences), MODE_PRIVATE);;
-        	    PlaylistList trackListObject = new PlaylistList();
-                int itemId = item.getItemId();
-				if (itemId == R.id.removePlaylistItem) {
-					int PlaylistLVLength = PlaylistLV.getCount();
-					SparseBooleanArray checkboxList = PlaylistAdapter.PlaylistCheckboxList;
-					ArrayList<Integer> tracksToDelete = new ArrayList<Integer>();
-					
-					for (int i = 0; i < PlaylistLVLength; i++){
-						if (checkboxList.get(i, false)) {
-							tracksToDelete.add(i);
-						}
+        	    getString(R.string.trackPreferences), MODE_PRIVATE);;
+        	PlaylistList trackListObject = new PlaylistList();
+            int itemId = item.getItemId();
+            if (itemId == R.id.playlistSelectAllTracks) {
+            	selectAllPressed = true;
+            	selectAll = !selectAll;
+            	mActionMode.invalidate();
+            	
+              	for (int i = 1; i < PlaylistLV.getCount(); i++) {
+              		View view = PlaylistLV.getChildAt(i);
+              		int indexPosition = i - 1;
+              		
+              		if (view != null) {
+              			CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
+              			
+              			if (selectAll && ! checkbox.isChecked()){
+              				checkbox.setChecked(true);
+              			}
+              			else if (! selectAll && checkbox.isChecked()){
+              				checkbox.setChecked(false);
+              			}
+              		}
+              		
+              		if (selectAll && ! PlaylistAdapter.PlaylistCheckboxList.get(indexPosition, false) ){
+              			PlaylistAdapter.PlaylistCheckboxList.put(indexPosition, true);
+              			PlaylistAdapter.PlaylistCheckboxCount++;
 					}
-					Collections.sort(tracksToDelete, Collections.reverseOrder());
-					for (int i : tracksToDelete){
-					    trackList.remove(i);
+              		else if (! selectAll && PlaylistAdapter.PlaylistCheckboxList.get(indexPosition, false) ){
+              			PlaylistAdapter.PlaylistCheckboxList.put(indexPosition, false);
+              			PlaylistAdapter.PlaylistCheckboxCount--;
 					}
-					
-					trackListObject.setTrackList(trackList);
-					trackPreferences.putObject("tracks", trackListObject);
-					trackPreferences.commit();
-					
-					if (trackList != null && ! trackList.isEmpty()){
-						shuffleTrackList();
+              	}
+              	
+              	if (PlaylistAdapter.PlaylistCheckboxCount == 0){
+              		if (mActionMode != null){
+              			mActionMode.finish();
+              		}
+                }
+				else if (PlaylistAdapter.PlaylistCheckboxCount != 0){
+					callActionBar();
+					mActionMode.setTitle(PlaylistAdapter.PlaylistCheckboxCount + " selected");
+                }
+              	
+               	return true;
+            } else if (itemId == R.id.removePlaylistItem) {
+            	selectAllPressed = false;
+            	int PlaylistLVLength = PlaylistLV.getCount();
+				SparseBooleanArray checkboxList = PlaylistAdapter.PlaylistCheckboxList;
+				ArrayList<Integer> tracksToDelete = new ArrayList<Integer>();
+				
+				for (int i = 0; i < PlaylistLVLength; i++){
+					if (checkboxList.get(i, false)) {
+						tracksToDelete.add(i);
 					}
-					PlaylistModel.clear();
-					
-					for (HashMap<String, String> map : trackList) {
-						PlaylistModel.add(new PlaylistModel(map));
-					}
-					
-					if (tracksToDelete.size() == 1){
-						Toast.makeText(getApplicationContext(),"1 track removed from the playlist", Toast.LENGTH_LONG).show();
-					} else if(tracksToDelete.size() >= 2){
-						Toast.makeText(getApplicationContext(),tracksToDelete.size() + " tracks removed from the playlist", Toast.LENGTH_LONG).show();
-					}
-					
-					PlaylistListAdapter.notifyDataSetChanged();
-					PlaylistAdapter.PlaylistCheckboxList.clear();
-			    	PlaylistAdapter.PlaylistCheckboxCount = 0;
-					mActionMode.finish();
-					mActionMode = null;
-					mode.finish();
-					mode = null;
-					return true;
-				} else if (itemId == R.id.deletePlaylist) {
-					trackList.clear();
-					trackListObject.setTrackList(trackList);
-					trackPreferences.putObject("tracks", trackListObject);
-					trackPreferences.commit();
-					
-					if (trackList != null && ! trackList.isEmpty()){
-						shuffleTrackList();
-					}
-					PlaylistModel.clear();
-					
-					PlaylistAdapter.PlaylistCheckboxList.clear();
-			    	PlaylistAdapter.PlaylistCheckboxCount = 0;
-					PlaylistListAdapter.notifyDataSetChanged();
-					mActionMode.finish();
-					mActionMode = null;
-					mode.finish();
-					mode = null;
-					return true;
-				} else {
-					return false;
 				}
+				Collections.sort(tracksToDelete, Collections.reverseOrder());
+				for (int i : tracksToDelete){
+				    trackList.remove(i);
+				}
+				
+				trackListObject.setTrackList(trackList);
+				trackPreferences.putObject("tracks", trackListObject);
+				trackPreferences.commit();
+				
+				if (trackList != null && ! trackList.isEmpty()){
+					shuffleTrackList();
+				}
+				PlaylistModel.clear();
+					
+				for (HashMap<String, String> map : trackList) {
+					PlaylistModel.add(new PlaylistModel(map));
+				}
+					
+				if (tracksToDelete.size() == 1){
+					Toast.makeText(getApplicationContext(),"1 track removed from the playlist", Toast.LENGTH_LONG).show();
+				} else if(tracksToDelete.size() >= 2){
+					Toast.makeText(getApplicationContext(),tracksToDelete.size() + " tracks removed from the playlist", Toast.LENGTH_LONG).show();
+				}
+					
+				PlaylistListAdapter.notifyDataSetChanged();
+				PlaylistAdapter.PlaylistCheckboxList.clear();
+			   	PlaylistAdapter.PlaylistCheckboxCount = 0;
+				mActionMode.finish();
+				mActionMode = null;
+				mode.finish();
+				mode = null;
+				return true;
+			} else if (itemId == R.id.deletePlaylist) {
+				selectAllPressed = false;
+				trackList.clear();
+				trackListObject.setTrackList(trackList);
+				trackPreferences.putObject("tracks", trackListObject);
+				trackPreferences.commit();
+					
+				if (trackList != null && ! trackList.isEmpty()){
+					shuffleTrackList();
+				}
+				PlaylistModel.clear();
+				
+				PlaylistAdapter.PlaylistCheckboxList.clear();
+			   	PlaylistAdapter.PlaylistCheckboxCount = 0;
+				PlaylistListAdapter.notifyDataSetChanged();
+				mActionMode.finish();
+				mActionMode = null;
+				mode.finish();
+				mode = null;
+				return true;
+			} else {
+				return false;
+			}
 	    }
 
 	    @Override
         public void onDestroyActionMode(ActionMode mode) {
+	    	selectAllPressed = false;
 	    	if (mActionMode != null){
 	    		mActionMode = null;
 	    		mode = null;
