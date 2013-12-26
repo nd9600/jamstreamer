@@ -322,7 +322,7 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 				for (int i = 0; i < AlbumsByNameLVLength; i++){
 					if (checkboxList.get(i, false)) {
 						albumsToAddLoop++;
-						String albumID = albumList.get(i).get(TAG_ALBUM_ID);
+						String albumID = albumList.get(i).get("albumID");
 						String unformattedURL = getResources().getString(R.string.tracksByAlbumIDJSONURL);
 				    	String url = String.format(unformattedURL, albumID).replace("&amp;", "&");
 				    	
@@ -374,13 +374,13 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 					trackMap.put("trackArtist", artistName);
 					trackMap.put("trackAlbum", albumName);
 
-					trackList.add(trackMap);
+					trackList.add(trackMap);				
 				}
 			}
     	    
     	    if (onTrackRequestCompletedLoop == albumsToAddLoop){
     	    	ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(AlbumsByName.this,
-    	    		getString(R.string.trackPreferences), MODE_PRIVATE);;
+    	    		getString(R.string.trackPreferences), MODE_PRIVATE);;	
     	    		
     	        ArrayList<HashMap<String, String>> newTrackList = new ArrayList<HashMap<String, String>>();
     	    	if (trackPreferences.getObject("tracks", PlaylistList.class) != null){
@@ -391,7 +391,7 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
     	    	PlaylistList trackPreferencesObject = new PlaylistList();
         		trackPreferencesObject.setTrackList(newTrackList);
         	    trackPreferences.putObject("tracks", trackPreferencesObject);
-        	    trackPreferences.commit();
+        	    trackPreferences.commit();   
         		
         		Collections.shuffle(newTrackList);
         		PlaylistList shuffledTrackListObject = new PlaylistList();

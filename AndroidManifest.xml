@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.leokomarov.jamstreamer"
     android:installLocation="auto"
-    android:versionCode="9"
-    android:versionName="0.0.2.4" >
+    android:versionCode="10"
+    android:versionName="0.0.2.4b" >
 
     <uses-sdk
         android:minSdkVersion="8"
