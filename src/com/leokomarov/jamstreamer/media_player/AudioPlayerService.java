@@ -22,6 +22,7 @@ import android.net.wifi.WifiManager.WifiLock;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.leokomarov.jamstreamer.ComplexPreferences;
 import com.leokomarov.jamstreamer.R;
@@ -31,13 +32,14 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 	protected static MediaPlayer mp;
 	protected static AudioManager audioManager;
 	protected static WifiLock wifiLock;
+	protected static boolean prepared;
 	private static int lastKnownAudioFocusState;
 	private static boolean wasPlayingWhenTransientLoss;
 	private static int originalVolume;
 	protected static boolean repeatBoolean;
 	public static boolean shuffleBoolean;
 	private String artistAndAlbumStore = "";
-
+	
 	private ArrayList<HashMap<String, String>> getTrackListFromPreferences(){
     	ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
 	    		getString(R.string.trackPreferences), MODE_PRIVATE);
@@ -72,6 +74,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 	        
 	    	String unformattedURL = getResources().getString(R.string.trackByIDURL);
 	    	String url = String.format(unformattedURL, trackID).replace("&amp;", "&");
+	    	Log.v("AudioPlayerService-playSong","url = " + url);
 	    	String unformattedTrackInfoURL = getResources().getString(R.string.trackInformation);
 	    	String trackInfoURL = String.format(unformattedTrackInfoURL, trackID).replace("&amp;", "&");
 	    	
@@ -99,6 +102,8 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 	    			artistAndAlbumStore = artistName + " - "  + albumName;
 	    		}
 	    		
+	    		prepared = false;
+	    		Log.v("AudioPlayerService-playSong","Preparing");
 	    		mp.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
 	    		wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, "myWifiLock");
 	    		wifiLock.acquire();
@@ -162,10 +167,10 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
   
     	if (mp == null){
         	mp = new MediaPlayer();
+        	Log.v("AudioPlayerService-onStartCommand","Playing new song");
         	playSong(indexPosition);        	
         }
-    	else {
-        	if (trackID == currentTrackID){
+    	else if (trackID == currentTrackID){
        			String trackName = trackList.get(indexPosition).get("trackName");
        	        String trackDuration = trackList.get(indexPosition).get("trackDuration");
        	        String artistName = trackList.get(indexPosition).get("trackArtist");
@@ -174,13 +179,14 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
        			AudioPlayer.albumLabel.setText(albumName);
        			AudioPlayer.songTotalDurationLabel.setText(trackDuration);
        			AudioPlayer.albumArt.setImageBitmap(AudioParser.albumImageStore);			
-        	}
-        	else {
+        } else {
+        	if (mp.isPlaying()){
         		mp.stop();
-        		stopForeground(true);
-        		mp.reset();
-        		playSong(indexPosition);
-        	}    	
+        	}
+        	stopForeground(true);
+        	mp.reset();
+        	Log.v("AudioPlayerService-onStartCommand","Playing new song");
+        	playSong(indexPosition);    	
         }
         
         return super.onStartCommand(AudioPlayerServiceIntent,flags,startId);
@@ -195,17 +201,18 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     
     @Override
     public void onPrepared(MediaPlayer mp) {
+    	Log.v("AudioPlayerService-onPrepared","Prepared");
+    	prepared = true;
+    	
 		int audioFocusResult = audioManager.requestAudioFocus(onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-		if (audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+		if (mp != null && audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
 			originalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 			mp.start();
-	        AudioPlayer.songProgressBar.setProgress(0);
-	        AudioPlayer.songProgressBar.setMax(mp.getDuration() / 1000);
-	        AudioPlayer.updateProgressBar();
+	        //AudioPlayer.songProgressBar.setProgress(0);
+	        //AudioPlayer.songProgressBar.setMax(mp.getDuration() / 1000);
+	        //AudioPlayer.updateProgressBar();
 		}
         AudioPlayer.button_play.setClickable(true);
-        AudioPlayer.button_forward.setClickable(true);
-        AudioPlayer.button_backward.setClickable(true);
         AudioPlayer.button_next.setClickable(true);
         AudioPlayer.button_previous.setClickable(true);
         AudioPlayer.button_repeat.setClickable(true);
@@ -223,6 +230,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 			mp.seekTo(0);
 		}
     	else {
+    		prepared = false;
             audioManager.abandonAudioFocus(onAudioFocusChangeListener);
             if (wifiLock.isHeld()){
             	wifiLock.release();
@@ -241,8 +249,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     			    			
     			if (indexPosition + 1 <= trackList.size() - 1){
     				AudioPlayer.button_play.setClickable(false);
-    		    	AudioPlayer.button_forward.setClickable(false);
-    		    	AudioPlayer.button_backward.setClickable(false);
     		    	AudioPlayer.button_next.setClickable(false);
     		        AudioPlayer.button_previous.setClickable(false);
     		        AudioPlayer.button_repeat.setClickable(false);
@@ -263,8 +269,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     			
     			if (shuffledIndexPosition + 1 <= shuffledTracklist.size() - 1){
     				AudioPlayer.button_play.setClickable(false);
-    		    	AudioPlayer.button_forward.setClickable(false);
-    		    	AudioPlayer.button_backward.setClickable(false);
     		    	AudioPlayer.button_next.setClickable(false);
     		        AudioPlayer.button_previous.setClickable(false);
     		        AudioPlayer.button_repeat.setClickable(false);
@@ -287,7 +291,9 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     		if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
 				if (lastKnownAudioFocusState == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT && wasPlayingWhenTransientLoss) {
 	    			originalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-	    			mp.start();
+	    			if (prepared == true){
+	    				mp.start();
+	    			}
 				}
 				else if (lastKnownAudioFocusState == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
 					audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, originalVolume, 0);
@@ -295,13 +301,14 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 			}
     		else if (focusChange == AudioManager.AUDIOFOCUS_LOSS){
     			audioManager.abandonAudioFocus(onAudioFocusChangeListener);
-    			if (mp.isPlaying()){
+    			
+    			if (mp != null && mp.isPlaying()){
     				mp.pause();
     			}
     		}
     		else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT){
     			wasPlayingWhenTransientLoss = mp.isPlaying();
-    			if (wasPlayingWhenTransientLoss){
+    			if (mp != null && wasPlayingWhenTransientLoss){
     				mp.pause();
     			}
     		}
@@ -316,6 +323,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     public IBinder onBind(Intent AudioPlayerServiceIntent) {
         return null;
     }
+    
 
     @Override
     public void onDestroy() {

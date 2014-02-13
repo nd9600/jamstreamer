@@ -40,9 +40,6 @@ public class AudioPlayer extends SherlockActivity {
     protected static TextView songTotalDurationLabel;
 	
 	private static Handler mHandler = new Handler();
-    
-	private int seekForwardTime = 5000;
-	private int seekBackwardTime = 5000;
 	
 	private ArrayList<HashMap<String, String>> getTrackListFromPreferences(){
     	ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
@@ -62,8 +59,6 @@ public class AudioPlayer extends SherlockActivity {
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		
 		button_play = (ImageButton) findViewById(R.id.btnPlay);
-		button_forward = (ImageButton) findViewById(R.id.btnForward);
-		button_backward = (ImageButton) findViewById(R.id.btnBackward);
 		button_next = (ImageButton) findViewById(R.id.btnNext);
 		button_previous = (ImageButton) findViewById(R.id.btnPrevious);
 		button_playlist = (ImageButton) findViewById(R.id.btnPlaylist);
@@ -78,8 +73,6 @@ public class AudioPlayer extends SherlockActivity {
 		
 		button_play.setImageResource(R.drawable.button_play);
 		button_play.setClickable(false);
-    	button_forward.setClickable(false);
-    	button_backward.setClickable(false);
     	button_next.setClickable(false);
     	button_previous.setClickable(false);
     	button_repeat.setClickable(false);
@@ -169,33 +162,7 @@ public class AudioPlayer extends SherlockActivity {
                 }
             }
 		});
-		
-		button_forward.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				int currentPosition = AudioPlayerService.mp.getCurrentPosition();
-				if(currentPosition + seekForwardTime <= AudioPlayerService.mp.getDuration()) {
-					AudioPlayerService.mp.seekTo(currentPosition + seekForwardTime);
-				}
-				else {
-					AudioPlayerService.mp.seekTo(AudioPlayerService.mp.getDuration());
-				}
-			}
-		});
-		
-		button_backward.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				int currentPosition = AudioPlayerService.mp.getCurrentPosition();
-				if(currentPosition - seekBackwardTime >= 0) {
-					AudioPlayerService.mp.seekTo(currentPosition - seekBackwardTime);
-				}
-				else {
-					AudioPlayerService.mp.seekTo(0);
-				}	
-			}
-		});
-		
+				
 		button_next.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -343,7 +310,7 @@ public class AudioPlayer extends SherlockActivity {
 
 	private static Runnable mUpdateTime = new Runnable() {
         public void run() {
-        	if (AudioPlayerService.mp != null){
+        	if (AudioPlayerService.mp != null && AudioPlayerService.prepared == true){
         		int currentSeconds = AudioPlayerService.mp.getCurrentPosition() / 1000;
         		if (songProgressBar.getMax() != AudioPlayerService.mp.getDuration() / 1000){
         			songProgressBar.setMax(AudioPlayerService.mp.getDuration() / 1000);
@@ -363,7 +330,7 @@ public class AudioPlayer extends SherlockActivity {
 	
 	public static void updateProgressBar() {
         mHandler.postDelayed(mUpdateTime, 100);
-    }	
+    }
 	
 	@Override
 	protected void onDestroy() {

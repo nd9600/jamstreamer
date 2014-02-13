@@ -116,14 +116,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp">
- 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:background="@drawable/rounded_corner" >
-            
+           
          <ImageButton
             android:id="@+id/btnRepeat"
             android:layout_width="wrap_content"
@@ -141,6 +134,7 @@
                 android:background="@null"
                 android:contentDescription="@string/previousButton"/>
             
+            <!--
             <ImageButton
                 android:id="@+id/btnBackward"
                 android:src="@drawable/button_backward"
@@ -148,6 +142,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:contentDescription="@string/backwardButton"/>
+            -->
             
             <ImageButton
                 android:id="@+id/btnPlay"
@@ -157,6 +152,7 @@
                 android:background="@null"
                 android:contentDescription="@string/playButton"/>
 
+            <!--
             <ImageButton
                 android:id="@+id/btnForward"
                 android:src="@drawable/button_forward"
@@ -164,6 +160,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:contentDescription="@string/forwardButton"/>
+            -->
 
             <ImageButton
                 android:id="@+id/btnNext"
@@ -181,7 +178,6 @@
             	android:layout_marginLeft="5dp"
             	android:background="@null"
             	android:contentDescription="@string/shuffleButton"/>
-        </LinearLayout>
     </LinearLayout>
  
 </RelativeLayout>

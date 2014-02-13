@@ -47,6 +47,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	private String TAG_RESULTS = "results";
 	protected static String TAG_ARTIST_NAME = "artist_name";
 	protected static String TAG_ALBUM_NAME = "name";
+	private static String TAG_ALBUM_ID = "album_id";
 	private String TAG_TRACK_ID = "id";
 	private String TAG_TRACK_NAME = "name";
 	private String TAG_TRACK_DURATION = "duration";
@@ -58,6 +59,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	protected static boolean selectAllPressed;
 	private JSONArray results;
 	private ArrayList<HashMap<String, String>> trackList = new ArrayList<HashMap<String, String>>();
+	private ArrayList<HashMap<String, String>> albumIDList = new ArrayList<HashMap<String, String>>();
 	private ImageButton button_playlist;
 	
 	private void putHierarchy(String hierarchy){
@@ -92,14 +94,14 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 			unformattedURL = getResources().getString(R.string.tracksByPopularityPerWeek);
 		}
 		else if (hierarchy.equals("tracksFloatingMenuAlbum")){
-			searchTerm = intent.getStringExtra(TracksByName.TAG_ALBUM_NAME).replace(" ", "+");
-			unformattedURL = getResources().getString(R.string.tracksByAlbumNameJSONURL);
+			searchTerm = intent.getStringExtra(TracksByName.TAG_ALBUM_ID).replace(" ", "+");
+			unformattedURL = getResources().getString(R.string.tracksByAlbumIDJSONURL);
 		}
 		else if (hierarchy.equals("playlistFloatingMenuAlbum")){
 			searchTerm = intent.getStringExtra(PlaylistActivity.TAG_ALBUM_NAME).replace(" ", "+");
 			unformattedURL = getResources().getString(R.string.tracksByAlbumNameJSONURL);
 		}
-		String url = String.format(unformattedURL, searchTerm).replace("&amp;", "&");
+		String url = String.format(unformattedURL, searchTerm).replace("&amp;", "&");		
 		JSONParser jParser = new JSONParser(this);
 		jParser.execute(url);
 	}
@@ -115,6 +117,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 					JSONArray tracksArray = results.getJSONObject(i).getJSONArray("tracks");
 					String artistName = results.getJSONObject(i).getString(TAG_ARTIST_NAME);
 					String albumName = results.getJSONObject(i).getString("name");
+					String albumID = results.getJSONObject(i).getString("id");
 					for(int j = 0; j < tracksArray.length(); j++) {
 						JSONObject trackInfo = tracksArray.getJSONObject(j);
 					
@@ -122,6 +125,10 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 						String trackName = trackInfo.getString(TAG_TRACK_NAME);
 						long durationLong = Long.valueOf(trackInfo.getString(TAG_TRACK_DURATION));
 						String trackDuration = String.format(Locale.US, "%d:%02d", durationLong / 60,durationLong % 60);
+						
+						HashMap<String, String> albumIDMap = new HashMap<String, String>();
+						albumIDMap.put("albumID", albumID);
+						albumIDList.add(albumIDMap);
 					
 						HashMap<String, String> trackMap = new HashMap<String, String>();
 						trackMap.put("trackID", trackID);
@@ -143,6 +150,11 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 					String trackDuration = String.format(Locale.US, "%d:%02d", durationLong / 60,durationLong % 60);
 					String artistName = trackInfo.getString(TAG_ARTIST_NAME);
 					String albumName = trackInfo.getString("album_name");
+					String albumID = trackInfo.getString("album_id");
+					
+					HashMap<String, String> albumIDMap = new HashMap<String, String>();
+					albumIDMap.put("albumID", albumID);
+					albumIDList.add(albumIDMap);
 					
 					HashMap<String, String> trackMap = new HashMap<String, String>();
 					trackMap.put("trackID", trackID);
@@ -273,9 +285,9 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 			return true;
 		} else if (menuID == R.id.tracksFloating_viewAlbum) {
 			putHierarchy("tracksFloatingMenuAlbum");
-			String albumName = trackList.get(indexPosition).get("trackAlbum");
+			String albumID = albumIDList.get(indexPosition).get("albumID");
 			Intent albumsIntent = new Intent(getApplicationContext(), TracksByName.class);
-			albumsIntent.putExtra(TAG_ALBUM_NAME, albumName);
+			albumsIntent.putExtra(TAG_ALBUM_ID, albumID);
 			startActivityForResult(albumsIntent, 4);
 			return true;
 		} else {
