@@ -8,6 +8,7 @@ import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
@@ -21,6 +22,10 @@ import com.leokomarov.jamstreamer.searches.TracksSearch;
 
 public class MainMenu extends SherlockActivity {
 	private ImageButton button_playlist;
+	private TextView textView_artists;
+	private TextView textView_albums;
+	private TextView textView_tracks;
+	private TextView textView_topTracksThisWeek;
 	
 	private void putHierarchy(String hierarchy){
 		SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
@@ -42,6 +47,46 @@ public class MainMenu extends SherlockActivity {
                 Intent button_playlistIntent = new Intent(getApplicationContext(), PlaylistActivity.class);
                 startActivityForResult(button_playlistIntent, 1);
             }
+    	});
+    	
+    	textView_artists = (TextView) findViewById(R.id.mainMenu_artists);    	
+    	textView_artists.setOnClickListener(new View.OnClickListener() {
+    		@Override
+            public void onClick(View v) {
+    			putHierarchy("artists");
+    			Intent artistIntent = new Intent(getApplicationContext(), ArtistsSearch.class);
+    			startActivity(artistIntent);
+    		}
+    	});
+    	
+    	textView_albums = (TextView) findViewById(R.id.mainMenu_albums);    	
+    	textView_albums.setOnClickListener(new View.OnClickListener() {
+    		@Override
+            public void onClick(View v) {
+    			putHierarchy("albums");
+    			Intent albumIntent = new Intent(getApplicationContext(), AlbumsSearch.class);
+    			startActivity(albumIntent);	
+    		}
+    	});
+    	
+    	textView_tracks = (TextView) findViewById(R.id.mainMenu_tracks);    	
+    	textView_tracks.setOnClickListener(new View.OnClickListener() {
+    		@Override
+            public void onClick(View v) {
+    			putHierarchy("tracks");
+    			Intent trackIntent = new Intent(getApplicationContext(), TracksSearch.class);
+    			startActivity(trackIntent);	
+    		}
+    	});
+    	
+    	textView_topTracksThisWeek = (TextView) findViewById(R.id.mainMenu_topTracksThisWeek);    	
+    	textView_topTracksThisWeek.setOnClickListener(new View.OnClickListener() {
+    		@Override
+            public void onClick(View v) {
+    			putHierarchy("topTracksPerWeek");
+    			Intent topTracksWeekIntent = new Intent(getApplicationContext(), TracksByName.class);
+    			startActivityForResult(topTracksWeekIntent, 2);	
+    		}
     	});
     	
     	//if FIRSTRUN_PREFERENCE doesn't contain "firstrun" or "firstrun" == false

@@ -6,14 +6,13 @@
     android:orientation="vertical">
     
     <TextView
-        android:id="@+id/main_artistsText"
+        android:id="@+id/mainMenu_artists"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:background="@drawable/background_highlighter"
         android:clickable="true"
-        android:onClick="artistsMainButton"
         android:paddingBottom="5dp"
         android:paddingLeft="5dp"
         android:paddingTop="5dp"
@@ -22,22 +21,21 @@
         android:textSize="24sp" />
 
     <View
-        android:id="@+id/main_separator_1"
+        android:id="@+id/mainMenu_separator_1"
         android:layout_width="fill_parent"
         android:layout_height="0.5dp"
-        android:layout_below="@id/main_artistsText"
+        android:layout_below="@id/mainMenu_artists"
         android:visibility="visible"
         android:background="#d3d3d3"/>
        
     <TextView
-        android:id="@+id/main_albumsText"
+        android:id="@+id/mainMenu_albums"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/main_separator_1"
+        android:layout_below="@id/mainMenu_separator_1"
         android:background="@drawable/background_highlighter"
         android:clickable="true"
-        android:onClick="albumsMainButton"
         android:paddingBottom="5dp"
         android:paddingLeft="5dp"
         android:paddingTop="9dp"
@@ -46,18 +44,18 @@
         android:textSize="24sp" />
     
     <View
-        android:id="@+id/main_separator_2"
+        android:id="@+id/mainMenu_separator_2"
         android:layout_width="fill_parent"
         android:layout_height="0.5dp"
-        android:layout_below="@id/main_albumsText"
+        android:layout_below="@id/mainMenu_albums"
         android:visibility="visible"
         android:background="#d3d3d3"/>   
         
     <TextView
-        android:id="@+id/main_tracksText"
+        android:id="@+id/mainMenu_tracks"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/main_separator_2"
+        android:layout_below="@id/mainMenu_separator_2"
         android:layout_alignParentLeft="true"
         android:text="@string/mainTracks"
         android:background="@drawable/background_highlighter"
@@ -67,22 +65,21 @@
         android:paddingBottom="5dp"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
-        android:clickable="true"
-        android:onClick="tracksMainButton" />
+        android:clickable="true" />
     
     <View
-        android:id="@+id/main_separator_3"
+        android:id="@+id/mainMenu_separator_3"
         android:layout_width="fill_parent"
         android:layout_height="0.5dp"
-        android:layout_below="@id/main_tracksText"
+        android:layout_below="@id/mainMenu_tracks"
         android:visibility="visible"
         android:background="#d3d3d3"/>  
         
     <TextView
-        android:id="@+id/main_topTracksWeekText"
+        android:id="@+id/mainMenu_topTracksThisWeek"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/main_separator_3"
+        android:layout_below="@id/mainMenu_separator_3"
         android:layout_alignParentLeft="true"
         android:text="@string/mainTopTracksWeek"
         android:background="@drawable/background_highlighter"
@@ -92,14 +89,13 @@
         android:paddingBottom="5dp"
         android:paddingLeft="5dp"
         android:paddingRight="5dp"
-        android:clickable="true"
-        android:onClick="topTracksWeekMainButton" />
+        android:clickable="true"/>
     
     <View
-        android:id="@+id/main_separator_4"
+        android:id="@+id/mainMenu_separator_4"
         android:layout_width="fill_parent"
         android:layout_height="0.5dp"
-        android:layout_below="@id/main_topTracksWeekText"
+        android:layout_below="@id/mainMenu_topTracksThisWeek"
         android:visibility="visible"
         android:background="#d3d3d3"/>  
     
@@ -107,7 +103,7 @@
         android:id="@+id/mainMenu_btnPlaylist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/main_separator_4"
+        android:layout_below="@id/mainMenu_separator_4"
         android:layout_alignParentRight="true"
         android:paddingTop="5dp"
         android:background="@null"

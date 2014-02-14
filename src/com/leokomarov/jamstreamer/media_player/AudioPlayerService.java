@@ -207,10 +207,15 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 		int audioFocusResult = audioManager.requestAudioFocus(onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 		if (mp != null && audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
 			originalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-			mp.start();
-	        //AudioPlayer.songProgressBar.setProgress(0);
-	        //AudioPlayer.songProgressBar.setMax(mp.getDuration() / 1000);
-	        //AudioPlayer.updateProgressBar();
+			
+			try { 
+				mp.start();
+			} catch (IllegalArgumentException e) {
+			}
+			
+	        AudioPlayer.songProgressBar.setProgress(0);
+	        AudioPlayer.songProgressBar.setMax(mp.getDuration() / 1000);
+	        AudioPlayer.updateProgressBar();
 		}
         AudioPlayer.button_play.setClickable(true);
         AudioPlayer.button_next.setClickable(true);
@@ -292,7 +297,10 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 				if (lastKnownAudioFocusState == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT && wasPlayingWhenTransientLoss) {
 	    			originalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
 	    			if (prepared == true){
-	    				mp.start();
+	    				try { 
+	    					mp.start();
+	    				} catch (IllegalArgumentException e) {
+	    				}
 	    			}
 				}
 				else if (lastKnownAudioFocusState == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
