@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/JamStreamer.iml" filepath="$PROJECT_DIR$/JamStreamer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/jamstreamer.iml" filepath="$PROJECT_DIR$/jamstreamer.iml" />
     </modules>
   </component>
 </project>
-
