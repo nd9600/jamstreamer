@@ -49,7 +49,7 @@ public class TracksByNameAdapter extends ArrayAdapter<TracksByNameModel> {
 	public static int TracksByNameCheckboxCount = 0;
 	
 	protected interface CallbackInterface {
-        public void callActionBar();
+        void callActionBar();
     }
 	
 	private CallbackInterface mCallback;
@@ -83,7 +83,8 @@ public class TracksByNameAdapter extends ArrayAdapter<TracksByNameModel> {
 
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
-		View view = null;
+		View view;
+
 		if (convertView == null) {
 			LayoutInflater inflator = context.getLayoutInflater();
 			view = inflator.inflate(R.layout.tracks_by_name, null);
@@ -101,13 +102,13 @@ public class TracksByNameAdapter extends ArrayAdapter<TracksByNameModel> {
 					TracksByNameModel element = (TracksByNameModel) viewHolder.checkbox.getTag();
 					element.setSelected(buttonView.isChecked());
 					if (element.isSelected()){
-						if (TracksByNameCheckboxList.get(position, false) == false){
+						if (! TracksByNameCheckboxList.get(position, false)){
 							TracksByNameCheckboxList.put(position, true);
 							TracksByNameCheckboxCount++;
 						}
 					}
 					else {
-						if (TracksByNameCheckboxList.get(position, false) == true){
+						if (! TracksByNameCheckboxList.get(position, false)){
 							TracksByNameCheckboxList.put(position, false);
 							if (TracksByNameCheckboxCount >= 1){
 								TracksByNameCheckboxCount--;

@@ -9,7 +9,6 @@ import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 
-import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,10 +31,8 @@ public class JSONParser extends AsyncTask<String, Void, JSONObject>  {
 	        conn.setDoInput(true);
 	        conn.connect();
 	        is = conn.getInputStream();
-		} catch (SocketTimeoutException e) {
-		} catch (UnsupportedEncodingException e) {
-		} catch (ClientProtocolException e) {
-		} catch (IOException e) {
+		} catch (Exception e) {
+		  System.out.println("Exception:" + e.getMessage());
 		}
 		
 		try {
@@ -48,17 +45,19 @@ public class JSONParser extends AsyncTask<String, Void, JSONObject>  {
 			is.close();
 			json = sb.toString();
 		} catch (Exception e) {
+			System.out.println("Exception:" + e.getMessage());
 		}
 
 		try {
 			jObj = new JSONObject(json);
 		} catch (JSONException e) {
+			System.out.println("Exception:" + e.getMessage());
 		}
 		return jObj;
     }
 	
 	public interface CallbackInterface {
-        public void onRequestCompleted(JSONObject json);
+        void onRequestCompleted(JSONObject json);
     }
 	
 	private CallbackInterface mCallback;

@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -93,32 +92,35 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 		Intent intent = getIntent();
 		SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
 		String hierarchy = hierarchyPreference.getString("hierarchy", "none");
-		String searchTerm = new String();
-		String unformattedURL = new String();
-		if (hierarchy.equals("artists")){
-			searchTerm = intent.getStringExtra(ArtistsParser.TAG_ARTIST_ID);
-			unformattedURL = getResources().getString(R.string.albumsByArtistIDJSONURL);
-		}
-		else if (hierarchy.equals("albums")){
-			searchTerm = intent.getStringExtra(AlbumsSearch.TAG_ALBUM_NAME);
-			unformattedURL = getResources().getString(R.string.albumsByNameJSONURL);
-		}
-		else if (hierarchy.equals("tracks")){
-			searchTerm = intent.getStringExtra(TracksByName.TAG_ALBUM_NAME);
-			unformattedURL = getResources().getString(R.string.albumsByNameJSONURL);
-		}
-		else if (hierarchy.equals("tracksFloatingMenuArtist")){
-			searchTerm = intent.getStringExtra(TracksByName.TAG_ARTIST_NAME);
-			unformattedURL = getResources().getString(R.string.albumsByArtistNameJSONURL);
-		}
-		else if (hierarchy.equals("albumsFloatingMenuArtist")){
-			searchTerm = intent.getStringExtra(AlbumsByName.TAG_ARTIST_NAME);
-			unformattedURL = getResources().getString(R.string.albumsByArtistNameJSONURL);
-		}
-		else if (hierarchy.equals("playlistFloatingMenuArtist")){
-			searchTerm = intent.getStringExtra(PlaylistActivity.TAG_ARTIST_NAME);
-			unformattedURL = getResources().getString(R.string.albumsByArtistNameJSONURL);
-		}
+		String searchTerm = "";
+		String unformattedURL = "";
+
+        switch (hierarchy) {
+            case "artists":
+                searchTerm = intent.getStringExtra(ArtistsParser.TAG_ARTIST_ID);
+                unformattedURL = getResources().getString(R.string.albumsByArtistIDJSONURL);
+                break;
+            case "albums":
+                searchTerm = intent.getStringExtra(AlbumsSearch.TAG_ALBUM_NAME);
+                unformattedURL = getResources().getString(R.string.albumsByNameJSONURL);
+                break;
+            case "tracks":
+                searchTerm = intent.getStringExtra(TracksByName.TAG_ALBUM_NAME);
+                unformattedURL = getResources().getString(R.string.albumsByNameJSONURL);
+                break;
+            case "tracksFloatingMenuArtist":
+                searchTerm = intent.getStringExtra(TracksByName.TAG_ARTIST_NAME);
+                unformattedURL = getResources().getString(R.string.albumsByArtistNameJSONURL);
+                break;
+            case "albumsFloatingMenuArtist":
+                searchTerm = intent.getStringExtra(AlbumsByName.TAG_ARTIST_NAME);
+                unformattedURL = getResources().getString(R.string.albumsByArtistNameJSONURL);
+                break;
+            case "playlistFloatingMenuArtist":
+                searchTerm = intent.getStringExtra(PlaylistActivity.TAG_ARTIST_NAME);
+                unformattedURL = getResources().getString(R.string.albumsByArtistNameJSONURL);
+                break;
+        }
 		
     	String url = String.format(unformattedURL, searchTerm).replace("&amp;", "&").replace(" ", "+");
 		JSONParser jParser = new JSONParser(this);
@@ -162,8 +164,8 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 					albumList.add(map);
 				}
 			}
-		} catch (NullPointerException e) {
-		} catch (JSONException e) {
+		} catch (Exception e) {
+            System.out.println("Exception:" + e.getMessage());
 		}
 		
 		if (json == null || json.isNull("results")) {
@@ -334,7 +336,7 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 				mActionMode.finish();
 				mActionMode = null;
 				mode.finish();
-				mode = null;
+				//mode = null;
 				return true;
 			} else {
 				return false;
@@ -345,7 +347,7 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
         public void onDestroyActionMode(ActionMode mode) {
 	    	if (mActionMode != null){
 	    		mActionMode = null;
-	    		mode = null;
+	    		//mode = null;
 	    	}
         }
 	};
@@ -380,9 +382,9 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
     	    
     	    if (onTrackRequestCompletedLoop == albumsToAddLoop){
     	    	ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(AlbumsByName.this,
-    	    		getString(R.string.trackPreferences), MODE_PRIVATE);;	
-    	    		
-    	        ArrayList<HashMap<String, String>> newTrackList = new ArrayList<HashMap<String, String>>();
+    	    		getString(R.string.trackPreferences), MODE_PRIVATE);
+
+				ArrayList<HashMap<String, String>> newTrackList = new ArrayList<HashMap<String, String>>();
     	    	if (trackPreferences.getObject("tracks", PlaylistList.class) != null){
     	    		newTrackList.addAll(trackPreferences.getObject("tracks", PlaylistList.class).trackList);
     	    	}       
@@ -406,8 +408,8 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
                 	Toast.makeText(getApplicationContext(),albumsToAddLoop + " albums added to the playlist", Toast.LENGTH_LONG).show();
                 }
     	    }
-		} catch (NullPointerException e) {		
-		} catch (JSONException e) {		
+		} catch (Exception e) {
+            System.out.println("Exception:" + e.getMessage());
 		}
 	}
 
@@ -443,7 +445,7 @@ class AlbumsByNameTrackParser extends AsyncTask<String, Void, JSONObject>  {
 	Context context;
 	
 	public interface CallbackInterface {
-        public void onTrackRequestCompleted(JSONObject json);
+        void onTrackRequestCompleted(JSONObject json);
     }
 	
 	private CallbackInterface mCallback;
@@ -457,34 +459,31 @@ class AlbumsByNameTrackParser extends AsyncTask<String, Void, JSONObject>  {
     protected JSONObject doInBackground(String... urls) {
 		JSONObject jObj = null;
         try {
-        	InputStream is = null;
-        	String json = "";
-        	String myURL = urls[0];
-        	URL url = new URL(myURL);
-			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-	        conn.setReadTimeout(10000 /* milliseconds */);
-	        conn.setConnectTimeout(15000 /* milliseconds */);
-	        conn.setRequestMethod("GET");
-	        conn.setDoInput(true);
-	        conn.connect();
-	        is = conn.getInputStream();
-            
+            InputStream is;
+            String json;
+            String myURL = urls[0];
+            URL url = new URL(myURL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(10000 /* milliseconds */);
+            conn.setConnectTimeout(15000 /* milliseconds */);
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+            conn.connect();
+            is = conn.getInputStream();
+
             BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
-			StringBuilder sb = new StringBuilder();
-			String line = null;
-			while ((line = reader.readLine()) != null) {
-				sb.append(line + "\n");
-			}
-			is.close();
-			json = sb.toString();
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+            is.close();
+            json = sb.toString();
             jObj = new JSONObject(json);
-        } catch (SocketTimeoutException e) {
-        } catch (JSONException e) {
-		} catch (UnsupportedEncodingException e) {
-		} catch (ClientProtocolException e) {
-		} catch (IOException e) {
-		} catch (Exception e) {
-		}       
+        } catch (Exception e) {
+            System.out.println("Exception:" + e.getMessage());
+		}
+
         return jObj;
     }
 			   

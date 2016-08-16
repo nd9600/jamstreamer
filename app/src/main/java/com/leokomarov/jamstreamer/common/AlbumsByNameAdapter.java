@@ -49,7 +49,7 @@ public class AlbumsByNameAdapter extends ArrayAdapter<AlbumsByNameModel> {
 	public static int AlbumsByNameCheckboxCount = 0;
 	
 	protected interface CallbackInterface {
-        public void callActionBar();
+        void callActionBar();
     }
 	
 	private CallbackInterface mCallback;
@@ -83,7 +83,8 @@ public class AlbumsByNameAdapter extends ArrayAdapter<AlbumsByNameModel> {
 
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
-		View view = null;
+		View view;
+
 		if (convertView == null) {
 			LayoutInflater inflator = context.getLayoutInflater();
 			view = inflator.inflate(R.layout.albums_by_name, null);
@@ -101,13 +102,13 @@ public class AlbumsByNameAdapter extends ArrayAdapter<AlbumsByNameModel> {
 					AlbumsByNameModel element = (AlbumsByNameModel) viewHolder.checkbox.getTag();
 					element.setSelected(buttonView.isChecked());
 					if (element.isSelected()){
-						if (AlbumsByNameCheckboxList.get(position, false) == false){
+						if (! AlbumsByNameCheckboxList.get(position, false)){
 							AlbumsByNameCheckboxList.put(position, true);
 							AlbumsByNameCheckboxCount++;
 						}
 					}
 					else {
-						if (AlbumsByNameCheckboxList.get(position, false) == true){
+						if (! AlbumsByNameCheckboxList.get(position, false)){
 							AlbumsByNameCheckboxList.put(position, false);
 							if (AlbumsByNameCheckboxCount >= 1){
 								AlbumsByNameCheckboxCount--;

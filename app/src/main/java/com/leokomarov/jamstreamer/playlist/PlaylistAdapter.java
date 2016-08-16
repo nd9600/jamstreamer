@@ -49,7 +49,7 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistModel> {
 	public static int PlaylistCheckboxCount = 0;
 	
 	protected interface CallbackInterface {
-        public void callActionBar();
+        void callActionBar();
     }
 	
 	private CallbackInterface mCallback;
@@ -83,7 +83,8 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistModel> {
 
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
-		View view = null;
+		View view;
+
 		if (convertView == null) {
 			LayoutInflater inflator = context.getLayoutInflater();
 			view = inflator.inflate(R.layout.playlist_by_list_item, null);
@@ -101,13 +102,13 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistModel> {
 					PlaylistModel element = (PlaylistModel) viewHolder.checkbox.getTag();
 					element.setSelected(buttonView.isChecked());
 					if (element.isSelected()){
-						if (PlaylistCheckboxList.get(position, false) == false){
+						if (! PlaylistCheckboxList.get(position, false)){
 							PlaylistCheckboxList.put(position, true);
 							PlaylistCheckboxCount++;
 						}
 					}
 					else {
-						if (PlaylistCheckboxList.get(position, false) == true){
+						if (! PlaylistCheckboxList.get(position, false)){
 							PlaylistCheckboxList.put(position, false);
 							if (PlaylistCheckboxCount >= 1){
 								PlaylistCheckboxCount--;

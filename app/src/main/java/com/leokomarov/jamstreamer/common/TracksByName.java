@@ -80,27 +80,32 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 		Intent intent = getIntent();
 		SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
 		String hierarchy = hierarchyPreference.getString("hierarchy", "none");
-		String searchTerm = new String();
-		String unformattedURL = new String();
-		if (hierarchy.equals("artists") || hierarchy.equals("albums")){
-			searchTerm = intent.getStringExtra(AlbumsByName.TAG_ALBUM_ID);
-			unformattedURL = getResources().getString(R.string.tracksByAlbumIDJSONURL);
-		}
-		else if (hierarchy.equals("tracks")){
-			searchTerm = intent.getStringExtra(TracksSearch.TAG_TRACK_NAME).replace(" ", "+");
-			unformattedURL = getResources().getString(R.string.tracksByNameJSONURL);
-		}
-		else if (hierarchy.equals("topTracksPerWeek")){
-			unformattedURL = getResources().getString(R.string.tracksByPopularityPerWeek);
-		}
-		else if (hierarchy.equals("tracksFloatingMenuAlbum")){
-			searchTerm = intent.getStringExtra(TracksByName.TAG_ALBUM_ID).replace(" ", "+");
-			unformattedURL = getResources().getString(R.string.tracksByAlbumIDJSONURL);
-		}
-		else if (hierarchy.equals("playlistFloatingMenuAlbum")){
-			searchTerm = intent.getStringExtra(PlaylistActivity.TAG_ALBUM_NAME).replace(" ", "+");
-			unformattedURL = getResources().getString(R.string.tracksByAlbumNameJSONURL);
-		}
+		String searchTerm = "";
+		String unformattedURL = "";
+
+        switch (hierarchy) {
+            case "artists":
+            case "albums":
+                searchTerm = intent.getStringExtra(AlbumsByName.TAG_ALBUM_ID);
+                unformattedURL = getResources().getString(R.string.tracksByAlbumIDJSONURL);
+                break;
+            case "tracks":
+                searchTerm = intent.getStringExtra(TracksSearch.TAG_TRACK_NAME).replace(" ", "+");
+                unformattedURL = getResources().getString(R.string.tracksByNameJSONURL);
+                break;
+            case "topTracksPerWeek":
+                unformattedURL = getResources().getString(R.string.tracksByPopularityPerWeek);
+                break;
+            case "tracksFloatingMenuAlbum":
+                searchTerm = intent.getStringExtra(TracksByName.TAG_ALBUM_ID).replace(" ", "+");
+                unformattedURL = getResources().getString(R.string.tracksByAlbumIDJSONURL);
+                break;
+            case "playlistFloatingMenuAlbum":
+                searchTerm = intent.getStringExtra(PlaylistActivity.TAG_ALBUM_NAME).replace(" ", "+");
+                unformattedURL = getResources().getString(R.string.tracksByAlbumNameJSONURL);
+                break;
+        }
+
 		String url = String.format(unformattedURL, searchTerm).replace("&amp;", "&");		
 		JSONParser jParser = new JSONParser(this);
 		jParser.execute(url);
@@ -165,8 +170,8 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 					trackList.add(trackMap);
 				}
 			}
-		} catch (NullPointerException e) {
-		} catch (JSONException e) {
+		} catch (Exception e) {
+            System.out.println("Exception:" + e.getMessage());
 		}
 			
 		if (json == null || json.isNull("results")) {
@@ -190,9 +195,9 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	    	setListAdapter(TracksByNameListAdapter);
 	    	registerForContextMenu(TracksByNameLV);
 	    	final ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-	    		getString(R.string.trackPreferences), MODE_PRIVATE);;
-	    		
-	    	button_playlist = (ImageButton) findViewById(R.id.tracks_by_name_btnPlaylist);    	
+	    		getString(R.string.trackPreferences), MODE_PRIVATE);
+
+			button_playlist = (ImageButton) findViewById(R.id.tracks_by_name_btnPlaylist);
 	    	button_playlist.setOnClickListener(new View.OnClickListener() {
 			@Override
 	           	public void onClick(View v) {
@@ -241,7 +246,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	    	    	indexPositionEditor.putInt("indexPosition", indexPosition);
 	    	    	indexPositionEditor.commit();
 	    	    	
-	    	    	if(AudioPlayerService.shuffleBoolean == true){
+	    	    	if(AudioPlayerService.shuffleBoolean){
 	                	AudioPlayerService.shuffleBoolean = false;
 	    	    	}
 	    	        
@@ -380,8 +385,8 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 					 }
 				}
 				ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(TracksByName.this,
-	    	    	getString(R.string.trackPreferences), MODE_PRIVATE);;
-				
+	    	    	getString(R.string.trackPreferences), MODE_PRIVATE);
+
 				ArrayList<HashMap<String, String>> newTrackList = new ArrayList<HashMap<String, String>>();
     	    	if (trackPreferences.getObject("tracks", PlaylistList.class) != null){
     	    		newTrackList.addAll(trackPreferences.getObject("tracks", PlaylistList.class).trackList);
@@ -407,7 +412,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 				mActionMode.finish();
 				mActionMode = null;
 				mode.finish();
-				mode = null;
+				//mode = null;
 				return true;
 			} else {
 				return false;
@@ -418,7 +423,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
         public void onDestroyActionMode(ActionMode mode) {
 	    	if (mActionMode != null){
 	    		mActionMode = null;
-	    		mode = null;
+	    		//mode = null;
 	    	}
         }
 	};

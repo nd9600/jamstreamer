@@ -9,7 +9,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,7 +40,6 @@ public class AudioParser extends AsyncTask<String, Void, Bitmap> {
 	        is = conn.getInputStream();
 		} catch (NullPointerException e) {
 		} catch (UnsupportedEncodingException e) {
-		} catch (ClientProtocolException e) {
 		} catch (IOException e) {
 		}
 		

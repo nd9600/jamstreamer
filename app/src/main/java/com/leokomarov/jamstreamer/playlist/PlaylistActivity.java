@@ -129,7 +129,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
     	    	indexPositionEditor.putInt("indexPosition", indexPosition );
     	    	indexPositionEditor.commit();
     	    	
-    	    	if(AudioPlayerService.shuffleBoolean == true){
+    	    	if(AudioPlayerService.shuffleBoolean){
                 	AudioPlayerService.shuffleBoolean = false;
                 	AudioPlayer.button_shuffle.setImageResource(R.drawable.img_repeat_default);
     	    	}
@@ -215,8 +215,8 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 	    @Override
 	    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 	    	ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(PlaylistActivity.this, 
-        	    getString(R.string.trackPreferences), MODE_PRIVATE);;
-        	PlaylistList trackListObject = new PlaylistList();
+        	    getString(R.string.trackPreferences), MODE_PRIVATE);
+			PlaylistList trackListObject = new PlaylistList();
             int itemId = item.getItemId();
             if (itemId == R.id.playlistSelectAllTracks) {
             	selectAllPressed = true;
@@ -300,7 +300,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 				mActionMode.finish();
 				mActionMode = null;
 				mode.finish();
-				mode = null;
+				//mode = null;
 				return true;
 			} else if (itemId == R.id.deletePlaylist) {
 				selectAllPressed = false;
@@ -320,7 +320,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 				mActionMode.finish();
 				mActionMode = null;
 				mode.finish();
-				mode = null;
+				//mode = null;
 				return true;
 			} else {
 				return false;
@@ -332,7 +332,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 	    	selectAllPressed = false;
 	    	if (mActionMode != null){
 	    		mActionMode = null;
-	    		mode = null;
+	    		//mode = null;
 	    	}
         }
 	};
