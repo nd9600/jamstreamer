@@ -39,8 +39,8 @@ public class MainMenu extends SherlockActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_menu);       
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        
-        button_playlist = (ImageButton) findViewById(R.id.mainMenu_btnPlaylist);    	
+
+        button_playlist = (ImageButton) findViewById(R.id.mainMenu_btnPlaylist);
     	button_playlist.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
@@ -90,8 +90,9 @@ public class MainMenu extends SherlockActivity {
     	});
     	
     	//if FIRSTRUN_PREFERENCE doesn't contain "firstrun" or "firstrun" == false
+		// show the toasts
         if (! getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE).contains("firstrun") 
-				|| ! getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE).getBoolean("firstrun", true) == false) {
+				|| getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE).getBoolean("firstrun", true)) {
         	Toast.makeText(getApplicationContext(),"Long-press on an album or track for options", Toast.LENGTH_LONG).show();
         	Toast.makeText(getApplicationContext(),"I'd appreciate it if you rate this app. Thanks!", Toast.LENGTH_LONG).show();
         	SharedPreferences firstrunPreference = getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE);
@@ -147,8 +148,6 @@ public class MainMenu extends SherlockActivity {
         .setNegativeButton("No", null)
         .show();
     }
-
-
     
     public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) { 
 	        int itemId = item.getItemId();
