@@ -23,8 +23,12 @@ public class PlaylistPresenter {
         this.trackPreferences = trackPreferences;
     }
 
-    public ArrayList<HashMap<String, String>> restoreTracklist(Bundle savedInstanceState){
+    public ArrayList<HashMap<String, String>> restoreTracklist(){
+        return interactor.restoreTracklist(savedInstanceState, trackPreferences);
+    }
 
+    public void shuffleTracklist(){
+        interactor.shuffleTrackList(trackPreferences);
     }
 
 
