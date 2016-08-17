@@ -1,18 +1,15 @@
 package com.leokomarov.jamstreamer;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.SocketTimeoutException;
-import java.net.URL;
+import android.os.AsyncTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.os.AsyncTask;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class JSONParser extends AsyncTask<String, Void, JSONObject>  {
     static InputStream is = null;
@@ -38,9 +35,9 @@ public class JSONParser extends AsyncTask<String, Void, JSONObject>  {
 		try {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
 			StringBuilder sb = new StringBuilder();
-			String line = null;
+			String line;
 			while ((line = reader.readLine()) != null) {
-				sb.append(line + "\n");
+				sb.append(line).append("\n");
 			}
 			is.close();
 			json = sb.toString();

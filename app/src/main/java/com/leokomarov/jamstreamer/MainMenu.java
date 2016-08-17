@@ -43,7 +43,12 @@ public class MainMenu extends SherlockActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         button_playlist = (ImageButton) findViewById(R.id.mainMenu_btnPlaylist);
-    	button_playlist.setOnClickListener(new View.OnClickListener() {
+        textView_artists = (TextView) findViewById(R.id.mainMenu_artists);
+        textView_albums = (TextView) findViewById(R.id.mainMenu_albums);
+        textView_tracks = (TextView) findViewById(R.id.mainMenu_tracks);
+        textView_topTracksThisWeek = (TextView) findViewById(R.id.mainMenu_topTracksThisWeek);
+
+        button_playlist.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
                 Intent playlistIntent = new Intent(getApplicationContext(), PlaylistActivity.class);
@@ -53,7 +58,6 @@ public class MainMenu extends SherlockActivity {
 
         //If the artists &c button is clicked
         //put the appropriate string in the hierarchy, and start the activity
-    	textView_artists = (TextView) findViewById(R.id.mainMenu_artists);    	
     	textView_artists.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
@@ -62,8 +66,7 @@ public class MainMenu extends SherlockActivity {
     			startActivity(artistIntent);
     		}
     	});
-    	
-    	textView_albums = (TextView) findViewById(R.id.mainMenu_albums);    	
+
     	textView_albums.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
@@ -73,7 +76,6 @@ public class MainMenu extends SherlockActivity {
     		}
     	});
     	
-    	textView_tracks = (TextView) findViewById(R.id.mainMenu_tracks);    	
     	textView_tracks.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
@@ -83,7 +85,6 @@ public class MainMenu extends SherlockActivity {
     		}
     	});
     	
-    	textView_topTracksThisWeek = (TextView) findViewById(R.id.mainMenu_topTracksThisWeek);    	
     	textView_topTracksThisWeek.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
@@ -92,7 +93,6 @@ public class MainMenu extends SherlockActivity {
     			startActivityForResult(topTracksWeekIntent, 2);	
     		}
     	});
-
 
     	//if the app hasn't been ran before, show the toasts
 		// ie FIRSTRUN_PREFERENCE doesn't contain "firstrun" or "firstrun" == true

@@ -15,33 +15,6 @@ import android.widget.TextView;
 
 import com.leokomarov.jamstreamer.R;
 
-class PlaylistModel {
-	  private HashMap<String, String> trackMap;
-	  private boolean selected;
-
-	  public PlaylistModel(HashMap<String, String> trackMap) {
-		  this.trackMap = trackMap;
-		  selected = false;
-	  }
-	    
-	  public String getTrackNameAndDuration(){
-		  return trackMap.get("trackName") + " - " + trackMap.get("trackDuration");
-	  }
-	  
-	  public String getTrackArtistAndAlbum(){
-		  return trackMap.get("trackArtist") + " - " + trackMap.get("trackAlbum");
-	  }
-
-	  public boolean isSelected() {
-		  return selected;
-	  }
-	  
-	  public void setSelected(boolean selected) {
-		    this.selected = selected;
-	  }
-
-} 
-
 public class PlaylistAdapter extends ArrayAdapter<PlaylistModel> {
 	private final List<PlaylistModel> list;
 	private final Activity context;

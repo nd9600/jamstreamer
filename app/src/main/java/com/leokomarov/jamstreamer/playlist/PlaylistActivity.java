@@ -37,51 +37,20 @@ import com.leokomarov.jamstreamer.media_player.AudioPlayer;
 import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
 
 public class PlaylistActivity extends SherlockListActivity implements PlaylistAdapter.CallbackInterface {
-	private final String TAG_TRACKLIST = "trackListSaved";
-	public static String TAG_ARTIST_NAME = "artist_name";
+    public static String TAG_ARTIST_NAME = "artist_name";
 	public static String TAG_ALBUM_NAME = "name";
-	private ArrayList<HashMap<String, String>> trackList = new ArrayList<HashMap<String, String>>();
+
+	private ArrayList<HashMap<String, String>> trackList = new ArrayList<>();
 	protected static ListView PlaylistLV;
 	private ArrayAdapter<PlaylistModel> PlaylistListAdapter;
-	private List<PlaylistModel> PlaylistModel = new ArrayList<PlaylistModel>();
+	private List<PlaylistModel> PlaylistModel = new ArrayList<>();
+    ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
+            getString(R.string.trackPreferences), MODE_PRIVATE);
+
+    //Used with the action bar
 	protected static ActionMode mActionMode;
 	protected static boolean selectAll;
 	protected static boolean selectAllPressed;
-	
-	//See ComplexPreferences docs on Github
-    private ArrayList<HashMap<String, String>> restoreTracklist(Bundle savedInstanceState){
-    	if (savedInstanceState != null) {
-        	@SuppressWarnings("unchecked")
-			//ArrayList<HashMap<String, String>> trackList = (ArrayList<HashMap<String,String>>)savedInstanceState.get(TAG_TRACKLIST);
-        	ArrayList<HashMap<String, String>> trackList = (ArrayList<HashMap<String, String>>)savedInstanceState.getSerializable(TAG_TRACKLIST);
-        	return trackList;
-        } 
-        else {
-        	ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-    	    		getString(R.string.trackPreferences), MODE_PRIVATE);
-        	PlaylistList trackPreferencesObject = trackPreferences.getObject("tracks", PlaylistList.class);
-        	if (trackPreferencesObject != null){
-        		return trackPreferencesObject.trackList;        		
-        	}
-        	else {
-        		return null;
-        	}
-        	
-        }
-    }
-    
-	private void shuffleTrackList(){
-		ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-			getString(R.string.trackPreferences), MODE_PRIVATE);	
-		PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("tracks", PlaylistList.class);
-		ArrayList<HashMap<String, String>> trackList = shuffledTrackPreferencesObject.trackList;
-		
-		Collections.shuffle(trackList);
-		PlaylistList shuffledTrackListObject = new PlaylistList();
-		shuffledTrackListObject.setTrackList(trackList);  
-		trackPreferences.putObject("shuffledTracks", shuffledTrackListObject);
-		trackPreferences.commit();
-	}
     
 	private void putHierarchy(String hierarchy){
 		SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
@@ -206,7 +175,8 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 	        if (! selectAll){
 	        	menu.findItem(R.id.playlistSelectAllTracks).setTitle("Select all");
 	        }
-	        else if (selectAll){
+			//selectAll will always be true
+	        else {
 	        	menu.findItem(R.id.playlistSelectAllTracks).setTitle("Select none");
 	        }	
 			return true;
@@ -214,7 +184,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 
 	    @Override
 	    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-	    	ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(PlaylistActivity.this, 
+	    	ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(PlaylistActivity.this,
         	    getString(R.string.trackPreferences), MODE_PRIVATE);
 			PlaylistList trackListObject = new PlaylistList();
             int itemId = item.getItemId();
@@ -263,7 +233,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
             	selectAllPressed = false;
             	int PlaylistLVLength = PlaylistLV.getCount();
 				SparseBooleanArray checkboxList = PlaylistAdapter.PlaylistCheckboxList;
-				ArrayList<Integer> tracksToDelete = new ArrayList<Integer>();
+				ArrayList<Integer> tracksToDelete = new ArrayList<>();
 				
 				for (int i = 0; i < PlaylistLVLength; i++){
 					if (checkboxList.get(i, false)) {
