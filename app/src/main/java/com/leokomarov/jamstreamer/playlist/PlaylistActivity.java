@@ -43,10 +43,8 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 
 	private ArrayList<HashMap<String, String>> trackList = new ArrayList<>();
 	protected static ListView playlistLV;
-	private ArrayAdapter<PlaylistModel> playlistListAdapter;
-	private List<PlaylistModel> playlistModel = new ArrayList<>();
-    ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-            getString(R.string.trackPreferences), MODE_PRIVATE);
+	private ArrayAdapter<PlaylistTrackModel> playlistListAdapter;
+	private List<PlaylistTrackModel> playlistTrackModel = new ArrayList<>();
 
     private PlaylistPresenter presenter;
 
@@ -67,6 +65,9 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
         super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);     
         setContentView(R.layout.original_empty_list);
+
+        ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
+                getString(R.string.trackPreferences), MODE_PRIVATE);
         presenter = new PlaylistPresenter(playlistLV, savedInstanceState, new PlaylistInteractor(), trackPreferences);
         selectAllPressed = false;
         selectAll = false;
@@ -85,10 +86,10 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 		playlistLV.addHeaderView(header, null, false);
 		
     	for (HashMap<String, String> map : trackList) {
-    		playlistModel.add(new PlaylistModel(map));
+    		playlistTrackModel.add(new PlaylistTrackModel(map));
     	}
     	
-    	playlistListAdapter = new PlaylistAdapter(this, this, playlistModel);	
+    	playlistListAdapter = new PlaylistAdapter(this, this, playlistTrackModel);
     	setListAdapter(playlistListAdapter);
     	registerForContextMenu(playlistLV);
     	
@@ -256,10 +257,10 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 				if (trackList != null && ! trackList.isEmpty()){
 					presenter.shuffleTracklist();
 				}
-				playlistModel.clear();
+				playlistTrackModel.clear();
 					
 				for (HashMap<String, String> map : trackList) {
-					playlistModel.add(new PlaylistModel(map));
+					playlistTrackModel.add(new PlaylistTrackModel(map));
 				}
 					
 				if (tracksToDelete.size() == 1){
@@ -286,7 +287,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 				if (trackList != null && ! trackList.isEmpty()){
 					presenter.shuffleTracklist();
 				}
-				playlistModel.clear();
+				playlistTrackModel.clear();
 				
 				PlaylistAdapter.PlaylistCheckboxList.clear();
 			   	PlaylistAdapter.PlaylistCheckboxCount = 0;

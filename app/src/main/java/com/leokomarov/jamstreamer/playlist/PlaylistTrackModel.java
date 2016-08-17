@@ -2,11 +2,11 @@ package com.leokomarov.jamstreamer.playlist;
 
 import java.util.HashMap;
 
-public class PlaylistModel {
+public class PlaylistTrackModel {
     private HashMap<String, String> trackMap;
     private boolean selected;
 
-    public PlaylistModel(HashMap<String, String> trackMap) {
+    public PlaylistTrackModel(HashMap<String, String> trackMap) {
         this.trackMap = trackMap;
         selected = false;
     }

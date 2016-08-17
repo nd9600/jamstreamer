@@ -1,6 +1,5 @@
 package com.leokomarov.jamstreamer.playlist;
 
-import java.util.HashMap;
 import java.util.List;
 
 import android.app.Activity;
@@ -15,8 +14,8 @@ import android.widget.TextView;
 
 import com.leokomarov.jamstreamer.R;
 
-public class PlaylistAdapter extends ArrayAdapter<PlaylistModel> {
-	private final List<PlaylistModel> list;
+public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
+	private final List<PlaylistTrackModel> list;
 	private final Activity context;
 	public static SparseBooleanArray PlaylistCheckboxList = new SparseBooleanArray();
 	public static int PlaylistCheckboxCount = 0;
@@ -27,7 +26,7 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistModel> {
 	
 	private CallbackInterface mCallback;
 	
-	protected PlaylistAdapter(CallbackInterface callback, Activity context, List<PlaylistModel> list) {
+	protected PlaylistAdapter(CallbackInterface callback, Activity context, List<PlaylistTrackModel> list) {
 		super(context, R.layout.playlist_by_list_item, list);
 		this.context = context;
 		this.list = list;
@@ -72,7 +71,7 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistModel> {
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 					mCallback.callActionBar();
 					
-					PlaylistModel element = (PlaylistModel) viewHolder.checkbox.getTag();
+					PlaylistTrackModel element = (PlaylistTrackModel) viewHolder.checkbox.getTag();
 					element.setSelected(buttonView.isChecked());
 					if (element.isSelected()){
 						if (! PlaylistCheckboxList.get(position, false)){
