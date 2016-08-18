@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="appName">JamStreamer</string>
+
+    <string name="trackPreferences">track_preferences</string>
+    <string name="currentTrackPreferences">currentTrack_preferences</string>
+    <string name="indexPositionPreferences">indexPosition_preferences</string>
+    <string name="hierarchyPreferences">hierarchy_preferences</string>
+    <string name="playingWhileOrientationChangePreferences">playingWhileOrientationChange_preferences</string>
+
+    <string name="TAG_TRACKLIST">trackList</string>
+    <string name="TAG_ARTIST_NAME">artist_name</string>
+    <string name="TAG_ALBUM_NAME">album_name</string>
+
+</resources>

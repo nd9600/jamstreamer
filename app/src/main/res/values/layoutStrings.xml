@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mainArtists">Artists</string>
+    <string name="mainAlbums">Albums</string>
+    <string name="mainTracks">Tracks</string>
+    <string name="mainTopTracksWeek">Top tracks this week</string>
+
+    <string name="playlist">Playlist</string>
+    <string name="backwardButton">Backward</string>
+    <string name="previousButton">Previous</string>
+    <string name="playButton">Play</string>
+    <string name="nextButton">Next</string>
+    <string name="forwardButton">Forward</string>
+    <string name="playlistButton">Playlist</string>
+    <string name="repeatButton">Repeat</string>
+    <string name="shuffleButton">Shuffle</string>
+
+    <string name="artistsByNameFieldText">Enter an artist</string>
+    <string name="albumsByNameFieldText">Enter an album</string>
+    <string name="tracksByNameFieldText">Enter a track</string>
+    <string name="buttonText">Search</string>
+    <string name="selectTrack">Select track</string>
+    <string name="selectAlbum">Select album</string>
+    <string name="selectAll">Select all</string>
+    <string name="viewArtistFloatingText">View artist</string>
+    <string name="viewAlbumFloatingText">View album</string>
+    <string name="addTrackToPlaylistCAB">Add track(s)</string>
+    <string name="addAlbumToPlaylistCAB">Add album(s)</string>
+    <string name="playlistRemoveCAB">Remove track(s)</string>
+    <string name="deletePlaylistCAB">Delete playlist</string>
+</resources>

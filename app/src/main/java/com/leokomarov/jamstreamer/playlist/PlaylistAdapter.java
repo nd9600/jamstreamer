@@ -1,7 +1,5 @@
 package com.leokomarov.jamstreamer.playlist;
 
-import java.util.List;
-
 import android.app.Activity;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -13,6 +11,8 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.leokomarov.jamstreamer.R;
+
+import java.util.List;
 
 public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 	private final List<PlaylistTrackModel> list;
@@ -58,8 +58,8 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 		View view;
 
 		if (convertView == null) {
-			LayoutInflater inflator = context.getLayoutInflater();
-			view = inflator.inflate(R.layout.playlist_by_list_item, null);
+			LayoutInflater inflater = context.getLayoutInflater();
+			view = inflater.inflate(R.layout.playlist_by_list_item, parent);
 			final ViewHolder viewHolder = new ViewHolder();
 			
 			viewHolder.trackNameAndDuration = (TextView) view.findViewById(R.id.playlist_trackNameAndDuration);
@@ -91,7 +91,7 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 					if (PlaylistCheckboxCount == 0){
 	                	PlaylistActivity.mActionMode.finish();
 	                }
-					else if (PlaylistCheckboxCount != 0){
+					else {
 						PlaylistActivity.mActionMode.setTitle(PlaylistCheckboxCount + " selected");
 	                }
 				}
@@ -106,7 +106,7 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 		
 		ViewHolder holder = (ViewHolder) view.getTag();
 		
-		if (PlaylistActivity.selectAllPressed){
+		if (PlaylistPresenter.selectAllPressed){
 			if (PlaylistActivity.selectAll && ! holder.checkbox.isChecked()){
 				holder.checkbox.setChecked(true);
 			}
