@@ -97,11 +97,11 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
     ///*
 	public void callActionBar(){
 		if (mActionMode == null) {
-			mActionMode = startActionMode(mActionModeCallback);
             System.out.println("");
             System.out.println("####################");
             System.out.println("Started action bar");
             System.out.println("");
+			mActionMode = startActionMode(mActionModeCallback);
 		}
 	}
 
@@ -112,11 +112,35 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
             System.out.println("####################");
             System.out.println("Created action mode");
             System.out.println("");
+            MenuInflater inflater = getSupportMenuInflater();
+            inflater.inflate(R.menu.playlist_contextual_menu, menu);
+
+            System.out.println("");
+            System.out.println("####################");
+            System.out.println("Opened action bar");
+            System.out.println("");
+
+            if (! selectAll){
+                System.out.println("");
+                System.out.println("####################");
+                System.out.println("Set button to \"Select all\"");
+                System.out.println("");
+                menu.findItem(R.id.playlistSelectAllTracks).setTitle("Select all");
+            }
+            else { //selectAll will always be true here
+                System.out.println("");
+                System.out.println("####################");
+                System.out.println("Set button to \"Select none\"");
+                System.out.println("");
+                menu.findItem(R.id.playlistSelectAllTracks).setTitle("Select none");
+            }
 	        return true;
 	    }
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            /*
+            System.out.println("abcdefghijklmnopqrstuvwxyz");
 			menu.clear();
 	    	MenuInflater inflater = getSupportMenuInflater();
 	        inflater.inflate(R.menu.playlist_contextual_menu, menu);
@@ -140,6 +164,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
                 System.out.println("");
 	        	menu.findItem(R.id.playlistSelectAllTracks).setTitle("Select none");
 	        }
+	        */
 			return true;
 		}
 
