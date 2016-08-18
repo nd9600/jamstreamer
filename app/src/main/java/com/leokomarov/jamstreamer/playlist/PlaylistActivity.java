@@ -32,7 +32,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 	private ArrayAdapter<PlaylistTrackModel> playlistListAdapter;
 
     private PlaylistPresenter presenter;
-    private ArrayList<HashMap<String, String>> trackList = new ArrayList<>();
+    private ArrayList<HashMap<String, String>> tracklist = new ArrayList<>();
 
     //Used with the action bar
 	protected static ActionMode mActionMode;
@@ -45,6 +45,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
         setContentView(R.layout.original_empty_list);
 
         presenter = new PlaylistPresenter(this, this, savedInstanceState, new PlaylistInteractor());
+        tracklist = presenter.restoreTracklist();
 
         playlistLV = getListView();
         LayoutInflater inflater = getLayoutInflater();
@@ -231,16 +232,16 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 				}
 				Collections.sort(tracksToDelete, Collections.reverseOrder());
 				for (int i : tracksToDelete){
-				    trackList.remove(i);
+				    tracklist.remove(i);
 				}
 
-                presenter.saveTracklist(trackList);
+                presenter.saveTracklist(tracklist);
 
-				if (trackList != null && ! trackList.isEmpty()){
+				if (tracklist != null && ! tracklist.isEmpty()){
 					presenter.shuffleTracklist();
 				}
 				presenter.clearPlaylistTrackModel();
-				presenter.setPlaylistTrackModel(trackList);
+				presenter.setPlaylistTrackModel(tracklist);
 
                 String textInToast = "";
 				if (tracksToDelete.size() == 1){
@@ -260,10 +261,10 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 				return true;
 			} else if (itemId == R.id.deletePlaylist) {
                 PlaylistPresenter.selectAllPressed = false;
-				trackList.clear();
-				presenter.saveTracklist(trackList);
+				tracklist.clear();
+				presenter.saveTracklist(tracklist);
 
-				if (trackList != null && ! trackList.isEmpty()){
+				if (tracklist != null && ! tracklist.isEmpty()){
 					presenter.shuffleTracklist();
 				}
 				presenter.clearPlaylistTrackModel();
@@ -298,8 +299,8 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 	@Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
     	super.onSaveInstanceState(savedInstanceState);
-    	trackList = presenter.restoreTracklist();
-    	savedInstanceState.putSerializable(getString(R.string.TAG_TRACKLIST), trackList);
+    	tracklist = presenter.restoreTracklist();
+    	savedInstanceState.putSerializable(getString(R.string.TAG_TRACKLIST), tracklist);
     }
     
 	public boolean onOptionsItemSelected(MenuItem item) { 
