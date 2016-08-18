@@ -59,7 +59,7 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 
 		if (convertView == null) {
 			LayoutInflater inflater = context.getLayoutInflater();
-			view = inflater.inflate(R.layout.playlist_by_list_item, parent);
+			view = inflater.inflate(R.layout.playlist_by_list_item, null);
 			final ViewHolder viewHolder = new ViewHolder();
 			
 			viewHolder.trackNameAndDuration = (TextView) view.findViewById(R.id.playlist_trackNameAndDuration);

@@ -18,8 +18,8 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.utils.utils;
 
@@ -69,6 +69,13 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
                 finish();
             }
         });
+
+        findViewById(R.id.playlist_checkBox).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PlaylistPresenter.selectAllPressed = false;
+            }
+        });
     }
 
     public void startNewActivity(Intent intent, int requestCode){
@@ -94,15 +101,24 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
     //Action bar
     //
 
+    ///*
 	public void callActionBar(){
 		if (mActionMode == null) {
 			mActionMode = startActionMode(mActionModeCallback);
+            System.out.println("");
+            System.out.println("####################");
+            System.out.println("Started action bar");
+            System.out.println("");
 		}
 	}
 
-	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
+    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
 		@Override
 	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            System.out.println("");
+            System.out.println("####################");
+            System.out.println("Created action mode");
+            System.out.println("");
 	        return true;
 	    }
 

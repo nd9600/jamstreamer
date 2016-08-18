@@ -1,14 +1,5 @@
 package com.leokomarov.jamstreamer.discography;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -32,35 +23,36 @@ import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.leokomarov.jamstreamer.utils.ComplexPreferences;
-import com.leokomarov.jamstreamer.utils.JSONParser;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.media_player.AudioPlayer;
 import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistAdapter;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
-import com.leokomarov.jamstreamer.searches.TracksSearch;
+import com.leokomarov.jamstreamer.utils.ComplexPreferences;
+import com.leokomarov.jamstreamer.utils.JSONParser;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 public class TracksByName extends SherlockListActivity implements JSONParser.CallbackInterface, TracksByNameAdapter.CallbackInterface {
-	private String TAG_RESULTS = "results";
-	protected static String TAG_ARTIST_NAME = "artist_name";
-	protected static String TAG_ALBUM_NAME = "name";
-	private static String TAG_ALBUM_ID = "album_id";
-	private String TAG_TRACK_ID = "id";
-	private String TAG_TRACK_NAME = "name";
-	private String TAG_TRACK_DURATION = "duration";
 	private ListView TracksByNameLV;
 	private ArrayAdapter<TracksByNameModel>TracksByNameListAdapter;
-	private List<TracksByNameModel> TracksByNameModel = new ArrayList<TracksByNameModel>();
+	private List<TracksByNameModel> TracksByNameModel = new ArrayList<>();
 	protected static ActionMode mActionMode;
 	protected static boolean selectAll;
 	protected static boolean selectAllPressed;
 	private JSONArray results;
-	private ArrayList<HashMap<String, String>> trackList = new ArrayList<HashMap<String, String>>();
-	private ArrayList<HashMap<String, String>> albumIDList = new ArrayList<HashMap<String, String>>();
+	private ArrayList<HashMap<String, String>> trackList = new ArrayList<>();
+	private ArrayList<HashMap<String, String>> albumIDList = new ArrayList<>();
 	private ImageButton button_playlist;
-	
+
 	private void putHierarchy(String hierarchy){
 		SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
     	SharedPreferences.Editor hierarchyEditor = hierarchyPreference.edit();
@@ -85,23 +77,21 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
         switch (hierarchy) {
             case "artists":
             case "albums":
-                searchTerm = intent.getStringExtra(AlbumsByName.TAG_ALBUM_ID);
+            case "tracksFloatingMenuAlbum":
+                //Gets the search term from the intent using the extra data put in with the TAG_ALBUM_ID tag
+                searchTerm = intent.getStringExtra(getString(R.string.TAG_ALBUM_ID));
                 unformattedURL = getResources().getString(R.string.tracksByAlbumIDJSONURL);
                 break;
             case "tracks":
-                searchTerm = intent.getStringExtra(TracksSearch.TAG_TRACK_NAME).replace(" ", "+");
-                unformattedURL = getResources().getString(R.string.tracksByNameJSONURL);
+                searchTerm = intent.getStringExtra(getString(R.string.TAG_TRACK_NAME)).replace(" ", "+");
+                unformattedURL = getString(R.string.tracksByNameJSONURL);
                 break;
             case "topTracksPerWeek":
-                unformattedURL = getResources().getString(R.string.tracksByPopularityPerWeek);
-                break;
-            case "tracksFloatingMenuAlbum":
-                searchTerm = intent.getStringExtra(TracksByName.TAG_ALBUM_ID).replace(" ", "+");
-                unformattedURL = getResources().getString(R.string.tracksByAlbumIDJSONURL);
+                unformattedURL = getString(R.string.tracksByPopularityPerWeek);
                 break;
             case "playlistFloatingMenuAlbum":
-                searchTerm = intent.getStringExtra(PlaylistActivity.TAG_ALBUM_NAME).replace(" ", "+");
-                unformattedURL = getResources().getString(R.string.tracksByAlbumNameJSONURL);
+                searchTerm = intent.getStringExtra(getString(R.string.TAG_ALBUM_NAME)).replace(" ", "+");
+                unformattedURL = getString(R.string.tracksByAlbumNameJSONURL);
                 break;
         }
 
@@ -113,28 +103,28 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	@Override
 	public void onRequestCompleted(JSONObject json) {
 		try {
-			results = json.getJSONArray(TAG_RESULTS);
+			results = json.getJSONArray(getString(R.string.TAG_RESULTS));
 			SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
 			String hierarchy = hierarchyPreference.getString("hierarchy", "none");
 			if (hierarchy.equals("artists") || hierarchy.equals("albums") || hierarchy.equals("tracksFloatingMenuAlbum") || hierarchy.equals("playlistFloatingMenuAlbum")){
 				for(int i = 0; i < results.length(); i++) {
 					JSONArray tracksArray = results.getJSONObject(i).getJSONArray("tracks");
-					String artistName = results.getJSONObject(i).getString(TAG_ARTIST_NAME);
+					String artistName = results.getJSONObject(i).getString(getString(R.string.TAG_ARTIST_NAME));
 					String albumName = results.getJSONObject(i).getString("name");
 					String albumID = results.getJSONObject(i).getString("id");
 					for(int j = 0; j < tracksArray.length(); j++) {
 						JSONObject trackInfo = tracksArray.getJSONObject(j);
 					
-						String trackID = trackInfo.getString(TAG_TRACK_ID);
-						String trackName = trackInfo.getString(TAG_TRACK_NAME);
-						long durationLong = Long.valueOf(trackInfo.getString(TAG_TRACK_DURATION));
+						String trackID = trackInfo.getString(getString(R.string.TAG_TRACK_ID));
+						String trackName = trackInfo.getString(getString(R.string.TAG_TRACK_NAME));
+						long durationLong = Long.valueOf(trackInfo.getString(getString(R.string.TAG_TRACK_DURATION)));
 						String trackDuration = String.format(Locale.US, "%d:%02d", durationLong / 60,durationLong % 60);
 						
-						HashMap<String, String> albumIDMap = new HashMap<String, String>();
+						HashMap<String, String> albumIDMap = new HashMap<>();
 						albumIDMap.put("albumID", albumID);
 						albumIDList.add(albumIDMap);
 					
-						HashMap<String, String> trackMap = new HashMap<String, String>();
+						HashMap<String, String> trackMap = new HashMap<>();
 						trackMap.put("trackID", trackID);
 						trackMap.put("trackName", trackName);
 						trackMap.put("trackDuration", trackDuration);
@@ -148,19 +138,19 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 				for(int i = 0; i < results.length(); i++) {
 					JSONObject trackInfo= results.getJSONObject(i);
 					
-					String trackID = trackInfo.getString(TAG_TRACK_ID);
-					String trackName = trackInfo.getString(TAG_TRACK_NAME);
-					long durationLong = Long.valueOf(trackInfo.getString(TAG_TRACK_DURATION));
+					String trackID = trackInfo.getString(getString(R.string.TAG_TRACK_ID));
+					String trackName = trackInfo.getString(getString(R.string.TAG_TRACK_NAME));
+					long durationLong = Long.valueOf(trackInfo.getString(getString(R.string.TAG_TRACK_DURATION)));
 					String trackDuration = String.format(Locale.US, "%d:%02d", durationLong / 60,durationLong % 60);
-					String artistName = trackInfo.getString(TAG_ARTIST_NAME);
-					String albumName = trackInfo.getString("album_name");
+					String artistName = trackInfo.getString(getString(R.string.TAG_ARTIST_NAME));
+					String albumName = trackInfo.getString(getString(R.string.TAG_ALBUM_NAME));
 					String albumID = trackInfo.getString("album_id");
 					
-					HashMap<String, String> albumIDMap = new HashMap<String, String>();
+					HashMap<String, String> albumIDMap = new HashMap<>();
 					albumIDMap.put("albumID", albumID);
 					albumIDList.add(albumIDMap);
 					
-					HashMap<String, String> trackMap = new HashMap<String, String>();
+					HashMap<String, String> trackMap = new HashMap<>();
 					trackMap.put("trackID", trackID);
 					trackMap.put("trackName", trackName);
 					trackMap.put("trackDuration", trackDuration);
@@ -208,7 +198,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	    	TracksByNameLV.setOnItemClickListener(new OnItemClickListener() {
 	    		@Override
 	    		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-	    			ArrayList<HashMap<String, String>> newTrackList = new ArrayList<HashMap<String, String>>();
+	    			ArrayList<HashMap<String, String>> newTrackList = new ArrayList<>();
 	    			SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
 	    			SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
 	    			String hierarchy = hierarchyPreference.getString("hierarchy", "none");
@@ -284,14 +274,14 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 			putHierarchy("tracksFloatingMenuArtist");
 			String artistName = trackList.get(indexPosition).get("trackArtist");
 			Intent artistsIntent = new Intent(getApplicationContext(), AlbumsByName.class);
-			artistsIntent.putExtra(TAG_ARTIST_NAME, artistName);
+			artistsIntent.putExtra(getString(R.string.TAG_ARTIST_NAME), artistName);
 			startActivityForResult(artistsIntent, 3);
 			return true;
 		} else if (menuID == R.id.tracksFloating_viewAlbum) {
 			putHierarchy("tracksFloatingMenuAlbum");
 			String albumID = albumIDList.get(indexPosition).get("albumID");
 			Intent albumsIntent = new Intent(getApplicationContext(), TracksByName.class);
-			albumsIntent.putExtra(TAG_ALBUM_ID, albumID);
+			albumsIntent.putExtra(getString(R.string.TAG_ALBUM_ID), albumID);
 			startActivityForResult(albumsIntent, 4);
 			return true;
 		} else {
@@ -324,7 +314,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
         	if (! selectAll){
 	        	menu.findItem(R.id.tracksSelectAllTracks).setTitle("Select all");
 	        }
-	        else if (selectAll){
+	        else {
 	        	menu.findItem(R.id.tracksSelectAllTracks).setTitle("Select none");
 	        }	
 			return true;
@@ -377,7 +367,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
             	selectAllPressed = false;
 				int tracksByNameLVLength = TracksByNameLV.getCount();
 				SparseBooleanArray checkboxList = TracksByNameAdapter.TracksByNameCheckboxList;
-				ArrayList<HashMap<String, String>> tracksToAddList = new ArrayList<HashMap<String, String>>();
+				ArrayList<HashMap<String, String>> tracksToAddList = new ArrayList<>();
 				for (int i = 0; i < tracksByNameLVLength; i++){
 					if (checkboxList.get(i, false)) {
 						tracksToAddList.add(trackList.get(i));
@@ -386,7 +376,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 				ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(TracksByName.this,
 	    	    	getString(R.string.trackPreferences), MODE_PRIVATE);
 
-				ArrayList<HashMap<String, String>> newTrackList = new ArrayList<HashMap<String, String>>();
+				ArrayList<HashMap<String, String>> newTrackList = new ArrayList<>();
     	    	if (trackPreferences.getObject("tracks", PlaylistList.class) != null){
     	    		newTrackList.addAll(trackPreferences.getObject("tracks", PlaylistList.class).trackList);
     	    	}
