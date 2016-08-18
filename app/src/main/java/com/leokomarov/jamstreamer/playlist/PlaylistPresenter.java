@@ -1,13 +1,15 @@
 package com.leokomarov.jamstreamer.playlist;
 
-import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.media_player.AudioPlayer;
+import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
+import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,41 +17,39 @@ import java.util.List;
 
 public class PlaylistPresenter {
 
-    private ListView view;
+    private Context context;
+    private Bundle savedInstanceState;
+    private PlaylistInterface view;
     private PlaylistInteractor interactor;
     private ComplexPreferences trackPreferences;
-    private Bundle savedInstanceState;
 
-    private List<PlaylistTrackModel> playlistTrackModel = new ArrayList<>();
-
-    public PlaylistPresenter(Context context, Bundle savedInstanceState, ListView playlistView, PlaylistInteractor playlistInteractor){
+    public PlaylistPresenter(Context context, PlaylistInterface view, Bundle savedInstanceState, PlaylistInteractor playlistInteractor){
+        this.context = context;
         this.savedInstanceState = savedInstanceState;
-        this.view = playlistView;
+        this.view = view;
         this.interactor = playlistInteractor;
         this.trackPreferences = ComplexPreferences.getComplexPreferences(context,
-                context.getString(R.string.trackPreferences), context.MODE_PRIVATE);
+                context.getString(R.string.trackPreferences), Context.MODE_PRIVATE);
     }
 
     public List<PlaylistTrackModel> getPlaylistTrackModel(){
-        return playlistTrackModel;
+        return interactor.getPlaylistTrackModel();
     }
 
     public void clearPlaylistTrackModel(){
-        playlistTrackModel.clear();
+        interactor.clearPlaylistTrackModel();
     }
 
-    public void setPlaylistTrackModel(ArrayList<HashMap<String, String>> trackList){
-
+    //Sets the playlist track model
+    //If the passed tracklist is null, the tracklist will be restored from memory
+    public void setPlaylistTrackModel(ArrayList<HashMap<String, String>> trackList) {
         if (trackList == null) {
             ArrayList<HashMap<String, String>> restoredTracklist = restoreTracklist();
             if (restoredTracklist != null) {
                 trackList = restoredTracklist;
             }
         }
-
-        for (HashMap<String, String> map : trackList) {
-            playlistTrackModel.add(new PlaylistTrackModel(map));
-        }
+        interactor.setPlaylistTrackModel(trackList);
     }
 
     public void saveTracklist(ArrayList<HashMap<String, String>> trackList){
@@ -62,6 +62,24 @@ public class PlaylistPresenter {
 
     public void shuffleTracklist(){
         interactor.shuffleTrackList(trackPreferences);
+    }
+
+    public void startAudioPlayer(int indexPosition){
+        SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
+        SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
+        indexPositionEditor.putInt("indexPosition", indexPosition );
+        indexPositionEditor.commit();
+
+        if(AudioPlayerService.shuffleBoolean){
+            AudioPlayerService.shuffleBoolean = false;
+            AudioPlayer.button_shuffle.setImageResource(R.drawable.img_repeat_default);
+        }
+
+        Intent intent = new Intent(context, AudioPlayer.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.putExtra("fromNotification", false);
+
+        view.startNewActivity(intent, 1);
     }
 
 }

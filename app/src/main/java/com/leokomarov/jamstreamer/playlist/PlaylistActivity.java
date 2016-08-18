@@ -35,7 +35,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public class PlaylistActivity extends SherlockListActivity implements PlaylistAdapter.CallbackInterface {
+public class PlaylistActivity extends SherlockListActivity implements PlaylistAdapter.CallbackInterface, PlaylistInterface {
     private final String TAG_TRACKLIST = "trackListSaved";
     public static String TAG_ARTIST_NAME = "artist_name";
 	public static String TAG_ALBUM_NAME = "name";
@@ -57,7 +57,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);     
         setContentView(R.layout.original_empty_list);
 
-        presenter = new PlaylistPresenter(this, savedInstanceState, playlistLV, new PlaylistInteractor());
+        presenter = new PlaylistPresenter(this, this, savedInstanceState, new PlaylistInteractor());
 
         playlistLV = getListView();
         LayoutInflater inflater = getLayoutInflater();
@@ -78,23 +78,14 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 			@Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				int indexPosition = position - 1;
- 
-				SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
-    	    	SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
-    	    	indexPositionEditor.putInt("indexPosition", indexPosition );
-    	    	indexPositionEditor.commit();
-    	    	
-    	    	if(AudioPlayerService.shuffleBoolean){
-                	AudioPlayerService.shuffleBoolean = false;
-                	AudioPlayer.button_shuffle.setImageResource(R.drawable.img_repeat_default);
-    	    	}
-    			Intent in = new Intent(getApplicationContext(), AudioPlayer.class);
-    			in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-    			in.putExtra("fromNotification", false);
-    			startActivityForResult(in, 1);
+                presenter.startAudioPlayer(indexPosition);
                 finish();
             }
         });
+    }
+
+    public void startNewActivity(Intent intent, int requestCode){
+        startActivityForResult(intent, requestCode);
     }
 	
     @Override

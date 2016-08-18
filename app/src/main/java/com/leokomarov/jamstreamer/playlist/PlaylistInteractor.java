@@ -7,9 +7,25 @@ import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 public class PlaylistInteractor {
     private final String TAG_TRACKLIST = "trackListSaved";
+    private List<PlaylistTrackModel> playlistTrackModel = new ArrayList<>();
+
+    public List<PlaylistTrackModel> getPlaylistTrackModel(){
+        return playlistTrackModel;
+    }
+
+    public void clearPlaylistTrackModel(){
+        playlistTrackModel.clear();
+    }
+
+    public void setPlaylistTrackModel(ArrayList<HashMap<String, String>> trackList){
+        for (HashMap<String, String> map : trackList) {
+            playlistTrackModel.add(new PlaylistTrackModel(map));
+        }
+    }
 
     public void saveTracklist(ComplexPreferences trackPreferences, ArrayList<HashMap<String, String>> trackList){
         PlaylistList trackListObject = new PlaylistList();
@@ -23,11 +39,9 @@ public class PlaylistInteractor {
     public ArrayList<HashMap<String, String>> restoreTracklist(Bundle savedInstanceState, ComplexPreferences trackPreferences){
         if (savedInstanceState != null) {
             @SuppressWarnings("unchecked")
-            //ArrayList<HashMap<String, String>> trackList = (ArrayList<HashMap<String,String>>)savedInstanceState.get(TAG_TRACKLIST);
-                    ArrayList<HashMap<String, String>> trackList = (ArrayList<HashMap<String, String>>)savedInstanceState.getSerializable(TAG_TRACKLIST);
+            ArrayList<HashMap<String, String>> trackList = (ArrayList<HashMap<String, String>>)savedInstanceState.getSerializable(TAG_TRACKLIST);
             return trackList;
-        }
-        else {
+        } else {
             PlaylistList trackPreferencesObject = trackPreferences.getObject("tracks", PlaylistList.class);
             if (trackPreferencesObject != null){
                 return trackPreferencesObject.trackList;
@@ -35,7 +49,6 @@ public class PlaylistInteractor {
             else {
                 return null;
             }
-
         }
     }
 
