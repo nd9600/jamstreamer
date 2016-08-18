@@ -1,5 +1,6 @@
 package com.leokomarov.jamstreamer.playlist;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -7,7 +8,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.leokomarov.jamstreamer.R;
@@ -53,7 +53,8 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
         return 250;
     }
 
-	@Override
+	@SuppressLint("InflateParams")
+    @Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
 		View view;
 
@@ -65,14 +66,25 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 			viewHolder.trackNameAndDuration = (TextView) view.findViewById(R.id.playlist_trackNameAndDuration);
 			viewHolder.trackArtistAndAlbum = (TextView) view.findViewById(R.id.playlist_trackArtistAndAlbum);
 			viewHolder.checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
+
+            /*
+            viewHolder.checkbox.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PlaylistPresenter.selectAllPressed = false;
+                }
+            });
+            */
       
-			viewHolder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			viewHolder.checkbox.setOnClickListener(new View.OnClickListener() {
 				@Override
-				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				public void onClick(View v) {
 					mCallback.callActionBar();
+                    PlaylistPresenter.selectAllPressed = false;
 					
 					PlaylistTrackModel element = (PlaylistTrackModel) viewHolder.checkbox.getTag();
-					element.setSelected(buttonView.isChecked());
+					//element.setSelected(buttonView.isChecked());
+                    element.setSelected(viewHolder.checkbox.isChecked());
 					if (element.isSelected()){
 						if (! PlaylistCheckboxList.get(position, false)){
 							PlaylistCheckboxList.put(position, true);
@@ -122,4 +134,5 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 		holder.checkbox.setChecked(list.get(position).isSelected());
 		return view;
 	}
+
 }

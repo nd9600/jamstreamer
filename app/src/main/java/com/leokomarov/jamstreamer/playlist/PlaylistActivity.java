@@ -51,15 +51,15 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
         ViewGroup header = (ViewGroup) inflater.inflate(R.layout.playlist_header, playlistLV, false);
         playlistLV.addHeaderView(header, null, false);
 
+        presenter.setPlaylistTrackModel(null);
+        playlistListAdapter = new PlaylistAdapter(this, this, presenter.getPlaylistTrackModel());
+        setListAdapter(playlistListAdapter);
+        registerForContextMenu(playlistLV);
+
         PlaylistPresenter.selectAllPressed = false;
         selectAll = false;
         
         utils.clearCheckboxes(2);
-
-        presenter.setPlaylistTrackModel(null);
-        playlistListAdapter = new PlaylistAdapter(this, this, presenter.getPlaylistTrackModel());
-    	setListAdapter(playlistListAdapter);
-    	registerForContextMenu(playlistLV);
     	
     	playlistLV.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -67,13 +67,6 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 				int indexPosition = position - 1;
                 presenter.startAudioPlayer(indexPosition);
                 finish();
-            }
-        });
-
-        findViewById(R.id.playlist_checkBox).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PlaylistPresenter.selectAllPressed = false;
             }
         });
     }
