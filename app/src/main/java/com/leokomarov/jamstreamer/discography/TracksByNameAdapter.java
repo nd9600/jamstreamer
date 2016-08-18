@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.common;
+package com.leokomarov.jamstreamer.discography;
 
 import java.util.HashMap;
 import java.util.List;

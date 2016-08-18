@@ -2,8 +2,7 @@ package com.leokomarov.jamstreamer.playlist;
 
 import android.os.Bundle;
 
-import com.leokomarov.jamstreamer.ComplexPreferences;
-import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,6 +10,13 @@ import java.util.HashMap;
 
 public class PlaylistInteractor {
     private final String TAG_TRACKLIST = "trackListSaved";
+
+    public void saveTracklist(ComplexPreferences trackPreferences, ArrayList<HashMap<String, String>> trackList){
+        PlaylistList trackListObject = new PlaylistList();
+        trackListObject.setTrackList(trackList);
+        trackPreferences.putObject("tracks", trackListObject);
+        trackPreferences.commit();
+    }
 
     //Restores the playlist from memory
     //See ComplexPreferences docs on Github

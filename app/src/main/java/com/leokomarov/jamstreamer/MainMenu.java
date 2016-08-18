@@ -12,14 +12,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
-import com.leokomarov.jamstreamer.common.TracksByName;
-import com.leokomarov.jamstreamer.common.TracksByNameAdapter;
+import com.leokomarov.jamstreamer.discography.TracksByName;
 import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
-import com.leokomarov.jamstreamer.playlist.PlaylistAdapter;
 import com.leokomarov.jamstreamer.searches.AlbumsSearch;
 import com.leokomarov.jamstreamer.searches.ArtistsSearch;
 import com.leokomarov.jamstreamer.searches.TracksSearch;
+import com.leokomarov.jamstreamer.utils.utils;
 
 public class MainMenu extends SherlockActivity {
 	private ImageButton button_playlist;
@@ -27,14 +26,6 @@ public class MainMenu extends SherlockActivity {
 	private TextView textView_albums;
 	private TextView textView_tracks;
 	private TextView textView_topTracksThisWeek;
-
-    //Stores whether you are going into the artists, albums, tracks, or top tracks this week activity
-	private void putHierarchy(String hierarchy){
-		SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
-    	SharedPreferences.Editor hierarchyEditor = hierarchyPreference.edit();
-    	hierarchyEditor.putString("hierarchy", hierarchy);
-		hierarchyEditor.commit();
-	}
 	
 	@Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +52,7 @@ public class MainMenu extends SherlockActivity {
     	textView_artists.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
-    			putHierarchy("artists");
+    			utils.putHierarchy(MainMenu.this, "artists");
     			Intent artistIntent = new Intent(getApplicationContext(), ArtistsSearch.class);
     			startActivity(artistIntent);
     		}
@@ -70,7 +61,7 @@ public class MainMenu extends SherlockActivity {
     	textView_albums.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
-    			putHierarchy("albums");
+                utils.putHierarchy(MainMenu.this, "albums");
     			Intent albumIntent = new Intent(getApplicationContext(), AlbumsSearch.class);
     			startActivity(albumIntent);	
     		}
@@ -79,7 +70,7 @@ public class MainMenu extends SherlockActivity {
     	textView_tracks.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
-    			putHierarchy("tracks");
+                utils.putHierarchy(MainMenu.this, "tracks");
     			Intent trackIntent = new Intent(getApplicationContext(), TracksSearch.class);
     			startActivity(trackIntent);	
     		}
@@ -88,7 +79,7 @@ public class MainMenu extends SherlockActivity {
     	textView_topTracksThisWeek.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
-    			putHierarchy("topTracksPerWeek");
+                utils.putHierarchy(MainMenu.this, "topTracksPerWeek");
     			Intent topTracksWeekIntent = new Intent(getApplicationContext(), TracksByName.class);
     			startActivityForResult(topTracksWeekIntent, 2);	
     		}
@@ -110,16 +101,7 @@ public class MainMenu extends SherlockActivity {
     //Resets the checkboxes once you've left the playlist or top tracks activities
     @Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case 1:
-                PlaylistAdapter.PlaylistCheckboxList.clear();
-                PlaylistAdapter.PlaylistCheckboxCount = 0;
-                break;
-            case 2:
-                TracksByNameAdapter.TracksByNameCheckboxList.clear();
-                TracksByNameAdapter.TracksByNameCheckboxCount = 0;
-                break;
-        }
+        utils.clearCheckboxes(requestCode);
 	}
 
     //Brings up the exit dialog when you press the back button

@@ -24,10 +24,10 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockListActivity;
 import com.actionbarsherlock.view.MenuItem;
-import com.leokomarov.jamstreamer.JSONParser;
+import com.leokomarov.jamstreamer.utils.JSONParser;
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.common.AlbumsByName;
-import com.leokomarov.jamstreamer.common.AlbumsByNameAdapter;
+import com.leokomarov.jamstreamer.discography.AlbumsByName;
+import com.leokomarov.jamstreamer.discography.AlbumsByNameAdapter;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistAdapter;
 

@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer;
+package com.leokomarov.jamstreamer.utils;
 
 import java.lang.reflect.Type;
 

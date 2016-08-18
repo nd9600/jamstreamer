@@ -1,12 +1,9 @@
-package com.leokomarov.jamstreamer.common;
+package com.leokomarov.jamstreamer.discography;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,7 +12,6 @@ import java.util.List;
 import java.util.Locale;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
@@ -43,8 +39,8 @@ import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.leokomarov.jamstreamer.ComplexPreferences;
-import com.leokomarov.jamstreamer.JSONParser;
+import com.leokomarov.jamstreamer.utils.ComplexPreferences;
+import com.leokomarov.jamstreamer.utils.JSONParser;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistAdapter;

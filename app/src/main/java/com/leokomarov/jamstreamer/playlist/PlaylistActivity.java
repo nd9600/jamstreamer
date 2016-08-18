@@ -1,10 +1,5 @@
 package com.leokomarov.jamstreamer.playlist;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -27,69 +22,55 @@ import com.actionbarsherlock.view.ActionMode;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.leokomarov.jamstreamer.ComplexPreferences;
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.common.AlbumsByName;
-import com.leokomarov.jamstreamer.common.AlbumsByNameAdapter;
-import com.leokomarov.jamstreamer.common.TracksByName;
-import com.leokomarov.jamstreamer.common.TracksByNameAdapter;
+import com.leokomarov.jamstreamer.discography.AlbumsByName;
+import com.leokomarov.jamstreamer.discography.TracksByName;
 import com.leokomarov.jamstreamer.media_player.AudioPlayer;
 import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
+import com.leokomarov.jamstreamer.utils.ComplexPreferences;
+import com.leokomarov.jamstreamer.utils.utils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 public class PlaylistActivity extends SherlockListActivity implements PlaylistAdapter.CallbackInterface {
     private final String TAG_TRACKLIST = "trackListSaved";
     public static String TAG_ARTIST_NAME = "artist_name";
 	public static String TAG_ALBUM_NAME = "name";
 
-	private ArrayList<HashMap<String, String>> trackList = new ArrayList<>();
 	protected static ListView playlistLV;
 	private ArrayAdapter<PlaylistTrackModel> playlistListAdapter;
-	private List<PlaylistTrackModel> playlistTrackModel = new ArrayList<>();
 
     private PlaylistPresenter presenter;
+    private ArrayList<HashMap<String, String>> trackList = new ArrayList<>();
 
     //Used with the action bar
 	protected static ActionMode mActionMode;
 	protected static boolean selectAll;
 	protected static boolean selectAllPressed;
-    
-	private void putHierarchy(String hierarchy){
-		SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
-    	SharedPreferences.Editor hierarchyEditor = hierarchyPreference.edit();
-    	hierarchyEditor.putString("hierarchy", hierarchy);
-		hierarchyEditor.commit();
-	}
-	
+
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);     
         setContentView(R.layout.original_empty_list);
 
-        ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-                getString(R.string.trackPreferences), MODE_PRIVATE);
-        presenter = new PlaylistPresenter(playlistLV, savedInstanceState, new PlaylistInteractor(), trackPreferences);
+        presenter = new PlaylistPresenter(this, savedInstanceState, playlistLV, new PlaylistInteractor());
+
+        playlistLV = getListView();
+        LayoutInflater inflater = getLayoutInflater();
+        ViewGroup header = (ViewGroup) inflater.inflate(R.layout.playlist_header, playlistLV, false);
+        playlistLV.addHeaderView(header, null, false);
+
         selectAllPressed = false;
         selectAll = false;
         
-        PlaylistAdapter.PlaylistCheckboxList.clear();
-    	PlaylistAdapter.PlaylistCheckboxCount = 0;
-        
-        ArrayList<HashMap<String, String>> restoredTracklist = presenter.restoreTracklist();
-        if (restoredTracklist != null ){
-        	trackList = restoredTracklist;
-        }
-        
-        playlistLV = getListView();
-		LayoutInflater inflater = getLayoutInflater();
-		ViewGroup header = (ViewGroup)inflater.inflate(R.layout.playlist_header, playlistLV, false);
-		playlistLV.addHeaderView(header, null, false);
-		
-    	for (HashMap<String, String> map : trackList) {
-    		playlistTrackModel.add(new PlaylistTrackModel(map));
-    	}
-    	
-    	playlistListAdapter = new PlaylistAdapter(this, this, playlistTrackModel);
+        utils.clearCheckboxes(2);
+
+        presenter.setPlaylistTrackModel(null);
+        playlistListAdapter = new PlaylistAdapter(this, this, presenter.getPlaylistTrackModel());
     	setListAdapter(playlistListAdapter);
     	registerForContextMenu(playlistLV);
     	
@@ -124,35 +105,36 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 	
 	@Override
 	public boolean onContextItemSelected(android.view.MenuItem item) {
-		trackList = presenter.restoreTracklist();
+        trackList = presenter.restoreTracklist();
         AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();   
         View viewClicked = info.targetView;
         int indexPosition = info.position - 1;
         
         int menuID = item.getItemId();
-        if (menuID == R.id.playlistFloating_selectTrack){
-        	selectAllPressed = false;
-        	callActionBar();
-        	CheckBox checkbox = (CheckBox) viewClicked.findViewById(R.id.playlist_checkBox);
-			checkbox.setChecked(! checkbox.isChecked());
-        	return true;
-		} else if (menuID == R.id.playlistFloating_viewArtist) {
-			putHierarchy("playlistFloatingMenuArtist");
-			String artistName = trackList.get(indexPosition).get("trackArtist");
-			Intent artistsIntent = new Intent(getApplicationContext(), AlbumsByName.class);
-			artistsIntent.putExtra(TAG_ARTIST_NAME, artistName);
-			startActivityForResult(artistsIntent, 2);
-			return true;
-		} else if (menuID == R.id.playlistFloating_viewAlbum) {
-			putHierarchy("playlistFloatingMenuAlbum");
-			String albumName = trackList.get(indexPosition).get("trackAlbum");
-			Intent albumsIntent = new Intent(getApplicationContext(), TracksByName.class);
-			albumsIntent.putExtra(TAG_ALBUM_NAME, albumName);
-			startActivityForResult(albumsIntent, 3);
-			return true;
-		} else {
-			return false;
-		}
+        switch (menuID) {
+            case R.id.playlistFloating_selectTrack:
+                selectAllPressed = false;
+                callActionBar();
+                CheckBox checkbox = (CheckBox) viewClicked.findViewById(R.id.playlist_checkBox);
+                checkbox.setChecked(!checkbox.isChecked());
+                return true;
+            case R.id.playlistFloating_viewArtist:
+                utils.putHierarchy(getApplicationContext(), "playlistFloatingMenuArtist");
+                String artistName = trackList.get(indexPosition).get("trackArtist");
+                Intent artistsIntent = new Intent(getApplicationContext(), AlbumsByName.class);
+                artistsIntent.putExtra(TAG_ARTIST_NAME, artistName);
+                startActivityForResult(artistsIntent, 2);
+                return true;
+            case R.id.playlistFloating_viewAlbum:
+                utils.putHierarchy(getApplicationContext(), "playlistFloatingMenuAlbum");
+                String albumName = trackList.get(indexPosition).get("trackAlbum");
+                Intent albumsIntent = new Intent(getApplicationContext(), TracksByName.class);
+                albumsIntent.putExtra(TAG_ALBUM_NAME, albumName);
+                startActivityForResult(albumsIntent, 3);
+                return true;
+            default:
+                return false;
+        }
 		
     }
     
@@ -189,9 +171,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 
 	    @Override
 	    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-	    	ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(PlaylistActivity.this,
-        	    getString(R.string.trackPreferences), MODE_PRIVATE);
-			PlaylistList trackListObject = new PlaylistList();
+
             int itemId = item.getItemId();
             if (itemId == R.id.playlistSelectAllTracks) {
             	selectAllPressed = true;
@@ -249,19 +229,14 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 				for (int i : tracksToDelete){
 				    trackList.remove(i);
 				}
-				
-				trackListObject.setTrackList(trackList);
-				trackPreferences.putObject("tracks", trackListObject);
-				trackPreferences.commit();
+
+                presenter.saveTracklist(trackList);
 				
 				if (trackList != null && ! trackList.isEmpty()){
 					presenter.shuffleTracklist();
 				}
-				playlistTrackModel.clear();
-					
-				for (HashMap<String, String> map : trackList) {
-					playlistTrackModel.add(new PlaylistTrackModel(map));
-				}
+				presenter.clearPlaylistTrackModel();
+				presenter.setPlaylistTrackModel(trackList);
 					
 				if (tracksToDelete.size() == 1){
 					Toast.makeText(getApplicationContext(),"1 track removed from the playlist", Toast.LENGTH_LONG).show();
@@ -280,17 +255,14 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 			} else if (itemId == R.id.deletePlaylist) {
 				selectAllPressed = false;
 				trackList.clear();
-				trackListObject.setTrackList(trackList);
-				trackPreferences.putObject("tracks", trackListObject);
-				trackPreferences.commit();
-					
+				presenter.saveTracklist(trackList);
+
 				if (trackList != null && ! trackList.isEmpty()){
 					presenter.shuffleTracklist();
 				}
-				playlistTrackModel.clear();
-				
-				PlaylistAdapter.PlaylistCheckboxList.clear();
-			   	PlaylistAdapter.PlaylistCheckboxCount = 0;
+				presenter.clearPlaylistTrackModel();
+
+				utils.clearCheckboxes(2);
 				playlistListAdapter.notifyDataSetChanged();
 				mActionMode.finish();
 				mActionMode = null;
@@ -314,18 +286,7 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == 1) {
-	    	PlaylistAdapter.PlaylistCheckboxList.clear();
-	    	PlaylistAdapter.PlaylistCheckboxCount = 0;
-	    }
-		if (requestCode == 2) {
-	    	AlbumsByNameAdapter.AlbumsByNameCheckboxList.clear();
-	    	AlbumsByNameAdapter.AlbumsByNameCheckboxCount = 0;
-	    }
-	    if (requestCode == 3) {
-	    	TracksByNameAdapter.TracksByNameCheckboxList.clear();
-	    	TracksByNameAdapter.TracksByNameCheckboxCount = 0;
-	    }
+        utils.clearCheckboxes(requestCode);
 	}
 	
 	@Override

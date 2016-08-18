@@ -10,8 +10,8 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.common.TracksByName;
-import com.leokomarov.jamstreamer.common.TracksByNameAdapter;
+import com.leokomarov.jamstreamer.discography.TracksByName;
+import com.leokomarov.jamstreamer.discography.TracksByNameAdapter;
 
 public class TracksSearch extends SherlockActivity {
 	public static final String TAG_TRACK_NAME = "name";

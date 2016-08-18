@@ -48,12 +48,12 @@
 
         <activity
             android:label="JamStreamer - Albums"
-            android:name="com.leokomarov.jamstreamer.common.AlbumsByName" >
+            android:name="com.leokomarov.jamstreamer.discography.AlbumsByName" >
         </activity>
         
         <activity
             android:label="JamStreamer - Tracks"
-            android:name="com.leokomarov.jamstreamer.common.TracksByName" >
+            android:name="com.leokomarov.jamstreamer.discography.TracksByName" >
         </activity>
         
         <activity

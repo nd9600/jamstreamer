@@ -10,8 +10,8 @@ import android.widget.Toast;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.common.AlbumsByName;
-import com.leokomarov.jamstreamer.common.AlbumsByNameAdapter;
+import com.leokomarov.jamstreamer.discography.AlbumsByName;
+import com.leokomarov.jamstreamer.discography.AlbumsByNameAdapter;
 
 public class AlbumsSearch extends SherlockActivity {
 	public static final String TAG_ALBUM_NAME = "name";
