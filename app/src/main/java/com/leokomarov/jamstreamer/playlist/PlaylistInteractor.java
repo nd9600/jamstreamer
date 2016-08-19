@@ -34,6 +34,7 @@ public class PlaylistInteractor {
     }
 
     //Saves the tracklist to memory
+    //trackListObject is a class with the trackList as a variable inside it
     public void saveTracklist(ComplexPreferences trackPreferences, ArrayList<HashMap<String, String>> trackList){
         PlaylistList trackListObject = new PlaylistList();
         trackListObject.setTrackList(trackList);

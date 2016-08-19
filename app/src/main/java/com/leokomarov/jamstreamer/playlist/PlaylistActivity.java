@@ -3,22 +3,28 @@ package com.leokomarov.jamstreamer.playlist;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.view.ActionMode;
+import android.util.SparseBooleanArray;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.utils.ActionBarListActivity;
 import com.leokomarov.jamstreamer.utils.utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 public class PlaylistActivity extends ActionBarListActivity implements PlaylistAdapter.CallbackInterface {
@@ -33,7 +39,8 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
     private PlaylistPresenter presenter;
     private ArrayList<HashMap<String, String>> tracklist = new ArrayList<>();
 
-    //Used with the action bar
+    //mActionMode is the action bar
+    //selectAll is changed when the selectAll/none button is pressed
 	protected static ActionMode mActionMode;
 	protected static boolean selectAll;
 
@@ -95,7 +102,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
     }
 
     //Called the presenter's function when the tracks are long-pressed
-	//@Override
+	@Override
 	public boolean onContextItemSelected(MenuItem item) {
         return presenter.onContextItemSelected(item);
     }
@@ -112,19 +119,20 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
             System.out.println("####################");
             System.out.println("Started action bar");
             System.out.println("");
-			//mActionMode = startActionMode(mActionModeCallback);
+			mActionMode = startSupportActionMode(mActionModeCallback);
 		}
 	}
 
-    /*
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
+
+        //called on initial creation
 		@Override
 	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             System.out.println("");
             System.out.println("####################");
             System.out.println("Created action mode");
             System.out.println("");
-            MenuInflater inflater = getSupportMenuInflater();
+            MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.playlist_contextual_menu, menu);
 
             System.out.println("");
@@ -132,31 +140,27 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
             System.out.println("Opened action bar");
             System.out.println("");
 
-            if (! selectAll){
-                System.out.println("");
-                System.out.println("####################");
-                System.out.println("Set button to \"Select all\"");
-                System.out.println("");
-                menu.findItem(R.id.playlistSelectAllTracks).setTitle("Select all");
-            }
-            else { //selectAll will always be true here
+            String selectAllTitle = "Select all";
+            if (selectAll){ //if selectAll is true, we want the button to say "Select none"
                 System.out.println("");
                 System.out.println("####################");
                 System.out.println("Set button to \"Select none\"");
                 System.out.println("");
-                menu.findItem(R.id.playlistSelectAllTracks).setTitle("Select none");
+                selectAllTitle = "selectNone";
             }
+            menu.findItem(R.id.playlistSelectAllTracks).setTitle(selectAllTitle);
 	        return true;
 	    }
 
+        //called on initial creation and whenever the actionMode is invalidated
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
 			return true;
 		}
 
+        //called when a button is clicked
 	    @Override
 	    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-
             System.out.println("");
             System.out.println("####################");
             System.out.println("Clicked button in action bar");
@@ -185,22 +189,22 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 
               		if (selectAll && ! PlaylistAdapter.playlistCheckboxList.get(indexPosition, false) ){
               			PlaylistAdapter.playlistCheckboxList.put(indexPosition, true);
-              			PlaylistAdapter.PlaylistCheckboxCount++;
+              			PlaylistAdapter.tickedCheckboxCounter++;
 					}
               		else if (! selectAll && PlaylistAdapter.playlistCheckboxList.get(indexPosition, false) ){
               			PlaylistAdapter.playlistCheckboxList.put(indexPosition, false);
-              			PlaylistAdapter.PlaylistCheckboxCount--;
+              			PlaylistAdapter.tickedCheckboxCounter--;
 					}
               	}
 
-              	if (PlaylistAdapter.PlaylistCheckboxCount == 0){
+              	if (PlaylistAdapter.tickedCheckboxCounter == 0){
               		if (mActionMode != null){
               			mActionMode.finish();
               		}
                 }
 				else {
 					callActionBar();
-					mActionMode.setTitle(PlaylistAdapter.PlaylistCheckboxCount + " selected");
+					mActionMode.setTitle(PlaylistAdapter.tickedCheckboxCounter + " selected");
                 }
 
                	return true;
@@ -225,7 +229,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 				if (tracklist != null && ! tracklist.isEmpty()){
 					presenter.shuffleTracklist();
 				}
-				presenter.clearPlaylistTrackModel();
+				presenter.clearPlaylistTrackData();
 				presenter.setPlaylistTrackData(tracklist);
 
                 String textInToast = "";
@@ -238,11 +242,11 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 
 				playlistListAdapter.notifyDataSetChanged();
 				PlaylistAdapter.playlistCheckboxList.clear();
-			   	PlaylistAdapter.PlaylistCheckboxCount = 0;
+			   	PlaylistAdapter.tickedCheckboxCounter = 0;
 				mActionMode.finish();
 				mActionMode = null;
 				mode.finish();
-				//mode = null;
+
 				return true;
 			} else if (itemId == R.id.deletePlaylist) {
                 PlaylistPresenter.selectAllPressed = false;
@@ -252,11 +256,12 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 				if (tracklist != null && ! tracklist.isEmpty()){
 					presenter.shuffleTracklist();
 				}
-				presenter.clearPlaylistTrackModel();
+				presenter.clearPlaylistTrackData();
 
 				utils.clearCheckboxes(2);
 				playlistListAdapter.notifyDataSetChanged();
 				mActionMode.finish();
+
 				mActionMode = null;
 				mode.finish();
 				//mode = null;
@@ -266,16 +271,17 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 			}
 	    }
 
+        //called when the action mode is closed
 	    @Override
         public void onDestroyActionMode(ActionMode mode) {
             PlaylistPresenter.selectAllPressed = false;
+            /*
 	    	if (mActionMode != null){
 	    		mActionMode = null;
-	    		//mode = null;
 	    	}
+	    	*/
         }
 	};
-	*/
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {

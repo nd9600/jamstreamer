@@ -76,6 +76,11 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 			viewHolder.trackNameAndDuration = (TextView) view.findViewById(R.id.playlist_trackNameAndDuration);
 			viewHolder.trackArtistAndAlbum = (TextView) view.findViewById(R.id.playlist_trackArtistAndAlbum);
 
+            //set the tag field of the view for this track to be the viewHolder
+            //and set the checkbox's tag field to be the track data
+            view.setTag(viewHolder);
+            viewHolder.checkbox.setTag(playlistTrackData.get(position));
+
             //creates the click listener for the checkbox
 			viewHolder.checkbox.setOnClickListener(new View.OnClickListener() {
 				@Override
@@ -85,9 +90,10 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
                     PlaylistPresenter.selectAllPressed = false;
 
                     //gets the track data from the checkbox's tag field
+                    //and sets whether it's selected
 					PlaylistTrackModel element = (PlaylistTrackModel) viewHolder.checkbox.getTag();
 					//element.setSelected(buttonView.isChecked());
-                    //element.setSelected(viewHolder.checkbox.isChecked());
+                    element.setSelected(viewHolder.checkbox.isChecked());
 
                     //if the checkbox is ticked, and it isn't in the list already as ticked,
                     //put it in the list and increment the counter
@@ -110,6 +116,8 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 						}
 					}
 
+                    //if no checkboxes are ticked, close the action bar
+                    //if they are, set the title to be how many are ticked
 					if (tickedCheckboxCounter == 0){
 	                	PlaylistActivity.mActionMode.finish();
 	                }
@@ -118,13 +126,13 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 	                }
 				}
 			});
-
-			view.setTag(viewHolder);
-			viewHolder.checkbox.setTag(playlistTrackData.get(position));
 		}
 
+        //get the viewHolder for this view
 		ViewHolder holder = (ViewHolder) view.getTag();
-		
+
+        //if the select all button is pressed, and the checkbox isn't ticked, tick it
+        //else if select all isn't pressed and it is ticked, untick it
 		if (PlaylistPresenter.selectAllPressed){
 			if (PlaylistActivity.selectAll && ! holder.checkbox.isChecked()){
 				holder.checkbox.setChecked(true);
@@ -133,7 +141,9 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 				holder.checkbox.setChecked(false);
 			}
 		}
-		
+
+        //get the name, duration, artist and album data from the track data
+        //and update the viewHolder's views
 		String trackNameAndDuration = playlistTrackData.get(position).getTrackNameAndDuration();
 		String trackArtistAndAlbum = playlistTrackData.get(position).getTrackArtistAndAlbum();
 		holder.trackNameAndDuration.setText(trackNameAndDuration);
