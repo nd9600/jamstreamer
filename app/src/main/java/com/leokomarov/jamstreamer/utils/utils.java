@@ -20,7 +20,7 @@ public class utils {
 
     public static void clearCheckboxes(int requestCode){
         if (requestCode == 1) {
-            PlaylistAdapter.PlaylistCheckboxList.clear();
+            PlaylistAdapter.playlistCheckboxList.clear();
             PlaylistAdapter.PlaylistCheckboxCount = 0;
         }
         if (requestCode == 2) {

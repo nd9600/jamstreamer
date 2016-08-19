@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              xmlns:app="http://schemas.android.com/apk/res-auto">
+              android:layout_height="fill_parent" >
     <TextView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -15,12 +14,4 @@
         android:textSize="32sp"
         android:textStyle="bold" />
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/playlist_actionBar"
-        android:minHeight="?attr/actionBarSize"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:titleTextColor="@android:color/white"
-        android:background="?attr/colorPrimary">
-    </android.support.v7.widget.Toolbar>
 </LinearLayout>

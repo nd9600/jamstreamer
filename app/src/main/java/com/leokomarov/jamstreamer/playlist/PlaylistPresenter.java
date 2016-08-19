@@ -39,24 +39,12 @@ public class PlaylistPresenter {
                 context.getString(R.string.trackPreferences), Context.MODE_PRIVATE);
     }
 
-    public List<PlaylistTrackModel> getPlaylistTrackModel(){
-        return interactor.getPlaylistTrackModel();
+    public List<PlaylistTrackModel> getPlaylistTrackData(){
+        return interactor.getPlaylistTrackData();
     }
 
-    public void clearPlaylistTrackModel(){
-        interactor.clearPlaylistTrackModel();
-    }
-
-    //Sets the playlist track model
-    //If the passed tracklist is null, the tracklist will be restored from memory
-    public void setPlaylistTrackModel(ArrayList<HashMap<String, String>> trackList) {
-        if (trackList == null) {
-            ArrayList<HashMap<String, String>> restoredTracklist = restoreTracklist();
-            if (restoredTracklist != null) {
-                trackList = restoredTracklist;
-            }
-        }
-        interactor.setPlaylistTrackModel(trackList);
+    public void clearPlaylistTrackData(){
+        interactor.clearPlaylistTrackData();
     }
 
     public void saveTracklist(ArrayList<HashMap<String, String>> trackList){
@@ -71,6 +59,19 @@ public class PlaylistPresenter {
         interactor.shuffleTrackList(trackPreferences);
     }
 
+    //Sets the playlist track data used to generate the listview
+    //If the passed tracklist is null, the tracklist will be restored from memory
+    public void setPlaylistTrackData(ArrayList<HashMap<String, String>> trackList) {
+        if (trackList == null) {
+            ArrayList<HashMap<String, String>> restoredTracklist = restoreTracklist();
+            if (restoredTracklist != null) {
+                trackList = restoredTracklist;
+            }
+        }
+        interactor.setPlaylistTrackData(trackList);
+    }
+
+    //Starts the audio player
     public void startAudioPlayer(int indexPosition){
         SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
         SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
@@ -89,6 +90,7 @@ public class PlaylistPresenter {
         view.startNewActivity(intent, 1);
     }
 
+    //Called when something in the floating menu is selected
     public boolean onContextItemSelected(MenuItem item){
         ArrayList<HashMap<String, String>> trackList = restoreTracklist();
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();

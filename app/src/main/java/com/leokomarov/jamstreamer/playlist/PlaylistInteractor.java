@@ -10,23 +10,30 @@ import java.util.HashMap;
 import java.util.List;
 
 public class PlaylistInteractor {
-    private final String TAG_TRACKLIST = "trackListSaved";
-    private List<PlaylistTrackModel> playlistTrackModel = new ArrayList<>();
+    private final String TAG_TRACKLIST = "tracklist_saved";
 
-    public List<PlaylistTrackModel> getPlaylistTrackModel(){
-        return playlistTrackModel;
+    //playlistTrackData is the data used to generate the listview,
+    //made up of individual tracks stored as PlaylistTrackModels
+    private List<PlaylistTrackModel> playlistTrackData = new ArrayList<>();
+
+    //Returns the playlist track data
+    public List<PlaylistTrackModel> getPlaylistTrackData(){
+        return playlistTrackData;
     }
 
-    public void clearPlaylistTrackModel(){
-        playlistTrackModel.clear();
+    //Clears the playlist track data
+    public void clearPlaylistTrackData(){
+        playlistTrackData.clear();
     }
 
-    public void setPlaylistTrackModel(ArrayList<HashMap<String, String>> trackList){
+    //Sets the playlist track data
+    public void setPlaylistTrackData(ArrayList<HashMap<String, String>> trackList){
         for (HashMap<String, String> map : trackList) {
-            playlistTrackModel.add(new PlaylistTrackModel(map));
+            playlistTrackData.add(new PlaylistTrackModel(map));
         }
     }
 
+    //Saves the tracklist to memory
     public void saveTracklist(ComplexPreferences trackPreferences, ArrayList<HashMap<String, String>> trackList){
         PlaylistList trackListObject = new PlaylistList();
         trackListObject.setTrackList(trackList);
@@ -52,8 +59,8 @@ public class PlaylistInteractor {
         }
     }
 
+    //Shuffles the tracklist and stores it in memory separate from the unshuffled list
     public void shuffleTrackList(ComplexPreferences trackPreferences){
-
         PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("tracks", PlaylistList.class);
         ArrayList<HashMap<String, String>> trackList = shuffledTrackPreferencesObject.trackList;
 

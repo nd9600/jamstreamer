@@ -3,7 +3,6 @@ package com.leokomarov.jamstreamer.playlist;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.view.ActionMode;
-import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -23,9 +22,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class PlaylistActivity extends ActionBarListActivity implements PlaylistAdapter.CallbackInterface {
+
+    //playListLV is the overall listview for the activity
 	private ListView playlistLV;
+
+    //playlistListAdapter links the LV with the data
 	private ArrayAdapter<PlaylistTrackModel> playlistListAdapter;
 
+    //presenter holds the logic
     private PlaylistPresenter presenter;
     private ArrayList<HashMap<String, String>> tracklist = new ArrayList<>();
 
@@ -38,30 +42,32 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         super.onCreate(savedInstanceState);
         setContentView(R.layout.original_empty_list);
 
+        //Initialises the presenter and restore the tracklist from memory
         presenter = new PlaylistPresenter(this, this, savedInstanceState, new PlaylistInteractor());
         tracklist = presenter.restoreTracklist();
 
+        //Initialises the LV and sets the playlist data using the tracklist stored in memory
         playlistLV = getListView();
-        presenter.setPlaylistTrackModel(null);
-        playlistListAdapter = new PlaylistAdapter(this, this, presenter.getPlaylistTrackModel());
+        presenter.setPlaylistTrackData(null);
+
+        //Creates the list adapter to link the LV and data
+        playlistListAdapter = new PlaylistAdapter(this, this, presenter.getPlaylistTrackData());
         setListAdapter(playlistListAdapter);
+
+        //Registers that the floating menu will be opened on a long press
         registerForContextMenu(playlistLV);
 
+        //Inflates the header and adds it to the LV
         LayoutInflater inflater = getLayoutInflater();
         ViewGroup header = (ViewGroup) inflater.inflate(R.layout.playlist_header, playlistLV, false);
-
-        // Find the toolbar view inside the activity layout
-        Toolbar actionBar = (Toolbar) findViewById(R.id.playlist_actionBar);
-        // Sets the Toolbar to act as the ActionBar for this Activity window.
-        // Make sure the toolbar exists in the activity and is not null
-        setSupportActionBar(actionBar);
-
         playlistLV.addHeaderView(header, null, false);
 
+        //Initial checkbox setup
         PlaylistPresenter.selectAllPressed = false;
         selectAll = false;
         utils.clearCheckboxes(2);
-    	
+
+        //Creates the click listeners for the tracks
     	playlistLV.setOnItemClickListener(new OnItemClickListener() {
 			@Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -72,20 +78,23 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         });
     }
 
+    //Called by the presenter to start new activities
     public void startNewActivity(Intent intent, int requestCode){
         startActivityForResult(intent, requestCode);
     }
 
     //
-    //Context menu
+    //Floating menu
     //
 
+    //Inflates the floating menu when the it's created,
     @Override
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, view, menuInfo);
         getMenuInflater().inflate(R.menu.playlist_floating_menu , menu);
     }
 
+    //Called the presenter's function when the tracks are long-pressed
 	//@Override
 	public boolean onContextItemSelected(MenuItem item) {
         return presenter.onContextItemSelected(item);
@@ -96,6 +105,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
     //
 
     ///*
+    //Creates the contextual action bar
 	public void callActionBar(){
 		if (mActionMode == null) {
             System.out.println("");
@@ -173,12 +183,12 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
               			}
               		}
 
-              		if (selectAll && ! PlaylistAdapter.PlaylistCheckboxList.get(indexPosition, false) ){
-              			PlaylistAdapter.PlaylistCheckboxList.put(indexPosition, true);
+              		if (selectAll && ! PlaylistAdapter.playlistCheckboxList.get(indexPosition, false) ){
+              			PlaylistAdapter.playlistCheckboxList.put(indexPosition, true);
               			PlaylistAdapter.PlaylistCheckboxCount++;
 					}
-              		else if (! selectAll && PlaylistAdapter.PlaylistCheckboxList.get(indexPosition, false) ){
-              			PlaylistAdapter.PlaylistCheckboxList.put(indexPosition, false);
+              		else if (! selectAll && PlaylistAdapter.playlistCheckboxList.get(indexPosition, false) ){
+              			PlaylistAdapter.playlistCheckboxList.put(indexPosition, false);
               			PlaylistAdapter.PlaylistCheckboxCount--;
 					}
               	}
@@ -197,7 +207,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
             } else if (itemId == R.id.removePlaylistItem) {
                 PlaylistPresenter.selectAllPressed = false;
             	int playlistLVLength = playlistLV.getCount();
-				SparseBooleanArray checkboxList = PlaylistAdapter.PlaylistCheckboxList;
+				SparseBooleanArray checkboxList = PlaylistAdapter.playlistCheckboxList;
 				ArrayList<Integer> tracksToDelete = new ArrayList<>();
 
 				for (int i = 0; i < playlistLVLength; i++){
@@ -216,7 +226,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 					presenter.shuffleTracklist();
 				}
 				presenter.clearPlaylistTrackModel();
-				presenter.setPlaylistTrackModel(tracklist);
+				presenter.setPlaylistTrackData(tracklist);
 
                 String textInToast = "";
 				if (tracksToDelete.size() == 1){
@@ -227,7 +237,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
                 Toast.makeText(getApplicationContext(),textInToast, Toast.LENGTH_LONG).show();
 
 				playlistListAdapter.notifyDataSetChanged();
-				PlaylistAdapter.PlaylistCheckboxList.clear();
+				PlaylistAdapter.playlistCheckboxList.clear();
 			   	PlaylistAdapter.PlaylistCheckboxCount = 0;
 				mActionMode.finish();
 				mActionMode = null;

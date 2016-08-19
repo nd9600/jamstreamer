@@ -119,7 +119,7 @@ public class ArtistsParser extends ActionBarListActivity implements JSONParser.C
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == 1) {
-	    	PlaylistAdapter.PlaylistCheckboxList.clear();
+	    	PlaylistAdapter.playlistCheckboxList.clear();
 	    	PlaylistAdapter.PlaylistCheckboxCount = 0;
 	    }
 		if (requestCode == 2) {
