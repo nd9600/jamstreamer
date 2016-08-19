@@ -1,16 +1,9 @@
 package com.leokomarov.jamstreamer.searches;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -22,16 +15,22 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockListActivity;
-import com.actionbarsherlock.view.MenuItem;
-import com.leokomarov.jamstreamer.utils.JSONParser;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.discography.AlbumsByName;
 import com.leokomarov.jamstreamer.discography.AlbumsByNameAdapter;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistAdapter;
+import com.leokomarov.jamstreamer.utils.ActionBarListActivity;
+import com.leokomarov.jamstreamer.utils.JSONParser;
+import com.leokomarov.jamstreamer.utils.utils;
 
-public class ArtistsParser extends SherlockListActivity implements JSONParser.CallbackInterface  {
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class ArtistsParser extends ActionBarListActivity implements JSONParser.CallbackInterface  {
 	
 	private static final String TAG_RESULTS = "results";
 	public static final String TAG_ARTIST_ID = "id";
@@ -42,7 +41,7 @@ public class ArtistsParser extends SherlockListActivity implements JSONParser.Ca
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar();//.setDisplayHomeAsUpEnabled(true);
 		
 		Intent intent = getIntent();
         String artistName = intent.getStringExtra(ArtistsSearch.TAG_ARTIST_NAME); 
@@ -56,7 +55,7 @@ public class ArtistsParser extends SherlockListActivity implements JSONParser.Ca
 		
 	@Override
 	public void onRequestCompleted(JSONObject json) {
-	    ArrayList<HashMap<String, String>> artistList = new ArrayList<HashMap<String, String>>();
+	    ArrayList<HashMap<String, String>> artistList = new ArrayList<>();
 		try {
 			results = json.getJSONArray(TAG_RESULTS);
 				
@@ -66,15 +65,15 @@ public class ArtistsParser extends SherlockListActivity implements JSONParser.Ca
 				String id = r.getString(TAG_ARTIST_ID);
 				String name = r.getString(TAG_ARTIST_NAME);
 				
-				HashMap<String, String> map = new HashMap<String, String>();
+				HashMap<String, String> map = new HashMap<>();
 					
 				map.put(TAG_ARTIST_ID, id);
 				map.put(TAG_ARTIST_NAME, name);
 
 				artistList.add(map);
 			}
-		} catch (NullPointerException e) {
-		} catch (JSONException e) {
+		} catch (Exception e) {
+            System.out.println("Exception: " +  e);
 		}
 		
 		if (json == null || json.isNull("results")) {
@@ -105,11 +104,8 @@ public class ArtistsParser extends SherlockListActivity implements JSONParser.Ca
 			lv.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
-			    	SharedPreferences.Editor hierarchyEditor = hierarchyPreference.edit();
-			    	hierarchyEditor.putString("hierarchy", "artists");
-					hierarchyEditor.commit();
-					String artistID = ((TextView) view.findViewById(R.id.artists_list_artists_ids)).getText().toString();
+                    utils.putHierarchy(ArtistsParser.this, "artists");
+                    String artistID = ((TextView) view.findViewById(R.id.artists_list_artists_ids)).getText().toString();
 
 					Intent in = new Intent(ArtistsParser.this, AlbumsByName.class);
 					in.putExtra(TAG_ARTIST_ID, artistID);
@@ -133,7 +129,7 @@ public class ArtistsParser extends SherlockListActivity implements JSONParser.Ca
 	}
 	
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) { 
+	public boolean onOptionsItemSelected(MenuItem item) {
 	        int itemId = item.getItemId();
 			if (itemId == android.R.id.home) {
 				onBackPressed();

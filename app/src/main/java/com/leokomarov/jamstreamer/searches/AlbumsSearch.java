@@ -2,25 +2,25 @@ package com.leokomarov.jamstreamer.searches;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.discography.AlbumsByName;
-import com.leokomarov.jamstreamer.discography.AlbumsByNameAdapter;
+import com.leokomarov.jamstreamer.utils.utils;
 
-public class AlbumsSearch extends SherlockActivity {
+public class AlbumsSearch extends AppCompatActivity {
 	public static final String TAG_ALBUM_NAME = "name";
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.albums_search);        
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar();//.setDisplayHomeAsUpEnabled(true);
         
         findViewById(R.id.albumsSearchButton).setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
@@ -40,14 +40,11 @@ public class AlbumsSearch extends SherlockActivity {
 		
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == 1) {
-	    	AlbumsByNameAdapter.AlbumsByNameCheckboxList.clear();
-	    	AlbumsByNameAdapter.AlbumsByNameCheckboxCount = 0;
-	    }
-	}
+        utils.clearCheckboxes(requestCode);
+    }
 	
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) { 
+	public boolean onOptionsItemSelected(MenuItem item) {
 	        int itemId = item.getItemId();
 			if (itemId == android.R.id.home) {
 				onBackPressed();

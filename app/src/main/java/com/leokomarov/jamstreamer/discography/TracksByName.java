@@ -3,10 +3,11 @@ package com.leokomarov.jamstreamer.discography;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.SparseBooleanArray;
+import android.support.v7.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -18,19 +19,15 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockListActivity;
-import com.actionbarsherlock.view.ActionMode;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.media_player.AudioPlayer;
 import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
-import com.leokomarov.jamstreamer.playlist.PlaylistAdapter;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
+import com.leokomarov.jamstreamer.utils.ActionBarListActivity;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.JSONParser;
+import com.leokomarov.jamstreamer.utils.utils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,7 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class TracksByName extends SherlockListActivity implements JSONParser.CallbackInterface, TracksByNameAdapter.CallbackInterface {
+public class TracksByName extends ActionBarListActivity implements JSONParser.CallbackInterface, TracksByNameAdapter.CallbackInterface {
 	private ListView TracksByNameLV;
 	private ArrayAdapter<TracksByNameModel>TracksByNameListAdapter;
 	private List<TracksByNameModel> TracksByNameModel = new ArrayList<>();
@@ -57,13 +54,13 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 		SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
     	SharedPreferences.Editor hierarchyEditor = hierarchyPreference.edit();
     	hierarchyEditor.putString("hierarchy", hierarchy);
-		hierarchyEditor.commit();
+		hierarchyEditor.apply();
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar();//.setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.original_empty_list);
         selectAllPressed = false;
         selectAll = false;
@@ -233,7 +230,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	    	    	    				    	        
 	    	    	SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
 	    	    	indexPositionEditor.putInt("indexPosition", indexPosition);
-	    	    	indexPositionEditor.commit();
+	    	    	indexPositionEditor.apply();
 	    	    	
 	    	    	if(AudioPlayerService.shuffleBoolean){
 	                	AudioPlayerService.shuffleBoolean = false;
@@ -242,7 +239,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	    			Intent in = new Intent(getApplicationContext(), AudioPlayer.class);
 	    			in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 	    			in.putExtra("fromNotification", false);
-	    			startActivityForResult(in, 2);	
+	    			startActivityForResult(in, 3);
 	    		}
 	    	});
     	
@@ -265,7 +262,7 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
         if (menuID == R.id.tracksFloating_selectTrack){
         	selectAllPressed = false;
         	if (mActionMode == null){
-				mActionMode = startActionMode(mActionModeCallback);
+                System.out.print("Started action bar");
         	}
         	CheckBox checkbox = (CheckBox) viewClicked.findViewById(R.id.tracks_by_name_checkBox);
 			checkbox.setChecked(! checkbox.isChecked());
@@ -275,14 +272,14 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 			String artistName = trackList.get(indexPosition).get("trackArtist");
 			Intent artistsIntent = new Intent(getApplicationContext(), AlbumsByName.class);
 			artistsIntent.putExtra(getString(R.string.TAG_ARTIST_NAME), artistName);
-			startActivityForResult(artistsIntent, 3);
+			startActivityForResult(artistsIntent, 2);
 			return true;
 		} else if (menuID == R.id.tracksFloating_viewAlbum) {
 			putHierarchy("tracksFloatingMenuAlbum");
 			String albumID = albumIDList.get(indexPosition).get("albumID");
 			Intent albumsIntent = new Intent(getApplicationContext(), TracksByName.class);
 			albumsIntent.putExtra(getString(R.string.TAG_ALBUM_ID), albumID);
-			startActivityForResult(albumsIntent, 4);
+			startActivityForResult(albumsIntent, 3);
 			return true;
 		} else {
 			return false;
@@ -296,10 +293,12 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	
 	public void callActionBar(){
 		if (mActionMode == null) {
-			mActionMode = startActionMode(mActionModeCallback);
+            System.out.print("Called action bar");
+			//mActionMode = startActionMode(mActionModeCallback);
 		}
 	}
 
+    /*
 	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
 		@Override 
 	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -416,18 +415,12 @@ public class TracksByName extends SherlockListActivity implements JSONParser.Cal
 	    	}
         }
 	};
+	*/
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-	    if (requestCode == 1) {
-	    	PlaylistAdapter.PlaylistCheckboxList.clear();
-	    	PlaylistAdapter.PlaylistCheckboxCount = 0;
-	    }
-	    if (requestCode == 3) {
-	    	AlbumsByNameAdapter.AlbumsByNameCheckboxList.clear();
-	    	AlbumsByNameAdapter.AlbumsByNameCheckboxCount = 0;
-	    }
-	}
+        utils.clearCheckboxes(requestCode);
+    }
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) { 

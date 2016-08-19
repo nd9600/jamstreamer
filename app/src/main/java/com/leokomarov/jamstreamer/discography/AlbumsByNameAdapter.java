@@ -1,8 +1,6 @@
 package com.leokomarov.jamstreamer.discography;
 
-import java.util.HashMap;
-import java.util.List;
-
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -15,32 +13,7 @@ import android.widget.TextView;
 
 import com.leokomarov.jamstreamer.R;
 
-class AlbumsByNameModel {
-	  private HashMap<String, String> albumMap;
-	  private boolean selected;
-
-	  public AlbumsByNameModel(HashMap<String, String> albumMap) {
-		  this.albumMap = albumMap;
-		  selected = false;
-	  }
-	  	  
-	  public String getAlbumName(){
-		  return albumMap.get("albumName");
-	  }
-	  
-	  public String getAlbumArtist(){
-		  return albumMap.get("albumArtist");
-	  }
-	   
-	  public boolean isSelected() {
-		  return selected;
-	  }
-	  
-	  public void setSelected(boolean selected) {
-		    this.selected = selected;
-	  }
-
-} 
+import java.util.List;
 
 public class AlbumsByNameAdapter extends ArrayAdapter<AlbumsByNameModel> {
 	private final List<AlbumsByNameModel> list;
@@ -81,7 +54,8 @@ public class AlbumsByNameAdapter extends ArrayAdapter<AlbumsByNameModel> {
         return 250;
     }
 
-	@Override
+	@SuppressLint("InflateParams")
+    @Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
 		View view;
 

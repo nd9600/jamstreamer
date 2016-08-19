@@ -2,23 +2,23 @@ package com.leokomarov.jamstreamer.searches;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.MenuItem;
 import com.leokomarov.jamstreamer.R;
 
-public class ArtistsSearch extends SherlockActivity {
+public class ArtistsSearch extends AppCompatActivity {
 	protected static final String TAG_ARTIST_NAME = "name";
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.artists_search);        
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar();//.setDisplayHomeAsUpEnabled(true);
         
         findViewById(R.id.artistsSearchButton).setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
@@ -37,7 +37,7 @@ public class ArtistsSearch extends SherlockActivity {
 	}
 		
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) { 
+	public boolean onOptionsItemSelected(MenuItem item) {
 	        int itemId = item.getItemId();
 			if (itemId == android.R.id.home) {
 				onBackPressed();

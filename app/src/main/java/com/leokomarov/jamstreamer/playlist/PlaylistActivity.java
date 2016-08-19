@@ -2,32 +2,27 @@ package com.leokomarov.jamstreamer.playlist;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
-import android.util.SparseBooleanArray;
+import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.utils.ActionBarListActivity;
 import com.leokomarov.jamstreamer.utils.utils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
-public class PlaylistActivity extends AppCompatActivity implements PlaylistAdapter.CallbackInterface {
+public class PlaylistActivity extends ActionBarListActivity implements PlaylistAdapter.CallbackInterface {
 	private ListView playlistLV;
 	private ArrayAdapter<PlaylistTrackModel> playlistListAdapter;
 
@@ -41,25 +36,30 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistAdapt
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);     
         setContentView(R.layout.original_empty_list);
 
         presenter = new PlaylistPresenter(this, this, savedInstanceState, new PlaylistInteractor());
         tracklist = presenter.restoreTracklist();
 
         playlistLV = getListView();
-        LayoutInflater inflater = getLayoutInflater();
-        ViewGroup header = (ViewGroup) inflater.inflate(R.layout.playlist_header, playlistLV, false);
-        playlistLV.addHeaderView(header, null, false);
-
         presenter.setPlaylistTrackModel(null);
         playlistListAdapter = new PlaylistAdapter(this, this, presenter.getPlaylistTrackModel());
         setListAdapter(playlistListAdapter);
         registerForContextMenu(playlistLV);
 
+        LayoutInflater inflater = getLayoutInflater();
+        ViewGroup header = (ViewGroup) inflater.inflate(R.layout.playlist_header, playlistLV, false);
+
+        // Find the toolbar view inside the activity layout
+        Toolbar actionBar = (Toolbar) findViewById(R.id.playlist_actionBar);
+        // Sets the Toolbar to act as the ActionBar for this Activity window.
+        // Make sure the toolbar exists in the activity and is not null
+        setSupportActionBar(actionBar);
+
+        playlistLV.addHeaderView(header, null, false);
+
         PlaylistPresenter.selectAllPressed = false;
         selectAll = false;
-        
         utils.clearCheckboxes(2);
     	
     	playlistLV.setOnItemClickListener(new OnItemClickListener() {
@@ -102,10 +102,11 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistAdapt
             System.out.println("####################");
             System.out.println("Started action bar");
             System.out.println("");
-			mActionMode = startActionMode(mActionModeCallback);
+			//mActionMode = startActionMode(mActionModeCallback);
 		}
 	}
 
+    /*
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
 		@Override
 	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -264,6 +265,7 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistAdapt
 	    	}
         }
 	};
+	*/
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -283,7 +285,7 @@ public class PlaylistActivity extends AppCompatActivity implements PlaylistAdapt
 				onBackPressed();
 				return true;
 			}
-	    return super.onOptionsItemSelected(MenuItem item);
+	    return super.onOptionsItemSelected(item);
 	}
 
 }

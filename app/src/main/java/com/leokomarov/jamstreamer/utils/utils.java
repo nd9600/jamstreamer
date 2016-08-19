@@ -15,7 +15,7 @@ public class utils {
         SharedPreferences hierarchyPreference = context.getSharedPreferences(context.getString(R.string.hierarchyPreferences), 0);
         SharedPreferences.Editor hierarchyEditor = hierarchyPreference.edit();
         hierarchyEditor.putString("hierarchy", hierarchy);
-        hierarchyEditor.commit();
+        hierarchyEditor.apply();
     }
 
     public static void clearCheckboxes(int requestCode){

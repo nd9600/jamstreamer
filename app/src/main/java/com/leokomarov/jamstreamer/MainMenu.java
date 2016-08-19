@@ -6,12 +6,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.leokomarov.jamstreamer.discography.TracksByName;
 import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
@@ -20,7 +21,7 @@ import com.leokomarov.jamstreamer.searches.ArtistsSearch;
 import com.leokomarov.jamstreamer.searches.TracksSearch;
 import com.leokomarov.jamstreamer.utils.utils;
 
-public class MainMenu extends SherlockActivity {
+public class MainMenu extends AppCompatActivity {
 	private ImageButton button_playlist;
 	private TextView textView_artists;
 	private TextView textView_albums;
@@ -31,7 +32,7 @@ public class MainMenu extends SherlockActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_menu);       
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar();
 
         button_playlist = (ImageButton) findViewById(R.id.mainMenu_btnPlaylist);
         textView_artists = (TextView) findViewById(R.id.mainMenu_artists);
@@ -94,7 +95,7 @@ public class MainMenu extends SherlockActivity {
         	SharedPreferences firstrunPreference = getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE);
             Editor firstrunEditor = firstrunPreference.edit();
             firstrunEditor.putBoolean("firstrun", false);
-            firstrunEditor.commit();
+            firstrunEditor.apply();
 		}   
 	}
 
@@ -121,7 +122,7 @@ public class MainMenu extends SherlockActivity {
     }
 
     //When you press the app home button, bring up the exit dialog
-    public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) { 
+    public boolean onOptionsItemSelected(MenuItem item) {
 	        int itemId = item.getItemId();
 			if (itemId == android.R.id.home) {
 				onBackPressed();

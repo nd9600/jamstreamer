@@ -1,14 +1,13 @@
 package com.leokomarov.jamstreamer.discography;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.SparseBooleanArray;
+import android.support.v7.view.ActionMode;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -20,34 +19,25 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockListActivity;
-import com.actionbarsherlock.view.ActionMode;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
-import com.leokomarov.jamstreamer.playlist.PlaylistAdapter;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
 import com.leokomarov.jamstreamer.searches.ArtistsParser;
+import com.leokomarov.jamstreamer.utils.ActionBarListActivity;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.JSONParser;
+import com.leokomarov.jamstreamer.utils.utils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class AlbumsByName extends SherlockListActivity implements JSONParser.CallbackInterface, AlbumsByNameAdapter.CallbackInterface,
+public class AlbumsByName extends ActionBarListActivity implements JSONParser.CallbackInterface, AlbumsByNameAdapter.CallbackInterface,
 		AlbumsByNameTrackParser.CallbackInterface {
 	private ListView AlbumsByNameLV;
 	private ArrayAdapter<AlbumsByNameModel>AlbumsByNameListAdapter;
@@ -66,13 +56,13 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 		SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
     	SharedPreferences.Editor hierarchyEditor = hierarchyPreference.edit();
     	hierarchyEditor.putString("hierarchy", hierarchy);
-		hierarchyEditor.commit();
+		hierarchyEditor.apply();
 	}
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar();//.setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.original_empty_list);
         selectAllPressed = false;
         selectAll = false;	
@@ -225,10 +215,12 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 	
 	public void callActionBar(){
 		if (mActionMode == null) {
-			mActionMode = startActionMode(mActionModeCallback);
+            System.out.println("Called action bar");
+			//mActionMode = startActionMode(mActionModeCallback);
 		}
 	}	
-	
+
+    /*
 	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
 		@Override 
 	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
@@ -330,6 +322,7 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
 	    	}
         }
 	};
+	*/
 	
 	@Override
 	public void onTrackRequestCompleted(JSONObject json) {
@@ -391,83 +384,19 @@ public class AlbumsByName extends SherlockListActivity implements JSONParser.Cal
             System.out.println("Exception:" + e.getMessage());
 		}
 	}
-
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == 1) {
-	    	PlaylistAdapter.PlaylistCheckboxList.clear();
-	    	PlaylistAdapter.PlaylistCheckboxCount = 0;
-	    }
-		if (requestCode == 2) {
-	    	TracksByNameAdapter.TracksByNameCheckboxList.clear();
-	    	TracksByNameAdapter.TracksByNameCheckboxCount = 0;
-	    }
-		if (requestCode == 3) {
-			AlbumsByNameAdapter.AlbumsByNameCheckboxList.clear();
-	    	AlbumsByNameAdapter.AlbumsByNameCheckboxCount = 0;
-	    }
-	}
-	
-	@Override
-	public boolean onOptionsItemSelected(com.actionbarsherlock.view.MenuItem item) { 
-	        switch (item.getItemId()) {
-	        case android.R.id.home: 
-	            onBackPressed();
-	            return true;
-	        }
-	    return super.onOptionsItemSelected(item);
-	}
-
-}
-
-class AlbumsByNameTrackParser extends AsyncTask<String, Void, JSONObject>  {
-	Context context;
-	
-	public interface CallbackInterface {
-        void onTrackRequestCompleted(JSONObject json);
+        utils.clearCheckboxes(requestCode);
     }
-	
-	private CallbackInterface mCallback;
 
-    public AlbumsByNameTrackParser(CallbackInterface callback, Context context) {
-        mCallback = callback;
-        this.context = context;
-    }
-	
-	@Override
-    protected JSONObject doInBackground(String... urls) {
-		JSONObject jObj = null;
-        try {
-            InputStream is;
-            String json;
-            String myURL = urls[0];
-            URL url = new URL(myURL);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000 /* milliseconds */);
-            conn.setConnectTimeout(15000 /* milliseconds */);
-            conn.setRequestMethod("GET");
-            conn.setDoInput(true);
-            conn.connect();
-            is = conn.getInputStream();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is, "iso-8859-1"), 8);
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
-            is.close();
-            json = sb.toString();
-            jObj = new JSONObject(json);
-        } catch (Exception e) {
-            System.out.println("Exception:" + e.getMessage());
-		}
-
-        return jObj;
-    }
-			   
     @Override
-    protected void onPostExecute(JSONObject jObj) {
-    	mCallback.onTrackRequestCompleted(jObj);
-     }  	
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 }
