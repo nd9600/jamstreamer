@@ -2,10 +2,15 @@ package com.leokomarov.jamstreamer.playlist;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ActionMode;
 import android.util.SparseBooleanArray;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -15,11 +20,6 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockListActivity;
-import com.actionbarsherlock.view.ActionMode;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.utils.utils;
 
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class PlaylistActivity extends SherlockListActivity implements PlaylistAdapter.CallbackInterface {
+public class PlaylistActivity extends AppCompatActivity implements PlaylistAdapter.CallbackInterface {
 	private ListView playlistLV;
 	private ArrayAdapter<PlaylistTrackModel> playlistListAdapter;
 
@@ -140,32 +140,6 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
 
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            /*
-            System.out.println("abcdefghijklmnopqrstuvwxyz");
-			menu.clear();
-	    	MenuInflater inflater = getSupportMenuInflater();
-	        inflater.inflate(R.menu.playlist_contextual_menu, menu);
-
-            System.out.println("");
-            System.out.println("####################");
-            System.out.println("Opened action bar");
-            System.out.println("");
-
-	        if (! selectAll){
-                System.out.println("");
-                System.out.println("####################");
-                System.out.println("Set button to \"Select all\"");
-                System.out.println("");
-	        	menu.findItem(R.id.playlistSelectAllTracks).setTitle("Select all");
-	        }
-	        else { //selectAll will always be true here
-                System.out.println("");
-                System.out.println("####################");
-                System.out.println("Set button to \"Select none\"");
-                System.out.println("");
-	        	menu.findItem(R.id.playlistSelectAllTracks).setTitle("Select none");
-	        }
-	        */
 			return true;
 		}
 
@@ -303,13 +277,13 @@ public class PlaylistActivity extends SherlockListActivity implements PlaylistAd
     	savedInstanceState.putSerializable(getString(R.string.TAG_TRACKLIST), tracklist);
     }
     
-	public boolean onOptionsItemSelected(MenuItem item) { 
+	public boolean onOptionsItemSelected(MenuItem item) {
 	        int itemId = item.getItemId();
 			if (itemId == android.R.id.home) {
 				onBackPressed();
 				return true;
 			}
-	    return super.onOptionsItemSelected((android.view.MenuItem) item);
+	    return super.onOptionsItemSelected(MenuItem item);
 	}
 
 }

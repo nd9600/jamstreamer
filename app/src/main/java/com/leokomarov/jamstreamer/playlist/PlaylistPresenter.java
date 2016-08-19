@@ -4,11 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 
-import com.actionbarsherlock.view.MenuItem;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.discography.AlbumsByName;
 import com.leokomarov.jamstreamer.discography.TracksByName;
@@ -75,7 +75,7 @@ public class PlaylistPresenter {
         SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
         SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
         indexPositionEditor.putInt("indexPosition", indexPosition );
-        indexPositionEditor.commit();
+        indexPositionEditor.apply();
 
         if(AudioPlayerService.shuffleBoolean){
             AudioPlayerService.shuffleBoolean = false;
