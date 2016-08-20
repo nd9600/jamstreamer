@@ -151,7 +151,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 	    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 
             int itemId = item.getItemId();
-            int numberOfTracks = playlistLV.getCount()
+            int numberOfTracks = playlistLV.getCount();
 
             //if the selectAll button is pressed
             if (itemId == R.id.playlistSelectAllTracks) {
