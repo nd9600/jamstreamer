@@ -72,6 +72,12 @@ public class PlaylistPresenter {
         interactor.shuffleTrackList(trackPreferences);
     }
 
+    public void deletePlaylist(){
+        clearPlaylistTrackData();
+        saveTracklist(new ArrayList<HashMap<String, String>>());
+        .shuffleTracklist();
+    }
+
     //Starts the audio player
     public void startAudioPlayer(int indexPosition){
         SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);

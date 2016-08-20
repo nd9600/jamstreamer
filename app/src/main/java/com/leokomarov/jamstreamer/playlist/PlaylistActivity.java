@@ -34,7 +34,6 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 
     //presenter holds the logic
     private PlaylistPresenter presenter;
-    private ArrayList<HashMap<String, String>> tracklist = new ArrayList<>();
 
     //mActionMode is the action bar
     //selectAll is changed when the selectAll/none button is pressed
@@ -46,9 +45,8 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         super.onCreate(savedInstanceState);
         setContentView(R.layout.original_empty_list);
 
-        //Initialises the presenter and restore the tracklist from memory
+        //Initialises the presenter
         presenter = new PlaylistPresenter(this, this, savedInstanceState, new PlaylistInteractor());
-        tracklist = presenter.restoreTracklist();
 
         //Initialises the LV and sets the playlist data using the tracklist stored in memory
         playlistLV = getListView();
@@ -248,10 +246,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 			} else if (itemId == R.id.deletePlaylist) {
                 //clear and save the tracklist and shuffled tracklist
                 PlaylistPresenter.selectAllPressed = false;
-				tracklist.clear();
-				presenter.saveTracklist(tracklist);
-                presenter.shuffleTracklist();
-                presenter.clearPlaylistTrackData();
+				presenter.deletePlaylist();
                 playlistListAdapter.notifyDataSetChanged();
 
                 //clear the checkboxes and close the action bar
@@ -292,7 +287,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 	@Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
     	super.onSaveInstanceState(savedInstanceState);
-    	tracklist = presenter.restoreTracklist();
+        ArrayList<HashMap<String, String>> tracklist = presenter.restoreTracklist();
     	savedInstanceState.putSerializable(getString(R.string.TAG_TRACKLIST), tracklist);
     }
     
