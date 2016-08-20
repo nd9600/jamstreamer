@@ -75,7 +75,7 @@ public class PlaylistPresenter {
     public void deletePlaylist(){
         clearPlaylistTrackData();
         saveTracklist(new ArrayList<HashMap<String, String>>());
-        .shuffleTracklist();
+        shuffleTracklist();
     }
 
     //Starts the audio player

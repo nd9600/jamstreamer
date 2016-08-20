@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -110,6 +111,8 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
     //Creates the contextual action bar
 	public void callActionBar(){
         System.out.println("");
+        startSupportActionMode(mActionModeCallback);
+        /*
 		if (mActionMode == null) {
             System.out.println("Started action bar");
 			mActionMode = startSupportActionMode(mActionModeCallback);
@@ -117,6 +120,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
             System.out.println("Invalidated action bar");
             mActionMode.invalidate();
         }
+        */
 	}
 
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
@@ -155,14 +159,16 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
             //if the selectAll button is pressed
             if (itemId == R.id.playlistSelectAllTracks) {
 
+                System.out.println("selectAll is: " + selectAll);
+
               	for (int i = 1; i < playlistLV.getCount(); i++) {
               		View view = playlistLV.getChildAt(i);
               		int indexPosition = i - 1;
 
               		if (view != null) {
-                        //CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
-                        //checkbox.setChecked(selectAll);
-                        ((PlaylistAdapter.ViewHolder) view.getTag()).checkbox.setChecked(selectAll);
+                        CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
+                        checkbox.setChecked(selectAll);
+                        System.out.println("Checkbox #" + i + " is now: " + checkbox.isChecked());
 
                         /*
               			if (selectAll && ! checkbox.isChecked()){
