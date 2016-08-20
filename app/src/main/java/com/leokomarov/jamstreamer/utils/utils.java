@@ -19,6 +19,8 @@ public class utils {
     }
 
     public static void clearCheckboxes(int requestCode){
+        System.out.println("");
+        System.out.println("Clearing checkboxes, requestCode: " + requestCode);
         if (requestCode == 1) {
             PlaylistAdapter.listOfCheckboxes.clear();
             PlaylistAdapter.tickedCheckboxCounter = 0;

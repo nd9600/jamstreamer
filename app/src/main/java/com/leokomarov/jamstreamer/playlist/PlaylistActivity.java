@@ -110,18 +110,14 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
     ///*
     //Creates the contextual action bar
 	public void callActionBar(){
-        System.out.println("");
-        mActionMode = startSupportActionMode(mActionModeCallback);
-        /*
-		if (mActionMode == null) {
+        if (getSupportActionBar() == null){
             System.out.println("Started action bar");
 			mActionMode = startSupportActionMode(mActionModeCallback);
 		} else {
             System.out.println("Invalidated action bar");
+            //getSupportActionBar().show();
             mActionMode.invalidate();
         }
-        */
-        System.out.println("mActionmode is null: " + (mActionMode == null));
 	}
 
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
@@ -129,7 +125,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         //called on initial creation
 		@Override
 	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            System.out.println("");
+            System.out.println(" ");
             System.out.println("onCreateActionMode");
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.playlist_contextual_menu, menu);
@@ -139,7 +135,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         //called on initial creation and whenever the actionMode is invalidated
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            System.out.println("");
+            System.out.println(" ");
             System.out.println("onPrepareActionMode");
 
             String selectAllTitle = "Select all";
@@ -198,7 +194,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
                 //set the pressed boolean
                 //and invalidate (refresh) the action mode
                 PlaylistPresenter.selectAllPressed = true;
-                mActionMode.invalidate();
+                //mActionMode.invalidate();
 
                 //since we want the button to change,
                 //set selectAll to the opposite value
@@ -277,6 +273,8 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         //called when the action mode is closed
 	    @Override
         public void onDestroyActionMode(ActionMode mode) {
+            System.out.println(" ");
+            System.out.println("onDestroyActionMode");
             PlaylistPresenter.selectAllPressed = false;
             /*
 	    	if (mActionMode != null){
