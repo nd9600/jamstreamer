@@ -22,7 +22,6 @@ import com.leokomarov.jamstreamer.utils.ActionBarListActivity;
 import com.leokomarov.jamstreamer.utils.utils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 
 public class PlaylistActivity extends ActionBarListActivity implements PlaylistAdapter.CallbackInterface {
@@ -112,6 +111,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
     ///*
     //Creates the contextual action bar
 	public void callActionBar(){
+        System.out.println("");
 		if (mActionMode == null) {
             System.out.println("Started action bar");
 			mActionMode = startSupportActionMode(mActionModeCallback);
@@ -126,6 +126,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         //called on initial creation
 		@Override
 	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            System.out.println("");
             System.out.println("onCreateActionMode");
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.playlist_contextual_menu, menu);
@@ -135,6 +136,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         //called on initial creation and whenever the actionMode is invalidated
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            System.out.println("");
             System.out.println("onPrepareActionMode");
 
             String selectAllTitle = "Select all";
@@ -211,43 +213,25 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 
             //if the button to remove those specific tracks from the playlist is pressed
             } else if (itemId == R.id.removePlaylistItem) {
-                PlaylistPresenter.selectAllPressed = false;
-            	int playlistLVLength = playlistLV.getCount();
-				ArrayList<Integer> tracksToDelete = new ArrayList<>();
+                int numberOfTracks = playlistLV.getCount();
 
-                //add every track that is ticked to a list
-				for (int i = 0; i < playlistLVLength; i++){
-					if (PlaylistAdapter.listOfCheckboxes.get(i, false)) {
-						tracksToDelete.add(i);
-					}
-				}
-                //reverse that list then remove the corresponding tracks from the tracklist,
-                //save the tracklist and shuffled tracklist,
-                //and update the LV's data
-
-				Collections.sort(tracksToDelete, Collections.reverseOrder());
-				for (int i : tracksToDelete){
-				    tracklist.remove(i);
-				}
-                presenter.saveTracklist(tracklist);
-                presenter.setPlaylistTrackData(tracklist);
+                //this method removes the ticked tracks from the tracklists
+                //and from the LV's data
+                //then the list adapter is told about the change
+                int numberOfTracksDeleted = presenter.removeTracksFromPlaylist(numberOfTracks);
                 playlistListAdapter.notifyDataSetChanged();
-
-				if (! tracklist.isEmpty()){
-					presenter.shuffleTracklist();
-				}
 
                 //make the toast telling the user how many tracks were removed
                 String textInToast = "";
-				if (tracksToDelete.size() == 1){
-					textInToast = "1 track removed from the playlist";
-				} else if(tracksToDelete.size() >= 2){
-					textInToast = tracksToDelete.size() + " tracks removed from the playlist";
-				}
+                if (numberOfTracksDeleted == 1){
+                    textInToast = "1 track removed from the playlist";
+                } else if(numberOfTracksDeleted >= 2){
+                    textInToast = numberOfTracksDeleted + " tracks removed from the playlist";
+                }
                 Toast.makeText(getApplicationContext(), textInToast, Toast.LENGTH_LONG).show();
 
                 //clear the checkboxes and close the action bar
-                for (int i = 1; i < playlistLV.getCount(); i++) {
+                for (int i = 1; i < numberOfTracks; i++) {
                     View view = playlistLV.getChildAt(i);
                     if (view != null) {
                         //CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
@@ -255,7 +239,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
                         ((PlaylistAdapter.ViewHolder) view.getTag()).checkbox.setChecked(false);
                     }
                 }
-				utils.clearCheckboxes(2);
+
 				mode.finish();
 
 				return true;

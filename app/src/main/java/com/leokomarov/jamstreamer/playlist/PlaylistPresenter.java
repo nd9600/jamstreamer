@@ -18,6 +18,7 @@ import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -125,6 +126,38 @@ public class PlaylistPresenter {
             default:
                 return false;
         }
+    }
+
+    //called in the action mode callback,
+    //removes the ticked tracks from the playlist
+    public int removeTracksFromPlaylist(int numberOfTracks){
+        ArrayList<HashMap<String, String>> tracklist = restoreTracklist();
+        PlaylistPresenter.selectAllPressed = false;
+
+        ArrayList<Integer> tracksToDelete = new ArrayList<>();
+        //add every track that is ticked to a list
+        for (int i = 0; i < numberOfTracks; i++){
+            if (PlaylistAdapter.listOfCheckboxes.get(i, false)) {
+                tracksToDelete.add(i);
+            }
+        }
+
+        //reverse that list then remove the corresponding tracks from the tracklist,
+        //save the tracklist and shuffled tracklist,
+        //and update the LV's data
+        Collections.sort(tracksToDelete, Collections.reverseOrder());
+        for (int i : tracksToDelete){
+            tracklist.remove(i);
+        }
+        saveTracklist(tracklist);
+        setPlaylistTrackData(tracklist);
+
+        if (! tracklist.isEmpty()){
+            shuffleTracklist();
+        }
+
+        utils.clearCheckboxes(2);
+        return tracksToDelete.size();
     }
 
 }
