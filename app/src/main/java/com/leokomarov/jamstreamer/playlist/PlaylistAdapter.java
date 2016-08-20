@@ -58,12 +58,9 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
     //or vice versa
     public static void tickCheckbox(int position, boolean tickIt){
         if (listOfCheckboxes.get(position, false) == (! tickIt)){
-            System.out.println("");
-            System.out.println("Box #" + position + " is now " + tickIt);
             listOfCheckboxes.put(position, tickIt);
             tickedCheckboxCounter += tickIt ? 1 : -1;
         }
-        System.out.println(tickedCheckboxCounter + " boxes are ticked");
     }
 
     //called on every scroll, returns the individual view for each track
@@ -81,7 +78,7 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 
         //if it doesn't exist, inflate a new one
         } else {
-			LayoutInflater inflater = playlistActivity.getLayoutInflater();
+            LayoutInflater inflater = playlistActivity.getLayoutInflater();
 			view = inflater.inflate(R.layout.playlist_by_list_item, null);
 
             //creates a new viewHolder for that track and put the textviews and checkbox inside it
@@ -99,42 +96,12 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 			viewHolder.checkbox.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-
-                    System.out.println("checkbox clicked: " + viewHolder.trackNameAndDuration.getText());
-
-                    //calls the action bar and sets selectAllPressed to false
+                    //calls the action bar, sets selectAllPressed to false
+                    //and change the checkbox list and counter
 					mCallback.callActionBar();
                     PlaylistPresenter.selectAllPressed = false;
 
-                    //gets the track data from the checkbox's tag field
-                    //and sets whether it's selected
-					PlaylistTrackModel element = (PlaylistTrackModel) viewHolder.checkbox.getTag();
-					//element.setSelected(buttonView.isChecked());
-                    element.setSelected(viewHolder.checkbox.isChecked());
-
-                    //if the checkbox is ticked, and if it isn't ticked in the list,
-                    //put it in the list at ticked
-                    //and increment the counter
                     tickCheckbox(position, viewHolder.checkbox.isChecked());
-                    /*
-					if (viewHolder.checkbox.isChecked()){
-						if (! listOfCheckboxes.get(position, false)){
-							listOfCheckboxes.put(position, true);
-							tickedCheckboxCounter++;
-						}
-					}
-                    //if it isn't ticked, and if it isn't unticked in the list,
-                    //put it in the list as unticked
-                    //and decrement the counter if necessary
-					else {
-						if (listOfCheckboxes.get(position, false)){
-							listOfCheckboxes.put(position, false);
-							if (tickedCheckboxCounter >= 1){
-								tickedCheckboxCounter--;
-							}
-						}
-					}
-					*/
 
                     //if no checkboxes are ticked, close the action bar
                     //if they are, set the title to be how many are ticked
@@ -151,18 +118,22 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
         //get the viewHolder for this view
 		ViewHolder holder = (ViewHolder) view.getTag();
 
-
+        //breaks the select all button when there isn't any scrolling
+        /*
         //if the select all button is pressed, and the checkbox isn't ticked, tick it
         //else if select all isn't pressed and it is ticked, untick it
 		if (PlaylistPresenter.selectAllPressed){
-			if (PlaylistActivity.selectAll && ! holder.checkbox.isChecked()){
+            System.out.println("selectAllPressed");
+            if (PlaylistActivity.selectAll && ! holder.checkbox.isChecked()){
+                System.out.println("setting checkbox to checked");
 				holder.checkbox.setChecked(true);
 			}
 			else if (! PlaylistActivity.selectAll && holder.checkbox.isChecked()){
+                System.out.println("setting checkbox to unchecked");
 				holder.checkbox.setChecked(false);
 			}
 		}
-
+		*/
 
         //get the name, duration, artist and album info from the track data
         //and update the viewHolder's views
@@ -170,7 +141,8 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 		String trackArtistAndAlbum = playlistTrackData.get(position).getTrackArtistAndAlbum();
 		holder.trackNameAndDuration.setText(trackNameAndDuration);
 		holder.trackArtistAndAlbum.setText(trackArtistAndAlbum);
-		holder.checkbox.setChecked(playlistTrackData.get(position).isSelected());
+		//holder.checkbox.setChecked(playlistTrackData.get(position).isSelected());
+        holder.checkbox.setChecked(listOfCheckboxes.get(position, false));
 
 		return view;
 	}

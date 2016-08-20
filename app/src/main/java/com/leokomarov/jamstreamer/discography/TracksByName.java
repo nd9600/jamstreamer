@@ -24,7 +24,7 @@ import com.leokomarov.jamstreamer.media_player.AudioPlayer;
 import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
-import com.leokomarov.jamstreamer.utils.ActionBarListActivity;
+import com.leokomarov.jamstreamer.common.ActionBarListActivity;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.JSONParser;
 import com.leokomarov.jamstreamer.utils.utils;

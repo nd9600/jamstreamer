@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.utils;
+package com.leokomarov.jamstreamer.common;
 
 import android.support.v7.app.AppCompatActivity;
 import android.widget.HeaderViewListAdapter;

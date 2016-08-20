@@ -19,7 +19,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.utils.ActionBarListActivity;
+import com.leokomarov.jamstreamer.common.ActionBarListActivity;
 import com.leokomarov.jamstreamer.utils.utils;
 
 import java.util.ArrayList;
@@ -149,50 +149,28 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         //called when a button is clicked
 	    @Override
 	    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            System.out.println("Clicked button in action bar");
 
             int itemId = item.getItemId();
+            int numberOfTracks = playlistLV.getCount()
 
             //if the selectAll button is pressed
             if (itemId == R.id.playlistSelectAllTracks) {
 
-                System.out.println("selectAll is: " + selectAll);
-                System.out.println("there are " + (playlistLV.getCount() - 1) + " views");
-
-              	for (int i = 1; i < playlistLV.getCount(); i++) {
+              	for (int i = 1; i < numberOfTracks; i++) {
               		View view = playlistLV.getChildAt(i);
               		int indexPosition = i - 1;
+                    PlaylistAdapter.tickCheckbox(indexPosition, selectAll);
 
               		if (view != null) {
                         CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
-                        checkbox.setChecked(selectAll);
-                        System.out.println("Checkbox #" + i + " is now: " + checkbox.isChecked());
 
-                        /*
-              			if (selectAll && ! checkbox.isChecked()){
-              				checkbox.setChecked(true);
-              			}
-              			else if (! selectAll && checkbox.isChecked()){
-              				checkbox.setChecked(false);
-              			}
-              			*/
+                        //if the select all button is pressed
+                        //and the checkbox isn't ticked, tick it
+                        if (selectAll && checkbox.isChecked() == (! selectAll)){
+                            checkbox.setChecked(selectAll);
+                        }
               		}
-
-                    PlaylistAdapter.tickCheckbox(indexPosition, selectAll);
-
-                    /*
-              		if (selectAll && ! PlaylistAdapter.listOfCheckboxes.get(indexPosition, false) ){
-              			PlaylistAdapter.listOfCheckboxes.put(indexPosition, true);
-              			PlaylistAdapter.tickedCheckboxCounter++;
-					}
-              		else if (! selectAll && PlaylistAdapter.listOfCheckboxes.get(indexPosition, false) ){
-              			PlaylistAdapter.listOfCheckboxes.put(indexPosition, false);
-              			PlaylistAdapter.tickedCheckboxCounter--;
-					}
-					*/
               	}
-
-                System.out.println("overall, " + PlaylistAdapter.tickedCheckboxCounter + " boxes are ticked");
 
                 //set the pressed boolean
                 PlaylistPresenter.selectAllPressed = true;
@@ -215,8 +193,6 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 
             //if the button to remove those specific tracks from the playlist is pressed
             } else if (itemId == R.id.removePlaylistItem) {
-                int numberOfTracks = playlistLV.getCount();
-
                 //this method removes the ticked tracks from the tracklists
                 //and from the LV's data
                 //then the list adapter is told about the change
@@ -254,7 +230,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
                 playlistListAdapter.notifyDataSetChanged();
 
                 //clear the checkboxes and close the action bar
-                for (int i = 1; i < playlistLV.getCount(); i++) {
+                for (int i = 1; i < numberOfTracks; i++) {
                     View view = playlistLV.getChildAt(i);
                     if (view != null) {
                         //CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);

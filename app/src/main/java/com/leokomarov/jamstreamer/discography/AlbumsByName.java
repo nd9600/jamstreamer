@@ -23,7 +23,7 @@ import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
 import com.leokomarov.jamstreamer.searches.ArtistsParser;
-import com.leokomarov.jamstreamer.utils.ActionBarListActivity;
+import com.leokomarov.jamstreamer.common.ActionBarListActivity;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.JSONParser;
 import com.leokomarov.jamstreamer.utils.utils;
