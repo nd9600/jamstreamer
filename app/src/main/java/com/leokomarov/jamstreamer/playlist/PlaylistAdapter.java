@@ -58,9 +58,12 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
     //or vice versa
     public static void tickCheckbox(int position, boolean tickIt){
         if (listOfCheckboxes.get(position, false) == (! tickIt)){
+            System.out.println("");
+            System.out.println("Box #" + position + " is now " + tickIt);
             listOfCheckboxes.put(position, tickIt);
+            tickedCheckboxCounter += tickIt ? 1 : -1;
         }
-        tickedCheckboxCounter += tickIt ? 1 : -1;
+        System.out.println(tickedCheckboxCounter + " boxes are ticked");
     }
 
     //called on every scroll, returns the individual view for each track

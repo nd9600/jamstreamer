@@ -65,9 +65,9 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         ViewGroup header = (ViewGroup) inflater.inflate(R.layout.playlist_header, playlistLV, false);
         playlistLV.addHeaderView(header, null, false);
 
-        //Initial checkbox setup
+        //Initial checkbox setup - the action mode's title is initially "Select all"
         PlaylistPresenter.selectAllPressed = false;
-        selectAll = false;
+        selectAll = true;
         utils.clearCheckboxes(2);
 
         //Creates the click listeners for the tracks
@@ -139,7 +139,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
             System.out.println("onPrepareActionMode");
 
             String selectAllTitle = "Select all";
-            if (selectAll){ //if selectAll is true, we want the button to say "Select none"
+            if (! selectAll){ //if selectAll is true, we want the button to say "Select none"
                 selectAllTitle = "Select none";
             }
             menu.findItem(R.id.playlistSelectAllTracks).setTitle(selectAllTitle);
@@ -157,6 +157,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
             if (itemId == R.id.playlistSelectAllTracks) {
 
                 System.out.println("selectAll is: " + selectAll);
+                System.out.println("there are " + (playlistLV.getCount() - 1) + " views");
 
               	for (int i = 1; i < playlistLV.getCount(); i++) {
               		View view = playlistLV.getChildAt(i);
@@ -191,10 +192,10 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 					*/
               	}
 
+                System.out.println("overall, " + PlaylistAdapter.tickedCheckboxCounter + " boxes are ticked");
+
                 //set the pressed boolean
-                //and invalidate (refresh) the action mode
                 PlaylistPresenter.selectAllPressed = true;
-                //mActionMode.invalidate();
 
                 //since we want the button to change,
                 //set selectAll to the opposite value
