@@ -1,6 +1,5 @@
 package com.leokomarov.jamstreamer.discography;
 
-import java.util.HashMap;
 import java.util.List;
 
 import android.app.Activity;
@@ -20,8 +19,8 @@ import com.leokomarov.jamstreamer.R;
 public class TracksByNameAdapter extends ArrayAdapter<TracksByNameModel> {
 	private final List<TracksByNameModel> list;
 	private final Activity context;
-	public static SparseBooleanArray TracksByNameCheckboxList = new SparseBooleanArray();
-	public static int TracksByNameCheckboxCount = 0;
+	public static SparseBooleanArray listOfCheckboxes = new SparseBooleanArray();
+	public static int tickedCheckboxCounter = 0;
 	
 	protected interface CallbackInterface {
         void callActionBar();
@@ -77,25 +76,25 @@ public class TracksByNameAdapter extends ArrayAdapter<TracksByNameModel> {
 					TracksByNameModel element = (TracksByNameModel) viewHolder.checkbox.getTag();
 					element.setSelected(buttonView.isChecked());
 					if (element.isSelected()){
-						if (! TracksByNameCheckboxList.get(position, false)){
-							TracksByNameCheckboxList.put(position, true);
-							TracksByNameCheckboxCount++;
+						if (! listOfCheckboxes.get(position, false)){
+							listOfCheckboxes.put(position, true);
+							tickedCheckboxCounter++;
 						}
 					}
 					else {
-						if (! TracksByNameCheckboxList.get(position, false)){
-							TracksByNameCheckboxList.put(position, false);
-							if (TracksByNameCheckboxCount >= 1){
-								TracksByNameCheckboxCount--;
+						if (! listOfCheckboxes.get(position, false)){
+							listOfCheckboxes.put(position, false);
+							if (tickedCheckboxCounter >= 1){
+								tickedCheckboxCounter--;
 							}
 						}
 					}
 					
-					if (TracksByNameCheckboxCount == 0){
+					if (tickedCheckboxCounter == 0){
 						TracksByName.mActionMode.finish();
 	                }
-	                else if (TracksByNameCheckboxCount != 0){
-	                	TracksByName.mActionMode.setTitle(TracksByNameCheckboxCount + " selected");
+	                else if (tickedCheckboxCounter != 0){
+	                	TracksByName.mActionMode.setTitle(tickedCheckboxCounter + " selected");
 	                }
 					
 				}

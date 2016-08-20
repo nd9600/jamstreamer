@@ -28,8 +28,8 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
     //mCallback is the instance of the interface with the callActionBar() method
     private CallbackInterface mCallback;
 
-    //playlistCheckboxList says if a checkbox at position _i_ has been checked
-	public static SparseBooleanArray playlistCheckboxList = new SparseBooleanArray();
+    //listOfCheckboxes says if a checkbox at position _i_ has been checked
+	public static SparseBooleanArray listOfCheckboxes = new SparseBooleanArray();
     //tickedCheckboxCounter is the number of checked checkboxes
 	public static int tickedCheckboxCounter = 0;
 	
@@ -51,6 +51,17 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 	public int getCount() {
 		return playlistTrackData.size();
 	}
+
+    //if the checkbox isn't ticked in the list,
+    //put it in the list as ticked
+    //and increment the counter
+    //or vice versa
+    public static void tickCheckbox(int position, boolean tickIt){
+        if (listOfCheckboxes.get(position, false) == (! tickIt)){
+            listOfCheckboxes.put(position, tickIt);
+        }
+        tickedCheckboxCounter += tickIt ? 1 : -1;
+    }
 
     //called on every scroll, returns the individual view for each track
     //so views are reused if possible - convertView holds the reusedView if it exists
@@ -95,26 +106,29 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 					//element.setSelected(buttonView.isChecked());
                     element.setSelected(viewHolder.checkbox.isChecked());
 
-                    //if the checkbox is ticked, and it isn't in the list already as ticked,
-                    //put it in the list and increment the counter
+                    //if the checkbox is ticked, and if it isn't ticked in the list,
+                    //put it in the list at ticked
+                    //and increment the counter
+                    tickCheckbox(position, viewHolder.checkbox.isChecked());
+                    /*
 					if (viewHolder.checkbox.isChecked()){
-						if (! playlistCheckboxList.get(position, false)){
-							playlistCheckboxList.put(position, true);
+						if (! listOfCheckboxes.get(position, false)){
+							listOfCheckboxes.put(position, true);
 							tickedCheckboxCounter++;
 						}
 					}
-                    //if it isn't ticked, and if it isn't ticked
-                    //in the list,
+                    //if it isn't ticked, and if it isn't unticked in the list,
                     //put it in the list as unticked
                     //and decrement the counter if necessary
 					else {
-						if (! playlistCheckboxList.get(position, false)){
-							playlistCheckboxList.put(position, false);
+						if (listOfCheckboxes.get(position, false)){
+							listOfCheckboxes.put(position, false);
 							if (tickedCheckboxCounter >= 1){
 								tickedCheckboxCounter--;
 							}
 						}
 					}
+					*/
 
                     //if no checkboxes are ticked, close the action bar
                     //if they are, set the title to be how many are ticked

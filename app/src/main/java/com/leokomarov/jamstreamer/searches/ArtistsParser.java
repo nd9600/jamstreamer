@@ -17,9 +17,7 @@ import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.discography.AlbumsByName;
-import com.leokomarov.jamstreamer.discography.AlbumsByNameAdapter;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
-import com.leokomarov.jamstreamer.playlist.PlaylistAdapter;
 import com.leokomarov.jamstreamer.utils.ActionBarListActivity;
 import com.leokomarov.jamstreamer.utils.JSONParser;
 import com.leokomarov.jamstreamer.utils.utils;
@@ -118,14 +116,7 @@ public class ArtistsParser extends ActionBarListActivity implements JSONParser.C
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == 1) {
-	    	PlaylistAdapter.playlistCheckboxList.clear();
-	    	PlaylistAdapter.PlaylistCheckboxCount = 0;
-	    }
-		if (requestCode == 2) {
-	    	AlbumsByNameAdapter.AlbumsByNameCheckboxList.clear();
-	    	AlbumsByNameAdapter.AlbumsByNameCheckboxCount = 0;
-	    }
+		utils.clearCheckboxes(2);
 	}
 	
 	@Override

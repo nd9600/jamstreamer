@@ -18,8 +18,8 @@ import java.util.List;
 public class AlbumsByNameAdapter extends ArrayAdapter<AlbumsByNameModel> {
 	private final List<AlbumsByNameModel> list;
 	private final Activity context;
-	public static SparseBooleanArray AlbumsByNameCheckboxList = new SparseBooleanArray();
-	public static int AlbumsByNameCheckboxCount = 0;
+	public static SparseBooleanArray listOfCheckboxes = new SparseBooleanArray();
+	public static int tickedCheckboxCounter = 0;
 	
 	protected interface CallbackInterface {
         void callActionBar();
@@ -76,25 +76,25 @@ public class AlbumsByNameAdapter extends ArrayAdapter<AlbumsByNameModel> {
 					AlbumsByNameModel element = (AlbumsByNameModel) viewHolder.checkbox.getTag();
 					element.setSelected(buttonView.isChecked());
 					if (element.isSelected()){
-						if (! AlbumsByNameCheckboxList.get(position, false)){
-							AlbumsByNameCheckboxList.put(position, true);
-							AlbumsByNameCheckboxCount++;
+						if (! listOfCheckboxes.get(position, false)){
+							listOfCheckboxes.put(position, true);
+							tickedCheckboxCounter++;
 						}
 					}
 					else {
-						if (! AlbumsByNameCheckboxList.get(position, false)){
-							AlbumsByNameCheckboxList.put(position, false);
-							if (AlbumsByNameCheckboxCount >= 1){
-								AlbumsByNameCheckboxCount--;
+						if (! listOfCheckboxes.get(position, false)){
+							listOfCheckboxes.put(position, false);
+							if (tickedCheckboxCounter >= 1){
+								tickedCheckboxCounter--;
 							}
 						}
 					}
 					
-					if (AlbumsByNameCheckboxCount == 0){
+					if (tickedCheckboxCounter == 0){
 						AlbumsByName.mActionMode.finish();
 	                }
-					else if (AlbumsByNameCheckboxCount != 0){
-						AlbumsByName.mActionMode.setTitle(AlbumsByNameCheckboxCount + " selected");
+					else if (tickedCheckboxCounter != 0){
+						AlbumsByName.mActionMode.setTitle(tickedCheckboxCounter + " selected");
 	                }
 
 				}

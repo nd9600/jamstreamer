@@ -264,24 +264,24 @@ public class AlbumsByName extends ActionBarListActivity implements JSONParser.Ca
               			}
               		}
               		
-              		if (selectAll && ! AlbumsByNameAdapter.AlbumsByNameCheckboxList.get(indexPosition, false) ){
-              			AlbumsByNameAdapter.AlbumsByNameCheckboxList.put(indexPosition, true);
-              			AlbumsByNameAdapter.AlbumsByNameCheckboxCount++;
+              		if (selectAll && ! AlbumsByNameAdapter.listOfCheckboxes.get(indexPosition, false) ){
+              			AlbumsByNameAdapter.listOfCheckboxes.put(indexPosition, true);
+              			AlbumsByNameAdapter.tickedCheckboxCounter++;
 					}
-              		else if (! selectAll && AlbumsByNameAdapter.AlbumsByNameCheckboxList.get(indexPosition, false) ){
-              			AlbumsByNameAdapter.AlbumsByNameCheckboxList.put(indexPosition, false);
-              			AlbumsByNameAdapter.AlbumsByNameCheckboxCount--;
+              		else if (! selectAll && AlbumsByNameAdapter.listOfCheckboxes.get(indexPosition, false) ){
+              			AlbumsByNameAdapter.listOfCheckboxes.put(indexPosition, false);
+              			AlbumsByNameAdapter.tickedCheckboxCounter--;
 					}
               	}
               	
-              	if (AlbumsByNameAdapter.AlbumsByNameCheckboxCount == 0){
+              	if (AlbumsByNameAdapter.tickedCheckboxCounter == 0){
               		if (mActionMode != null){
               			mActionMode.finish();
               		}
                 }
-				else if (AlbumsByNameAdapter.AlbumsByNameCheckboxCount != 0){
+				else if (AlbumsByNameAdapter.tickedCheckboxCounter != 0){
 					callActionBar();
-					mActionMode.setTitle(AlbumsByNameAdapter.AlbumsByNameCheckboxCount + " selected");
+					mActionMode.setTitle(AlbumsByNameAdapter.tickedCheckboxCounter + " selected");
                 }
               	
                	return true;
@@ -289,7 +289,7 @@ public class AlbumsByName extends ActionBarListActivity implements JSONParser.Ca
             	selectAllPressed = false;
 				button_playlist.setClickable(false);
 				int AlbumsByNameLVLength = AlbumsByNameLV.getCount();
-				SparseBooleanArray checkboxList = AlbumsByNameAdapter.AlbumsByNameCheckboxList;
+				SparseBooleanArray checkboxList = AlbumsByNameAdapter.listOfCheckboxes;
 				albumsToAddLoop = 0;
 				onTrackRequestCompletedLoop = 0;
 				for (int i = 0; i < AlbumsByNameLVLength; i++){

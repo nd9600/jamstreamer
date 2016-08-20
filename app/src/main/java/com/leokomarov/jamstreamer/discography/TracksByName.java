@@ -342,30 +342,30 @@ public class TracksByName extends ActionBarListActivity implements JSONParser.Ca
               			}
               		}
               		
-              		if (selectAll && ! TracksByNameAdapter.TracksByNameCheckboxList.get(indexPosition, false) ){
-              			TracksByNameAdapter.TracksByNameCheckboxList.put(indexPosition, true);
-              			TracksByNameAdapter.TracksByNameCheckboxCount++;
+              		if (selectAll && ! TracksByNameAdapter.listOfCheckboxes.get(indexPosition, false) ){
+              			TracksByNameAdapter.listOfCheckboxes.put(indexPosition, true);
+              			TracksByNameAdapter.tickedCheckboxCounter++;
 					}
-              		else if (! selectAll && TracksByNameAdapter.TracksByNameCheckboxList.get(indexPosition, false) ){
-              			TracksByNameAdapter.TracksByNameCheckboxList.put(indexPosition, false);
-              			TracksByNameAdapter.TracksByNameCheckboxCount--;
+              		else if (! selectAll && TracksByNameAdapter.listOfCheckboxes.get(indexPosition, false) ){
+              			TracksByNameAdapter.listOfCheckboxes.put(indexPosition, false);
+              			TracksByNameAdapter.tickedCheckboxCounter--;
 					}
               	}
-              	if (TracksByNameAdapter.TracksByNameCheckboxCount == 0){
+              	if (TracksByNameAdapter.tickedCheckboxCounter == 0){
               		if (mActionMode != null){
               			mActionMode.finish();
               		}
                 }
-				else if (TracksByNameAdapter.TracksByNameCheckboxCount != 0){
+				else if (TracksByNameAdapter.tickedCheckboxCounter != 0){
 					callActionBar();
-					mActionMode.setTitle(TracksByNameAdapter.TracksByNameCheckboxCount + " selected");
+					mActionMode.setTitle(TracksByNameAdapter.tickedCheckboxCounter + " selected");
                 }
               	
                	return true;
             } else if (itemId == R.id.addTrackToPlaylist) {
             	selectAllPressed = false;
 				int tracksByNameLVLength = TracksByNameLV.getCount();
-				SparseBooleanArray checkboxList = TracksByNameAdapter.TracksByNameCheckboxList;
+				SparseBooleanArray checkboxList = TracksByNameAdapter.listOfCheckboxes;
 				ArrayList<HashMap<String, String>> tracksToAddList = new ArrayList<>();
 				for (int i = 0; i < tracksByNameLVLength; i++){
 					if (checkboxList.get(i, false)) {

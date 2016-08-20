@@ -47,18 +47,6 @@ public class PlaylistPresenter {
         interactor.clearPlaylistTrackData();
     }
 
-    public void saveTracklist(ArrayList<HashMap<String, String>> trackList){
-        interactor.saveTracklist(trackPreferences, trackList);
-    }
-
-    public ArrayList<HashMap<String, String>> restoreTracklist(){
-        return interactor.restoreTracklist(savedInstanceState, trackPreferences);
-    }
-
-    public void shuffleTracklist(){
-        interactor.shuffleTrackList(trackPreferences);
-    }
-
     //Sets the playlist track data used to generate the listview
     //If the passed tracklist is null, the tracklist will be restored from memory
     public void setPlaylistTrackData(ArrayList<HashMap<String, String>> trackList) {
@@ -69,6 +57,18 @@ public class PlaylistPresenter {
             }
         }
         interactor.setPlaylistTrackData(trackList);
+    }
+
+    public void saveTracklist(ArrayList<HashMap<String, String>> trackList){
+        interactor.saveTracklist(trackPreferences, trackList);
+    }
+
+    public ArrayList<HashMap<String, String>> restoreTracklist(){
+        return interactor.restoreTracklist(savedInstanceState, trackPreferences);
+    }
+
+    public void shuffleTracklist(){
+        interactor.shuffleTrackList(trackPreferences);
     }
 
     //Starts the audio player

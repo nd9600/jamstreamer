@@ -3,7 +3,6 @@ package com.leokomarov.jamstreamer.playlist;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.view.ActionMode;
-import android.util.SparseBooleanArray;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -15,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -128,143 +126,159 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         //called on initial creation
 		@Override
 	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            System.out.println("");
-            System.out.println("####################");
-            System.out.println("Created action mode");
-            System.out.println("");
+            System.out.println("onCreateActionMode");
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.playlist_contextual_menu, menu);
-
-            System.out.println("");
-            System.out.println("####################");
-            System.out.println("Opened action bar");
-            System.out.println("");
-
-            String selectAllTitle = "Select all";
-            if (selectAll){ //if selectAll is true, we want the button to say "Select none"
-                System.out.println("");
-                System.out.println("####################");
-                System.out.println("Set button to \"Select none\"");
-                System.out.println("");
-                selectAllTitle = "selectNone";
-            }
-            menu.findItem(R.id.playlistSelectAllTracks).setTitle(selectAllTitle);
 	        return true;
 	    }
 
         //called on initial creation and whenever the actionMode is invalidated
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            System.out.println("onPrepareActionMode");
+
+            String selectAllTitle = "Select all";
+            if (selectAll){ //if selectAll is true, we want the button to say "Select none"
+                selectAllTitle = "selectNone";
+            }
+            menu.findItem(R.id.playlistSelectAllTracks).setTitle(selectAllTitle);
 			return true;
 		}
 
         //called when a button is clicked
 	    @Override
 	    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            System.out.println("");
-            System.out.println("####################");
             System.out.println("Clicked button in action bar");
-            System.out.println("");
 
             int itemId = item.getItemId();
+
+            //if the selectAll button is pressed
             if (itemId == R.id.playlistSelectAllTracks) {
+                //set the pressed boolean, and set selectAll to the opposite value
+                //and invalidate (refresh) the action mode
             	PlaylistPresenter.selectAllPressed = true;
             	selectAll = ! selectAll;
             	mActionMode.invalidate();
+
 
               	for (int i = 1; i < playlistLV.getCount(); i++) {
               		View view = playlistLV.getChildAt(i);
               		int indexPosition = i - 1;
 
               		if (view != null) {
-              			CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
+                        //CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
+                        //checkbox.setChecked(selectAll);
+                        ((PlaylistAdapter.ViewHolder) view.getTag()).checkbox.setChecked(selectAll);
 
+                        /*
               			if (selectAll && ! checkbox.isChecked()){
               				checkbox.setChecked(true);
               			}
               			else if (! selectAll && checkbox.isChecked()){
               				checkbox.setChecked(false);
               			}
+              			*/
               		}
 
-              		if (selectAll && ! PlaylistAdapter.playlistCheckboxList.get(indexPosition, false) ){
-              			PlaylistAdapter.playlistCheckboxList.put(indexPosition, true);
+                    PlaylistAdapter.tickCheckbox(indexPosition, selectAll);
+
+                    /*
+              		if (selectAll && ! PlaylistAdapter.listOfCheckboxes.get(indexPosition, false) ){
+              			PlaylistAdapter.listOfCheckboxes.put(indexPosition, true);
               			PlaylistAdapter.tickedCheckboxCounter++;
 					}
-              		else if (! selectAll && PlaylistAdapter.playlistCheckboxList.get(indexPosition, false) ){
-              			PlaylistAdapter.playlistCheckboxList.put(indexPosition, false);
+              		else if (! selectAll && PlaylistAdapter.listOfCheckboxes.get(indexPosition, false) ){
+              			PlaylistAdapter.listOfCheckboxes.put(indexPosition, false);
               			PlaylistAdapter.tickedCheckboxCounter--;
 					}
+					*/
               	}
 
+                //if all checkboxes have been unticked, close the action bar
+                //else open the action bar and set the title to however many are unticked
               	if (PlaylistAdapter.tickedCheckboxCounter == 0){
-              		if (mActionMode != null){
-              			mActionMode.finish();
-              		}
+              		mode.finish();
                 }
 				else {
-					callActionBar();
+					//callActionBar();
 					mActionMode.setTitle(PlaylistAdapter.tickedCheckboxCounter + " selected");
                 }
-
+                playlistListAdapter.notifyDataSetChanged();
                	return true;
+
+            //if the button to remove those specific tracks from the playlist is pressed
             } else if (itemId == R.id.removePlaylistItem) {
                 PlaylistPresenter.selectAllPressed = false;
             	int playlistLVLength = playlistLV.getCount();
-				SparseBooleanArray checkboxList = PlaylistAdapter.playlistCheckboxList;
 				ArrayList<Integer> tracksToDelete = new ArrayList<>();
 
+                //add every track that is ticked to a list
 				for (int i = 0; i < playlistLVLength; i++){
-					if (checkboxList.get(i, false)) {
+					if (PlaylistAdapter.listOfCheckboxes.get(i, false)) {
 						tracksToDelete.add(i);
 					}
 				}
+                //reverse that list then remove the corresponding tracks from the tracklist,
+                //save the tracklist and shuffled tracklist,
+                //and update the LV's data
+
 				Collections.sort(tracksToDelete, Collections.reverseOrder());
 				for (int i : tracksToDelete){
 				    tracklist.remove(i);
 				}
-
                 presenter.saveTracklist(tracklist);
+                presenter.setPlaylistTrackData(tracklist);
+                playlistListAdapter.notifyDataSetChanged();
 
-				if (tracklist != null && ! tracklist.isEmpty()){
+				if (! tracklist.isEmpty()){
 					presenter.shuffleTracklist();
 				}
-				presenter.clearPlaylistTrackData();
-				presenter.setPlaylistTrackData(tracklist);
 
+                //make the toast telling the user how many tracks were removed
                 String textInToast = "";
 				if (tracksToDelete.size() == 1){
 					textInToast = "1 track removed from the playlist";
 				} else if(tracksToDelete.size() >= 2){
 					textInToast = tracksToDelete.size() + " tracks removed from the playlist";
 				}
-                Toast.makeText(getApplicationContext(),textInToast, Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), textInToast, Toast.LENGTH_LONG).show();
 
-				playlistListAdapter.notifyDataSetChanged();
-				PlaylistAdapter.playlistCheckboxList.clear();
-			   	PlaylistAdapter.tickedCheckboxCounter = 0;
-				mActionMode.finish();
-				mActionMode = null;
+                //clear the checkboxes and close the action bar
+                for (int i = 1; i < playlistLV.getCount(); i++) {
+                    View view = playlistLV.getChildAt(i);
+                    if (view != null) {
+                        //CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
+                        //checkbox.setChecked(false);
+                        ((PlaylistAdapter.ViewHolder) view.getTag()).checkbox.setChecked(false);
+                    }
+                }
+				utils.clearCheckboxes(2);
 				mode.finish();
 
 				return true;
+
+            //if the "delete entire playlist" button is pressed
 			} else if (itemId == R.id.deletePlaylist) {
+                //clear and save the tracklist and shuffled tracklist
                 PlaylistPresenter.selectAllPressed = false;
 				tracklist.clear();
 				presenter.saveTracklist(tracklist);
+                presenter.shuffleTracklist();
+                presenter.clearPlaylistTrackData();
+                playlistListAdapter.notifyDataSetChanged();
 
-				if (tracklist != null && ! tracklist.isEmpty()){
-					presenter.shuffleTracklist();
-				}
-				presenter.clearPlaylistTrackData();
-
+                //clear the checkboxes and close the action bar
+                for (int i = 1; i < playlistLV.getCount(); i++) {
+                    View view = playlistLV.getChildAt(i);
+                    if (view != null) {
+                        //CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
+                        //checkbox.setChecked(false);
+                        ((PlaylistAdapter.ViewHolder) view.getTag()).checkbox.setChecked(false);
+                    }
+                }
 				utils.clearCheckboxes(2);
-				playlistListAdapter.notifyDataSetChanged();
-				mActionMode.finish();
 
-				mActionMode = null;
 				mode.finish();
-				//mode = null;
 				return true;
 			} else {
 				return false;

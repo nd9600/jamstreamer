@@ -20,16 +20,16 @@ public class utils {
 
     public static void clearCheckboxes(int requestCode){
         if (requestCode == 1) {
-            PlaylistAdapter.playlistCheckboxList.clear();
-            PlaylistAdapter.PlaylistCheckboxCount = 0;
+            PlaylistAdapter.listOfCheckboxes.clear();
+            PlaylistAdapter.tickedCheckboxCounter = 0;
         }
         if (requestCode == 2) {
-            AlbumsByNameAdapter.AlbumsByNameCheckboxList.clear();
-            AlbumsByNameAdapter.AlbumsByNameCheckboxCount = 0;
+            AlbumsByNameAdapter.listOfCheckboxes.clear();
+            AlbumsByNameAdapter.tickedCheckboxCounter = 0;
         }
         if (requestCode == 3) {
-            TracksByNameAdapter.TracksByNameCheckboxList.clear();
-            TracksByNameAdapter.TracksByNameCheckboxCount = 0;
+            TracksByNameAdapter.listOfCheckboxes.clear();
+            TracksByNameAdapter.tickedCheckboxCounter = 0;
         }
     }
 
