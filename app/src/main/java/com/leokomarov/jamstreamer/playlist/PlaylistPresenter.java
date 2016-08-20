@@ -49,11 +49,11 @@ public class PlaylistPresenter {
     }
 
     //Sets the playlist track data used to generate the listview
-    //If the passed tracklist is null, the tracklist will be restored from memory
+    //If the passed tracklist is empty, the tracklist will be restored from memory
     public void setPlaylistTrackData(ArrayList<HashMap<String, String>> trackList) {
-        if (trackList == null) {
+        if (trackList.isEmpty()) {
             ArrayList<HashMap<String, String>> restoredTracklist = restoreTracklist();
-            if (restoredTracklist != null) {
+            if (! restoredTracklist.isEmpty()) {
                 trackList = restoredTracklist;
             }
         }

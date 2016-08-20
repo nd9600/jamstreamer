@@ -51,7 +51,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 
         //Initialises the LV and sets the playlist data using the tracklist stored in memory
         playlistLV = getListView();
-        presenter.setPlaylistTrackData(null);
+        presenter.setPlaylistTrackData(new ArrayList<HashMap<String, String>>());
 
         //Creates the list adapter to link the LV and data
         playlistListAdapter = new PlaylistAdapter(this, this, presenter.getPlaylistTrackData());
@@ -111,7 +111,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
     //Creates the contextual action bar
 	public void callActionBar(){
         System.out.println("");
-        startSupportActionMode(mActionModeCallback);
+        mActionMode = startSupportActionMode(mActionModeCallback);
         /*
 		if (mActionMode == null) {
             System.out.println("Started action bar");
@@ -121,6 +121,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
             mActionMode.invalidate();
         }
         */
+        System.out.println("mActionmode is null: " + (mActionMode == null));
 	}
 
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){

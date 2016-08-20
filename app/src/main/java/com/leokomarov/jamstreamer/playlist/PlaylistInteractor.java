@@ -44,20 +44,18 @@ public class PlaylistInteractor {
 
     //Restores the playlist from memory
     //See ComplexPreferences docs on Github
+    @SuppressWarnings("unchecked")
     public ArrayList<HashMap<String, String>> restoreTracklist(Bundle savedInstanceState, ComplexPreferences trackPreferences){
+        ArrayList<HashMap<String, String>> tracklist = new ArrayList<>();
         if (savedInstanceState != null) {
-            @SuppressWarnings("unchecked")
-            ArrayList<HashMap<String, String>> trackList = (ArrayList<HashMap<String, String>>)savedInstanceState.getSerializable(TAG_TRACKLIST);
-            return trackList;
+            tracklist = (ArrayList<HashMap<String, String>>)savedInstanceState.getSerializable(TAG_TRACKLIST);
         } else {
             PlaylistList trackPreferencesObject = trackPreferences.getObject("tracks", PlaylistList.class);
             if (trackPreferencesObject != null){
-                return trackPreferencesObject.trackList;
-            }
-            else {
-                return null;
+                tracklist = trackPreferencesObject.trackList;
             }
         }
+        return tracklist;
     }
 
     //Shuffles the tracklist and stores it in memory separate from the unshuffled list
