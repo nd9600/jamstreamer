@@ -113,12 +113,12 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
     //Creates the contextual action bar
 	public void callActionBar(){
 		if (mActionMode == null) {
-            System.out.println("");
-            System.out.println("####################");
             System.out.println("Started action bar");
-            System.out.println("");
 			mActionMode = startSupportActionMode(mActionModeCallback);
-		}
+		} else {
+            System.out.println("Invalidated action bar");
+            mActionMode.invalidate();
+        }
 	}
 
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
@@ -139,7 +139,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 
             String selectAllTitle = "Select all";
             if (selectAll){ //if selectAll is true, we want the button to say "Select none"
-                selectAllTitle = "selectNone";
+                selectAllTitle = "Select none";
             }
             menu.findItem(R.id.playlistSelectAllTracks).setTitle(selectAllTitle);
 			return true;
@@ -154,12 +154,6 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 
             //if the selectAll button is pressed
             if (itemId == R.id.playlistSelectAllTracks) {
-                //set the pressed boolean, and set selectAll to the opposite value
-                //and invalidate (refresh) the action mode
-            	PlaylistPresenter.selectAllPressed = true;
-            	selectAll = ! selectAll;
-            	mActionMode.invalidate();
-
 
               	for (int i = 1; i < playlistLV.getCount(); i++) {
               		View view = playlistLV.getChildAt(i);
@@ -193,6 +187,15 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 					}
 					*/
               	}
+
+                //set the pressed boolean
+                //and invalidate (refresh) the action mode
+                PlaylistPresenter.selectAllPressed = true;
+                mActionMode.invalidate();
+
+                //since we want the button to change,
+                //set selectAll to the opposite value
+                selectAll = ! selectAll;
 
                 //if all checkboxes have been unticked, close the action bar
                 //else open the action bar and set the title to however many are unticked

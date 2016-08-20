@@ -96,6 +96,9 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 			viewHolder.checkbox.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
+
+                    System.out.println("checkbox clicked: " + viewHolder.trackNameAndDuration.getText());
+
                     //calls the action bar and sets selectAllPressed to false
 					mCallback.callActionBar();
                     PlaylistPresenter.selectAllPressed = false;
@@ -145,6 +148,7 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
         //get the viewHolder for this view
 		ViewHolder holder = (ViewHolder) view.getTag();
 
+        /*
         //if the select all button is pressed, and the checkbox isn't ticked, tick it
         //else if select all isn't pressed and it is ticked, untick it
 		if (PlaylistPresenter.selectAllPressed){
@@ -155,8 +159,9 @@ public class PlaylistAdapter extends ArrayAdapter<PlaylistTrackModel> {
 				holder.checkbox.setChecked(false);
 			}
 		}
+		*/
 
-        //get the name, duration, artist and album data from the track data
+        //get the name, duration, artist and album info from the track data
         //and update the viewHolder's views
 		String trackNameAndDuration = playlistTrackData.get(position).getTrackNameAndDuration();
 		String trackArtistAndAlbum = playlistTrackData.get(position).getTrackArtistAndAlbum();
