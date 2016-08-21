@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.discography.TracksByName;
-import com.leokomarov.jamstreamer.utils.utils;
+import com.leokomarov.jamstreamer.utils.generalUtils;
 
 public class TracksSearch extends AppCompatActivity {
 	public static final String TAG_TRACK_NAME = "name";
@@ -40,7 +40,7 @@ public class TracksSearch extends AppCompatActivity {
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        utils.clearCheckboxes(requestCode);
+        generalUtils.clearCheckboxes(requestCode);
     }
 	
 	@Override

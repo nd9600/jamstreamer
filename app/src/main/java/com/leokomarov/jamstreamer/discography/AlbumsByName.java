@@ -26,7 +26,7 @@ import com.leokomarov.jamstreamer.searches.ArtistsParser;
 import com.leokomarov.jamstreamer.common.ActionBarListActivity;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.JSONParser;
-import com.leokomarov.jamstreamer.utils.utils;
+import com.leokomarov.jamstreamer.utils.generalUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -386,7 +386,7 @@ public class AlbumsByName extends ActionBarListActivity implements JSONParser.Ca
 	}
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        utils.clearCheckboxes(requestCode);
+        generalUtils.clearCheckboxes(requestCode);
     }
 
     @Override

@@ -19,7 +19,7 @@ import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.searches.AlbumsSearch;
 import com.leokomarov.jamstreamer.searches.ArtistsSearch;
 import com.leokomarov.jamstreamer.searches.TracksSearch;
-import com.leokomarov.jamstreamer.utils.utils;
+import com.leokomarov.jamstreamer.utils.generalUtils;
 
 public class MainMenu extends AppCompatActivity {
 	private ImageButton button_playlist;
@@ -53,7 +53,7 @@ public class MainMenu extends AppCompatActivity {
     	textView_artists.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
-    			utils.putHierarchy(MainMenu.this, "artists");
+    			generalUtils.putHierarchy(MainMenu.this, "artists");
     			Intent artistIntent = new Intent(getApplicationContext(), ArtistsSearch.class);
     			startActivity(artistIntent);
     		}
@@ -62,7 +62,7 @@ public class MainMenu extends AppCompatActivity {
     	textView_albums.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
-                utils.putHierarchy(MainMenu.this, "albums");
+                generalUtils.putHierarchy(MainMenu.this, "albums");
     			Intent albumIntent = new Intent(getApplicationContext(), AlbumsSearch.class);
     			startActivity(albumIntent);	
     		}
@@ -71,7 +71,7 @@ public class MainMenu extends AppCompatActivity {
     	textView_tracks.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
-                utils.putHierarchy(MainMenu.this, "tracks");
+                generalUtils.putHierarchy(MainMenu.this, "tracks");
     			Intent trackIntent = new Intent(getApplicationContext(), TracksSearch.class);
     			startActivity(trackIntent);	
     		}
@@ -80,7 +80,7 @@ public class MainMenu extends AppCompatActivity {
     	textView_topTracksThisWeek.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
-                utils.putHierarchy(MainMenu.this, "topTracksPerWeek");
+                generalUtils.putHierarchy(MainMenu.this, "topTracksPerWeek");
     			Intent topTracksWeekIntent = new Intent(getApplicationContext(), TracksByName.class);
     			startActivityForResult(topTracksWeekIntent, 2);	
     		}
@@ -102,7 +102,7 @@ public class MainMenu extends AppCompatActivity {
     //Resets the checkboxes once you've left the playlist or top tracks activities
     @Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        utils.clearCheckboxes(requestCode);
+        generalUtils.clearCheckboxes(requestCode);
 	}
 
     //Brings up the exit dialog when you press the back button

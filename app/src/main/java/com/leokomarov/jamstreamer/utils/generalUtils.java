@@ -8,7 +8,7 @@ import com.leokomarov.jamstreamer.discography.AlbumsByNameAdapter;
 import com.leokomarov.jamstreamer.discography.TracksByNameAdapter;
 import com.leokomarov.jamstreamer.playlist.PlaylistAdapter;
 
-public class utils {
+public class generalUtils {
 
     //Stores where you are going in the app hierarchy
     public static void putHierarchy(Context context, String hierarchy){
@@ -18,6 +18,7 @@ public class utils {
         hierarchyEditor.apply();
     }
 
+    //Clears the checkbox list and counter for the relevant adapter
     public static void clearCheckboxes(int requestCode){
         System.out.println("");
         System.out.println("Clearing checkboxes, requestCode: " + requestCode);

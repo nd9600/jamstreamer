@@ -1,5 +1,6 @@
 package com.leokomarov.jamstreamer.playlist;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.view.ActionMode;
@@ -20,7 +21,9 @@ import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.ActionBarListActivity;
-import com.leokomarov.jamstreamer.utils.utils;
+import com.leokomarov.jamstreamer.utils.ComplexPreferences;
+import com.leokomarov.jamstreamer.utils.generalUtils;
+import com.leokomarov.jamstreamer.utils.tracklistUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,7 +71,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         //Initial checkbox setup - the action mode's title is initially "Select all"
         PlaylistPresenter.selectAllPressed = false;
         selectAll = true;
-        utils.clearCheckboxes(2);
+        generalUtils.clearCheckboxes(2);
 
         //Creates the click listeners for the tracks
     	playlistLV.setOnItemClickListener(new OnItemClickListener() {
@@ -238,7 +241,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
                         ((PlaylistAdapter.ViewHolder) view.getTag()).checkbox.setChecked(false);
                     }
                 }
-				utils.clearCheckboxes(2);
+				generalUtils.clearCheckboxes(2);
 
 				mode.finish();
 				return true;
@@ -263,14 +266,16 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        utils.clearCheckboxes(requestCode);
+        generalUtils.clearCheckboxes(requestCode);
 	}
 	
 	@Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
     	super.onSaveInstanceState(savedInstanceState);
-        ArrayList<HashMap<String, String>> tracklist = presenter.restoreTracklist();
-    	savedInstanceState.putSerializable(getString(R.string.TAG_TRACKLIST), tracklist);
+        ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
+                getString(R.string.trackPreferences), Context.MODE_PRIVATE);
+        ArrayList<HashMap<String, String>> tracklist = tracklistUtils.restoreTracklist(savedInstanceState, trackPreferences);
+        savedInstanceState.putSerializable(getString(R.string.TAG_TRACKLIST), tracklist);
     }
     
 	public boolean onOptionsItemSelected(MenuItem item) {
