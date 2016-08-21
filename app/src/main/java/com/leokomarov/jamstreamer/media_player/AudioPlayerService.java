@@ -51,7 +51,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     }
 	
 	protected void playSong(int indexPosition){
-		ArrayList<HashMap<String, String>> trackList = new ArrayList<>();
+		ArrayList<HashMap<String, String>> trackList;
 		if (AudioPlayerService.shuffleBoolean){
 			ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
 				getString(R.string.trackPreferences), MODE_PRIVATE);

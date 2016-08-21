@@ -54,13 +54,13 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
             tracklist = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable(getString(R.string.TAG_TRACKLIST));
         }
 
-
         setContentView(R.layout.original_empty_list);
 
         //Initialises the presenter
         presenter = new PlaylistPresenter(this, this, savedInstanceState, new PlaylistInteractor());
 
         //Initialises the LV and sets the playlist data using the tracklist stored in memory
+        //either from the savedInstanceState or trackPreferences
         playlistLV = getListView();
         presenter.setPlaylistTrackData(tracklist);
 
@@ -122,10 +122,10 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
     //Creates the contextual action bar
 	public void callActionBar(){
         if (getSupportActionBar() == null){
-            System.out.println("Started action bar");
+            //System.out.println("Started action bar");
 			mActionMode = startSupportActionMode(mActionModeCallback);
 		} else {
-            System.out.println("Invalidated action bar");
+            //System.out.println("Invalidated action bar");
             //getSupportActionBar().show();
             mActionMode.invalidate();
         }
@@ -136,8 +136,8 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         //called on initial creation
 		@Override
 	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            System.out.println(" ");
-            System.out.println("onCreateActionMode");
+            //System.out.println(" ");
+            //System.out.println("onCreateActionMode");
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.playlist_contextual_menu, menu);
 	        return true;
@@ -146,8 +146,8 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         //called on initial creation and whenever the actionMode is invalidated
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            System.out.println(" ");
-            System.out.println("onPrepareActionMode");
+            //System.out.println(" ");
+            //System.out.println("onPrepareActionMode");
 
             String selectAllTitle = "Select all";
             if (! selectAll){ //if selectAll is true, we want the button to say "Select none"

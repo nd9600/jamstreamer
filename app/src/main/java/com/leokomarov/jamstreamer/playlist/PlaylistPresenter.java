@@ -63,8 +63,9 @@ public class PlaylistPresenter {
 
     public void deletePlaylist(){
         clearPlaylistTrackData();
-        tracklistUtils.saveTracklist(trackPreferences, new ArrayList<HashMap<String, String>>());
-        tracklistUtils.shuffleTrackList(trackPreferences);
+
+        new tracklistUtils().execute(trackPreferences, "save", new ArrayList<HashMap<String, String>>());
+        new tracklistUtils().execute(trackPreferences, "shuffle");
     }
 
     //Starts the audio player
@@ -145,12 +146,12 @@ public class PlaylistPresenter {
         Collections.sort(tracksToDelete, Collections.reverseOrder());
         for (int i : tracksToDelete){
             tracklist.remove(i);
-        }
-        tracklistUtils.saveTracklist(trackPreferences, tracklist);
+        };
+        new tracklistUtils().execute(trackPreferences, "save", new ArrayList<HashMap<String, String>>());
         setPlaylistTrackData(tracklist);
 
         if (! tracklist.isEmpty()){
-            tracklistUtils.shuffleTrackList(trackPreferences);
+            new tracklistUtils().execute(trackPreferences, "shuffle");
         }
 
         generalUtils.clearCheckboxes(2);
