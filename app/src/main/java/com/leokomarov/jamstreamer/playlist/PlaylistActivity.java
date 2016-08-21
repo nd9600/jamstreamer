@@ -44,9 +44,17 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 	protected static ActionMode mActionMode;
 	protected static boolean selectAll;
 
+    @SuppressWarnings("unchecked")
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ArrayList<HashMap<String, String>> tracklist = new ArrayList<>();
+        if (savedInstanceState != null){
+            tracklist = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable(getString(R.string.TAG_TRACKLIST));
+        }
+
+
         setContentView(R.layout.original_empty_list);
 
         //Initialises the presenter
@@ -54,7 +62,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 
         //Initialises the LV and sets the playlist data using the tracklist stored in memory
         playlistLV = getListView();
-        presenter.setPlaylistTrackData(new ArrayList<HashMap<String, String>>());
+        presenter.setPlaylistTrackData(tracklist);
 
         //Creates the list adapter to link the LV and data
         playlistListAdapter = new PlaylistAdapter(this, this, presenter.getPlaylistTrackData());
@@ -274,7 +282,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
     	super.onSaveInstanceState(savedInstanceState);
         ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
                 getString(R.string.trackPreferences), Context.MODE_PRIVATE);
-        ArrayList<HashMap<String, String>> tracklist = tracklistUtils.restoreTracklist(savedInstanceState, trackPreferences);
+        ArrayList<HashMap<String, String>> tracklist = tracklistUtils.restoreTracklist(trackPreferences, savedInstanceState);
         savedInstanceState.putSerializable(getString(R.string.TAG_TRACKLIST), tracklist);
     }
     

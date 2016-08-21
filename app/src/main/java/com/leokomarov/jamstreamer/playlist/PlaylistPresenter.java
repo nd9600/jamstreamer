@@ -53,7 +53,7 @@ public class PlaylistPresenter {
     //If the passed tracklist is empty, the tracklist will be restored from memory
     public void setPlaylistTrackData(ArrayList<HashMap<String, String>> trackList) {
         if (trackList.isEmpty()) {
-            ArrayList<HashMap<String, String>> restoredTracklist = tracklistUtils.restoreTracklist(savedInstanceState, trackPreferences);
+            ArrayList<HashMap<String, String>> restoredTracklist = tracklistUtils.restoreTracklist(trackPreferences, savedInstanceState);
             if (! restoredTracklist.isEmpty()) {
                 trackList = restoredTracklist;
             }
@@ -88,7 +88,7 @@ public class PlaylistPresenter {
 
     //Called when something in the floating menu is selected
     public boolean onContextItemSelected(MenuItem item){
-        ArrayList<HashMap<String, String>> trackList = tracklistUtils.restoreTracklist(savedInstanceState, trackPreferences);
+        ArrayList<HashMap<String, String>> trackList = tracklistUtils.restoreTracklist(trackPreferences, savedInstanceState);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         View viewClicked = info.targetView;
         int indexPosition = info.position - 1;
@@ -128,7 +128,7 @@ public class PlaylistPresenter {
     //called in the action mode callback,
     //removes the ticked tracks from the playlist
     public int removeTracksFromPlaylist(int numberOfTracks){
-        ArrayList<HashMap<String, String>> tracklist = tracklistUtils.restoreTracklist(savedInstanceState, trackPreferences);
+        ArrayList<HashMap<String, String>> tracklist = tracklistUtils.restoreTracklist(trackPreferences, savedInstanceState);
         PlaylistPresenter.selectAllPressed = false;
 
         ArrayList<Integer> tracksToDelete = new ArrayList<>();

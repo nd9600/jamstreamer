@@ -1,10 +1,5 @@
 package com.leokomarov.jamstreamer.media_player;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -24,9 +19,12 @@ import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
+import com.leokomarov.jamstreamer.utils.ComplexPreferences;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class AudioPlayerService extends Service implements OnErrorListener, OnPreparedListener, OnCompletionListener{
 	protected static MediaPlayer mp;
@@ -53,8 +51,8 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     }
 	
 	protected void playSong(int indexPosition){
-		ArrayList<HashMap<String, String>> trackList = new ArrayList<HashMap<String, String>>();
-		if (AudioPlayerService.shuffleBoolean == true){
+		ArrayList<HashMap<String, String>> trackList = new ArrayList<>();
+		if (AudioPlayerService.shuffleBoolean){
 			ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
 				getString(R.string.trackPreferences), MODE_PRIVATE);
 			PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
@@ -70,11 +68,11 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 	    	SharedPreferences currentTrackPreference = getSharedPreferences(getString(R.string.currentTrackPreferences), 0);
 	    	SharedPreferences.Editor currentTrackEditor = currentTrackPreference.edit();
 	    	currentTrackEditor.putInt("currentTrack", trackID);
-	        currentTrackEditor.commit();
+	        currentTrackEditor.apply();
 	        
 	    	String unformattedURL = getResources().getString(R.string.trackByIDURL);
 	    	String url = String.format(unformattedURL, trackID).replace("&amp;", "&");
-	    	Log.v("AudioPlayerService-playSong","url = " + url);
+	    	Log.v("service-playSong","url = " + url);
 	    	String unformattedTrackInfoURL = getResources().getString(R.string.trackInformation);
 	    	String trackInfoURL = String.format(unformattedTrackInfoURL, trackID).replace("&amp;", "&");
 	    	
@@ -86,7 +84,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 	        
 	    	mp.setAudioStreamType(AudioManager.STREAM_MUSIC);
 	    	try {
-	    		AudioPlayer.songTitleLabel.setText(trackName + " - " + artistName);
+	    		AudioPlayer.songTitleLabel.setText(String.format("%s - %s", trackName, artistName));
 	            AudioPlayer.albumLabel.setText(albumName);
 	            AudioPlayer.songCurrentDurationLabel.setText("0:00");
 	            AudioPlayer.songTotalDurationLabel.setText(trackDuration);
@@ -103,7 +101,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 	    		}
 	    		
 	    		prepared = false;
-	    		Log.v("AudioPlayerService-playSong","Preparing");
+	    		Log.v("service-playSong","Preparing");
 	    		mp.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
 	    		wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, "myWifiLock");
 	    		wifiLock.acquire();
@@ -126,13 +124,9 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 	    		mp.prepareAsync();
 	    	} catch(NullPointerException e){
 	        	android.util.Log.e("AudioPlayerService","NullPointerException :" + e.getMessage());
-	        	android.util.Log.e("AudioPlayerService","trackList.get(indexPosition) :" + trackList.get(indexPosition));
-	    	} catch (FileNotFoundException e){
-	    	} catch (IllegalArgumentException e) {
-	    	} catch (IllegalStateException e) {
-	    	} catch (RuntimeException e){
-	    	} catch (IOException e) {
+	        	android.util.Log.v("AudioPlayerService","trackList.get(indexPosition) :" + trackList.get(indexPosition));
 	    	} catch (Exception e) {
+                Log.e("AudioPlayerService", "Exception e: " + e.getMessage());
 	    	}
 		}
 	
@@ -146,10 +140,10 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     
     @Override
     public int onStartCommand(Intent AudioPlayerServiceIntent,int flags, int startId) {  
-    	ArrayList<HashMap<String, String>> trackList = new ArrayList<HashMap<String, String>>();
+    	ArrayList<HashMap<String, String>> trackList;
     	SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
     	int indexPosition;
-		if (AudioPlayerService.shuffleBoolean == true){
+		if (AudioPlayerService.shuffleBoolean){
 			ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
 				getString(R.string.trackPreferences), MODE_PRIVATE);
 			PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
@@ -160,14 +154,15 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 			trackList = getTrackListFromPreferences();
 			indexPosition = indexPositionPreference.getInt("indexPosition", 0);
 		}
-		
+
+        assert trackList != null;
         int trackID = Integer.parseInt(trackList.get(indexPosition).get("trackID") );
         SharedPreferences currentTrackPreference = getSharedPreferences(getString(R.string.currentTrackPreferences), 0);
         int currentTrackID = currentTrackPreference.getInt("currentTrack", 0);  
   
     	if (mp == null){
         	mp = new MediaPlayer();
-        	Log.v("AudioPlayerService-onStartCommand","Playing new song");
+        	Log.v("service-onStartCommand", "Playing new song");
         	playSong(indexPosition);        	
         }
     	else if (trackID == currentTrackID){
@@ -175,7 +170,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
        	        String trackDuration = trackList.get(indexPosition).get("trackDuration");
        	        String artistName = trackList.get(indexPosition).get("trackArtist");
        	        String albumName = trackList.get(indexPosition).get("trackAlbum");
-       	        AudioPlayer.songTitleLabel.setText(trackName + " - " + artistName);
+       	        AudioPlayer.songTitleLabel.setText(String.format("%s - %s", trackName, artistName));
        			AudioPlayer.albumLabel.setText(albumName);
        			AudioPlayer.songTotalDurationLabel.setText(trackDuration);
        			AudioPlayer.albumArt.setImageBitmap(AudioParser.albumImageStore);			
@@ -185,7 +180,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         	}
         	stopForeground(true);
         	mp.reset();
-        	Log.v("AudioPlayerService-onStartCommand","Playing new song");
+        	Log.v("service-onStartCommand", "Playing new song");
         	playSong(indexPosition);    	
         }
         
@@ -195,13 +190,13 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
   
     @Override
 	public boolean onError(MediaPlayer mp, int what, int extra) {
-    	android.util.Log.v("onError","Error: " + what + " " + extra);
+    	android.util.Log.v("onError", "Error: " + what + " " + extra);
 		return true;
 	}
     
     @Override
     public void onPrepared(MediaPlayer mp) {
-    	Log.v("AudioPlayerService-onPrepared","Prepared");
+    	Log.v("service-onPrepared", "Prepared");
     	prepared = true;
     	
 		int audioFocusResult = audioManager.requestAudioFocus(onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
@@ -211,7 +206,8 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 			try { 
 				mp.start();
 			} catch (IllegalArgumentException e) {
-			}
+                Log.e("AudioPlayerService", "IllegalArgumentException e: " + e.getMessage());
+            }
 			
 	        AudioPlayer.songProgressBar.setProgress(0);
 	        AudioPlayer.songProgressBar.setMax(mp.getDuration() / 1000);
@@ -231,7 +227,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     		mp.stop();
     	}
     	
-    	if (repeatBoolean == true){
+    	if (repeatBoolean){
 			mp.seekTo(0);
 		}
     	else {
@@ -248,11 +244,12 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
             SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
     		
-    		if (shuffleBoolean == false){
+    		if (! shuffleBoolean){
     			ArrayList<HashMap<String, String>> trackList = getTrackListFromPreferences();
     			int indexPosition = indexPositionPreference.getInt("indexPosition", -1);
-    			    			
-    			if (indexPosition + 1 <= trackList.size() - 1){
+
+                assert trackList != null;
+                if (indexPosition + 1 <= trackList.size() - 1){
     				AudioPlayer.button_play.setClickable(false);
     		    	AudioPlayer.button_next.setClickable(false);
     		        AudioPlayer.button_previous.setClickable(false);
@@ -263,11 +260,11 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     				mp.reset();
     				indexPosition++;
     				indexPositionEditor.putInt("indexPosition", indexPosition);
-    				indexPositionEditor.commit();
+    				indexPositionEditor.apply();
     				playSong(indexPosition);
     			}
     		}
-    		else if (shuffleBoolean == true){
+    		else {
     			PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
     			ArrayList<HashMap<String, String>> shuffledTracklist = shuffledTrackPreferencesObject.trackList;
     			int shuffledIndexPosition = indexPositionPreference.getInt("shuffledIndexPosition", -1);
@@ -283,7 +280,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     				mp.reset();
     				shuffledIndexPosition++;
     				indexPositionEditor.putInt("shuffledIndexPosition", shuffledIndexPosition);
-    				indexPositionEditor.commit();
+    				indexPositionEditor.apply();
     				playSong(shuffledIndexPosition);
     			}
     		}
@@ -296,10 +293,11 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     		if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
 				if (lastKnownAudioFocusState == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT && wasPlayingWhenTransientLoss) {
 	    			originalVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-	    			if (prepared == true){
+	    			if (prepared){
 	    				try { 
 	    					mp.start();
 	    				} catch (IllegalArgumentException e) {
+                            Log.e("AudioPlayerService", "IllegalArgumentException: " + e.getMessage());
 	    				}
 	    			}
 				}

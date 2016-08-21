@@ -16,6 +16,16 @@ public class JSONParser extends AsyncTask<String, Void, JSONObject>  {
 	static JSONObject jObj = null;
 	static String json = "";
 
+    public interface CallbackInterface {
+        void onRequestCompleted(JSONObject json);
+    }
+
+    private CallbackInterface mCallback;
+
+    public JSONParser(CallbackInterface callback) {
+        mCallback = callback;
+    }
+
 	@Override
     protected JSONObject doInBackground(String... urls) {
 		String urlString = urls[0];  
@@ -51,16 +61,6 @@ public class JSONParser extends AsyncTask<String, Void, JSONObject>  {
 			System.out.println("Exception:" + e.getMessage());
 		}
 		return jObj;
-    }
-	
-	public interface CallbackInterface {
-        void onRequestCompleted(JSONObject json);
-    }
-	
-	private CallbackInterface mCallback;
-
-    public JSONParser(CallbackInterface callback) {
-        mCallback = callback;
     }
 			   
     @Override
