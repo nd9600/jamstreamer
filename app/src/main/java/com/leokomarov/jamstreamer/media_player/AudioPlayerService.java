@@ -1,5 +1,6 @@
 package com.leokomarov.jamstreamer.media_player;
 
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -109,19 +110,26 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 	    		mp.setOnCompletionListener(this);
 	        	mp.setOnPreparedListener(this);
 	        	mp.setOnErrorListener(this);
+
 	        	AudioPlayer.button_play.setImageResource(R.drawable.button_pause);
 				
 	    		NotificationCompat.Builder builder = new NotificationCompat.Builder(this);  
 	        	builder.setSmallIcon(R.drawable.img_ic_launcher);
 	            builder.setContentTitle(trackName);  
 	            builder.setContentText(artistName + " - " + albumName);
-                
+
+                //this defines the activity that's opened when
+                //the notification is pressed
 	            Intent notificationIntent = new Intent(this, AudioPlayer.class);  
 	            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 	            notificationIntent.putExtra("fromNotification", true);
-	            PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);  
+	            PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 	            builder.setContentIntent(contentIntent);
-	        	startForeground(46798, builder.getNotification());
+
+                int notificationID = 46798;
+                NotificationManager notificationManager =
+                        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                notificationManager.notify(notificationID, builder.build());
 	    		mp.prepareAsync();
 	    	} catch(NullPointerException e){
 	        	android.util.Log.e("AudioPlayerService","NullPointerException :" + e.getMessage());

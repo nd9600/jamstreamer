@@ -26,8 +26,6 @@ import java.util.Locale;
 
 public class AudioPlayer extends AppCompatActivity {
 	protected static ImageButton button_play;
-	protected static ImageButton button_forward;
-	protected static ImageButton button_backward;
 	protected static ImageButton button_next;
 	protected static ImageButton button_previous;
 	private ImageButton button_playlist;
