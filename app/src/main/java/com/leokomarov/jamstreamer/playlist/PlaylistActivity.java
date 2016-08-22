@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.view.ActionMode;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -44,25 +45,31 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 	protected static ActionMode mActionMode;
 	protected static boolean selectAll;
 
+    public void notifyDataSetChanged(){
+        playlistListAdapter.notifyDataSetChanged();
+    }
+
     @SuppressWarnings("unchecked")
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        boolean restoreTracklistFromMemory = true;
 
         ArrayList<HashMap<String, String>> tracklist = new ArrayList<>();
         if (savedInstanceState != null){
             tracklist = (ArrayList<HashMap<String, String>>) savedInstanceState.getSerializable(getString(R.string.TAG_TRACKLIST));
+            restoreTracklistFromMemory = false;
         }
 
         setContentView(R.layout.original_empty_list);
 
         //Initialises the presenter
-        presenter = new PlaylistPresenter(this, this, savedInstanceState, new PlaylistInteractor());
+        presenter = new PlaylistPresenter(this, this, new PlaylistInteractor());
 
         //Initialises the LV and sets the playlist data using the tracklist stored in memory
         //either from the savedInstanceState or trackPreferences
         playlistLV = getListView();
-        presenter.setPlaylistTrackData(tracklist);
+        presenter.setPlaylistTrackData(restoreTracklistFromMemory, tracklist);
 
         //Creates the list adapter to link the LV and data
         playlistListAdapter = new PlaylistAdapter(this, this, presenter.getPlaylistTrackData());
@@ -204,6 +211,8 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 
             //if the button to remove those specific tracks from the playlist is pressed
             } else if (itemId == R.id.removePlaylistItem) {
+                Log.v("onActionItemClicked", "removing from the playlist");
+
                 //this method removes the ticked tracks from the tracklists
                 //and from the LV's data
                 //then the list adapter is told about the change
@@ -217,15 +226,17 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
                 } else if(numberOfTracksDeleted >= 2){
                     textInToast = numberOfTracksDeleted + " tracks removed from the playlist";
                 }
+                Log.v("onActionItemClicked", numberOfTracksDeleted + " tracks removed from the playlist");
                 Toast.makeText(getApplicationContext(), textInToast, Toast.LENGTH_LONG).show();
 
                 //clear the checkboxes and close the action bar
                 for (int i = 1; i < numberOfTracks; i++) {
                     View view = playlistLV.getChildAt(i);
+                    PlaylistAdapter.tickCheckbox(i, false);
                     if (view != null) {
-                        //CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
-                        //checkbox.setChecked(false);
-                        ((PlaylistAdapter.ViewHolder) view.getTag()).checkbox.setChecked(false);
+                        CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
+                        checkbox.setChecked(false);
+                        Log.v("onActionItemClicked", "unticking checkbox #" + i);
                     }
                 }
 
@@ -282,7 +293,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
     	super.onSaveInstanceState(savedInstanceState);
         ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
                 getString(R.string.trackPreferences), Context.MODE_PRIVATE);
-        ArrayList<HashMap<String, String>> tracklist = tracklistUtils.restoreTracklist(trackPreferences, savedInstanceState);
+        ArrayList<HashMap<String, String>> tracklist = tracklistUtils.restoreTracklist(trackPreferences);
         savedInstanceState.putSerializable(getString(R.string.TAG_TRACKLIST), tracklist);
     }
     

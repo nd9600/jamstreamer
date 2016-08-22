@@ -114,7 +114,8 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 	    		NotificationCompat.Builder builder = new NotificationCompat.Builder(this);  
 	        	builder.setSmallIcon(R.drawable.img_ic_launcher);
 	            builder.setContentTitle(trackName);  
-	            builder.setContentText(artistName + " - " + albumName);  
+	            builder.setContentText(artistName + " - " + albumName);
+                
 	            Intent notificationIntent = new Intent(this, AudioPlayer.class);  
 	            notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 	            notificationIntent.putExtra("fromNotification", true);
@@ -126,7 +127,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 	        	android.util.Log.e("AudioPlayerService","NullPointerException :" + e.getMessage());
 	        	android.util.Log.v("AudioPlayerService","trackList.get(indexPosition) :" + trackList.get(indexPosition));
 	    	} catch (Exception e) {
-                Log.e("AudioPlayerService", "Exception e: " + e.getMessage());
+                Log.e("AudioPlayerService", "Exception: " + e.getMessage());
 	    	}
 		}
 	

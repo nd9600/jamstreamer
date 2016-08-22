@@ -18,6 +18,7 @@ import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
+import com.leokomarov.jamstreamer.utils.tracklistUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,18 +41,42 @@ public class AudioPlayer extends AppCompatActivity {
     protected static TextView songTotalDurationLabel;
 	
 	private static Handler mHandler = new Handler();
-	
-	private ArrayList<HashMap<String, String>> getTrackListFromPreferences(){
-    	ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-	    		getString(R.string.trackPreferences), MODE_PRIVATE);
-	    PlaylistList trackPreferencesObject = trackPreferences.getObject("tracks", PlaylistList.class);
-	    if (trackPreferencesObject != null){
-    		return trackPreferencesObject.trackList;
-    	}
-    	else {
-    		return null;
-    	}
+
+    @Override
+    public void onNewIntent(Intent intent){
+        super.onNewIntent(intent);
+        setIntent(intent);
+        afterCreation(intent);
     }
+
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        afterCreation(getIntent());
+    }
+
+    public static void updateProgressBar() {
+        mHandler.postDelayed(mUpdateTime, 100);
+    }
+
+    private static Runnable mUpdateTime = new Runnable() {
+        public void run() {
+            if ((AudioPlayerService.mp != null) && AudioPlayerService.prepared){
+                int currentSeconds = AudioPlayerService.mp.getCurrentPosition() / 1000;
+                if (songProgressBar.getMax() != AudioPlayerService.mp.getDuration() / 1000){
+                    songProgressBar.setMax(AudioPlayerService.mp.getDuration() / 1000);
+                }
+
+                if (currentSeconds >= 0 && AudioPlayerService.mp != null ){
+                    if (AudioPlayerService.mp.isPlaying()){
+                        String currentDuration = String.format(Locale.US, "%d:%02d", currentSeconds / 60, currentSeconds % 60);
+                        songCurrentDurationLabel.setText(currentDuration);
+                        songProgressBar.setProgress(currentSeconds);
+                        mHandler.postDelayed(this, 1000);
+                    }
+                }
+            }
+        }
+    };
 		
 	public void afterCreation(Intent intent){
 		setContentView(R.layout.audio_player);	
@@ -108,6 +133,46 @@ public class AudioPlayer extends AppCompatActivity {
     			songProgressBar.setProgress(currentSeconds);
     		}
     	}
+
+        ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
+                getString(R.string.trackPreferences), MODE_PRIVATE);
+
+        Boolean fromNotification = intent.getBooleanExtra("fromNotification", false);
+        if (! fromNotification){
+            Intent audioService = new Intent(getApplicationContext(), AudioPlayerService.class);
+            startService(audioService);
+            button_play.setImageResource(R.drawable.button_pause);
+        }
+        else {
+            ArrayList<HashMap<String, String>> trackList;
+            SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
+            int indexPosition;
+            if (AudioPlayerService.shuffleBoolean){
+
+                PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
+                trackList = shuffledTrackPreferencesObject.trackList;
+                indexPosition = indexPositionPreference.getInt("shuffledIndexPosition", 0);
+            }
+            else {
+                trackList = tracklistUtils.restoreTracklist(trackPreferences);
+                indexPosition = indexPositionPreference.getInt("indexPosition", 0);
+            }
+
+            HashMap<String, String> trackMap = trackList.get(indexPosition);
+
+            String trackName = trackMap.get("trackName");
+            String artistName = trackMap.get("trackArtist");
+            String trackDuration = trackMap.get("trackDuration");
+            String albumName = trackMap.get("trackAlbum");
+
+            songTitleLabel.setText(String.format("%s - %s", trackName, artistName));
+            albumLabel.setText(albumName);
+            songTotalDurationLabel.setText(trackDuration);
+
+            if (AudioParser.albumImageStore != null){
+                albumArt.setImageBitmap(AudioParser.albumImageStore);
+            }
+        }
 		
 		button_playlist.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -177,7 +242,7 @@ public class AudioPlayer extends AppCompatActivity {
        	            SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
        	    		
        	    		if (! AudioPlayerService.shuffleBoolean){
-       	    			ArrayList<HashMap<String, String>> trackList = getTrackListFromPreferences();
+       	    			ArrayList<HashMap<String, String>> trackList = tracklistUtils.restoreTracklist(trackPreferences);
        	    			int indexPosition = indexPositionPreference.getInt("indexPosition", -1);
 
        	    			if ((indexPosition + 1) <= (trackList.size() - 1)){
@@ -187,7 +252,7 @@ public class AudioPlayer extends AppCompatActivity {
        	    				startService(audioServiceIntent);
        	    			}
        	    		}
-       	    		else if (AudioPlayerService.shuffleBoolean){
+       	    		else {
        	    			PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
        	    			ArrayList<HashMap<String, String>> shuffledTracklist = shuffledTrackPreferencesObject.trackList;
        	    			int shuffledIndexPosition = indexPositionPreference.getInt("shuffledIndexPosition", -1);
@@ -258,79 +323,7 @@ public class AudioPlayer extends AppCompatActivity {
 		        updateProgressBar();
 		    }
 		});
-		
-		Boolean fromNotication = intent.getBooleanExtra("fromNotification", false);
-		if (! fromNotication){
-			Intent audioService = new Intent(getApplicationContext(), AudioPlayerService.class);
-			startService(audioService);
-			button_play.setImageResource(R.drawable.button_pause);
-		}
-		else {
-			ArrayList<HashMap<String, String>> trackList;
-	    	SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
-	    	int indexPosition;
-			if (AudioPlayerService.shuffleBoolean){
-				ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-					getString(R.string.trackPreferences), MODE_PRIVATE);
-				PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
-				trackList = shuffledTrackPreferencesObject.trackList;
-				indexPosition = indexPositionPreference.getInt("shuffledIndexPosition", 0);
-			}
-			else {
-				trackList = getTrackListFromPreferences();
-				indexPosition = indexPositionPreference.getInt("indexPosition", 0);
-			}
-			
-			String trackName = trackList.get(indexPosition).get("trackName");
-	        String artistName = trackList.get(indexPosition).get("trackArtist");
-	        String trackDuration = trackList.get(indexPosition).get("trackDuration");
-	        String albumName = trackList.get(indexPosition).get("trackAlbum");
-	        
-	        songTitleLabel.setText(String.format("%s - %s", trackName, artistName));
-			albumLabel.setText(albumName);
-			songTotalDurationLabel.setText(trackDuration);
-			
-			if (AudioParser.albumImageStore != null){
-				albumArt.setImageBitmap(AudioParser.albumImageStore);
-			}
-		}
 	}
-	
-	@Override
-	public void onNewIntent(Intent intent){
-		super.onNewIntent(intent);
-		setIntent(intent);
-		afterCreation(intent);
-	}
-	
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		afterCreation(getIntent());
-	}
-
-	private static Runnable mUpdateTime = new Runnable() {
-        public void run() {
-        	if ((AudioPlayerService.mp != null) && AudioPlayerService.prepared){
-        		int currentSeconds = AudioPlayerService.mp.getCurrentPosition() / 1000;
-        		if (songProgressBar.getMax() != AudioPlayerService.mp.getDuration() / 1000){
-        			songProgressBar.setMax(AudioPlayerService.mp.getDuration() / 1000);
-        		}
-            
-        		if (currentSeconds >= 0 && AudioPlayerService.mp != null ){
-        			if (AudioPlayerService.mp.isPlaying()){
-        				String currentDuration = String.format(Locale.US, "%d:%02d", currentSeconds / 60, currentSeconds % 60);
-        				songCurrentDurationLabel.setText(currentDuration);
-        				songProgressBar.setProgress(currentSeconds);
-        				mHandler.postDelayed(this, 1000);
-        			}
-        		}
-        	}
-        }
-     };
-	
-	public static void updateProgressBar() {
-        mHandler.postDelayed(mUpdateTime, 100);
-    }
 	
 	@Override
 	protected void onDestroy() {

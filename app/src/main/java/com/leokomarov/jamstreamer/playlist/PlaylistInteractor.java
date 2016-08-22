@@ -21,6 +21,7 @@ public class PlaylistInteractor {
 
     //Sets the playlist track data
     public void setPlaylistTrackData(ArrayList<HashMap<String, String>> trackList){
+        playlistTrackData.clear();
         for (HashMap<String, String> map : trackList) {
             playlistTrackData.add(new PlaylistTrackModel(map));
         }
