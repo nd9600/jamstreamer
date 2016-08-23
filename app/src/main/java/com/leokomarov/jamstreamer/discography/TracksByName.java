@@ -50,7 +50,7 @@ public class TracksByName extends ActionBarListActivity implements JSONParser.Ca
 	private ArrayList<HashMap<String, String>> albumIDList = new ArrayList<>();
 	private ImageButton button_playlist;
 
-	private void putHierarchy(String hierarchy){
+    private void putHierarchy(String hierarchy){
 		SharedPreferences hierarchyPreference = getSharedPreferences(getString(R.string.hierarchyPreferences), 0);
     	SharedPreferences.Editor hierarchyEditor = hierarchyPreference.edit();
     	hierarchyEditor.putString("hierarchy", hierarchy);

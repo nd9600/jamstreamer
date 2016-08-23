@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.ActionBarListActivity;
+import com.leokomarov.jamstreamer.common.TrackModel;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.generalUtils;
 import com.leokomarov.jamstreamer.utils.tracklistUtils;
@@ -35,19 +36,15 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 	private ListView playlistLV;
 
     //playlistListAdapter links the LV with the data
-	private ArrayAdapter<PlaylistTrackModel> playlistListAdapter;
+	private ArrayAdapter<TrackModel> playlistListAdapter;
 
     //presenter holds the logic
     private PlaylistPresenter presenter;
 
     //mActionMode is the action bar
     //selectAll is changed when the selectAll/none button is pressed
-	protected static ActionMode mActionMode;
+	public static ActionMode mActionMode;
 	protected static boolean selectAll;
-
-    public void notifyDataSetChanged(){
-        playlistListAdapter.notifyDataSetChanged();
-    }
 
     @SuppressWarnings("unchecked")
 	@Override
@@ -72,7 +69,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         presenter.setPlaylistTrackData(restoreTracklistFromMemory, tracklist);
 
         //Creates the list adapter to link the LV and data
-        playlistListAdapter = new PlaylistAdapter(this, this, presenter.getPlaylistTrackData());
+        playlistListAdapter = new PlaylistAdapter(this, this, presenter);
         setListAdapter(playlistListAdapter);
 
         //Registers that the floating menu will be opened on a long press
@@ -128,11 +125,12 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
     ///*
     //Creates the contextual action bar
 	public void callActionBar(){
+        Log.v("callActionBar", "");
         if (getSupportActionBar() == null){
-            //System.out.println("Started action bar");
+            Log.v("callActionBar", "Started");
 			mActionMode = startSupportActionMode(mActionModeCallback);
 		} else {
-            //System.out.println("Invalidated action bar");
+            Log.v("callActionBar", "Invalidated");
             //getSupportActionBar().show();
             mActionMode.invalidate();
         }
@@ -143,8 +141,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         //called on initial creation
 		@Override
 	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            //System.out.println(" ");
-            //System.out.println("onCreateActionMode");
+            Log.v("onCreateActionMode", "");
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.playlist_contextual_menu, menu);
 	        return true;
@@ -153,8 +150,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         //called on initial creation and whenever the actionMode is invalidated
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            //System.out.println(" ");
-            //System.out.println("onPrepareActionMode");
+            Log.v("onPrepareActionMode", "");
 
             String selectAllTitle = "Select all";
             if (! selectAll){ //if selectAll is true, we want the button to say "Select none"

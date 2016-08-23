@@ -10,6 +10,8 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.common.Presenter;
+import com.leokomarov.jamstreamer.common.TrackModel;
 import com.leokomarov.jamstreamer.discography.AlbumsByName;
 import com.leokomarov.jamstreamer.discography.TracksByName;
 import com.leokomarov.jamstreamer.media_player.AudioPlayer;
@@ -23,7 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-public class PlaylistPresenter {
+public class PlaylistPresenter extends Presenter {
 
     private Context context;
     private PlaylistActivity view;
@@ -39,7 +41,7 @@ public class PlaylistPresenter {
                 context.getString(R.string.trackPreferences), Context.MODE_PRIVATE);
     }
 
-    public List<PlaylistTrackModel> getPlaylistTrackData(){
+    public List<TrackModel> getPlaylistTrackData(){
         return interactor.getPlaylistTrackData();
     }
 
