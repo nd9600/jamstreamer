@@ -13,6 +13,13 @@ import java.util.List;
 
 public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
 
+    public interface CallbackInterface {
+        void callActionBar();
+    }
+
+    //mCallback is the instance of the interface with the callActionBar() method
+    private CallbackInterface mCallback;
+
     //listActivity is the activity that contains the LV
     private final ActionBarListActivity listActivity;
 
@@ -34,8 +41,9 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
     //tickedCheckboxCounter is the number of checked checkboxes
     public static int tickedCheckboxCounter = 0;
 
-    protected CustomListAdapter(ActionBarListActivity listActivity, Presenter presenter, List<TrackModel> trackData, int listLayoutID, int checkboxID, int textView1ID, int textView2ID) {
+    protected CustomListAdapter(CallbackInterface callback, ActionBarListActivity listActivity, Presenter presenter, List<TrackModel> trackData, int listLayoutID, int checkboxID, int textView1ID, int textView2ID) {
         super(listActivity, listLayoutID, trackData);
+        this.mCallback = callback;
         this.listActivity = listActivity;
         this.presenter = presenter;
         this.trackData = trackData;
@@ -49,8 +57,6 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
     public int getCount() {
         return trackData.size();
     }
-
-    public abstract void callActionBarFromCustomAdapter();
 
     //if the checkbox isn't ticked in the list,
     //put it in the list as ticked
@@ -70,9 +76,6 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
         public TextView textView2;
     }
 
-    //viewHolder.checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
-    //viewHolder.trackNameAndDuration = (TextView) view.findViewById(R.id.playlist_trackNameAndDuration);
-    //viewHolder.trackArtistAndAlbum = (TextView) view.findViewById(R.id.playlist_trackArtistAndAlbum);
     //set the viewHolder's views
     public void setViewHolder(View view, ViewHolder viewHolder, int checkboxID, int textView1ID, int textView2ID){
         viewHolder.checkbox = (CheckBox) view.findViewById(checkboxID);
@@ -80,20 +83,8 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
         viewHolder.textView2 = (TextView) view.findViewById(textView2ID);
     }
 
-    /*
-    //get the name, duration, artist and album info from the track data
-    //and update the viewHolder's views
-    String trackNameAndDuration = trackData.get(position).getTrackNameAndDuration();
-    String trackArtistAndAlbum = trackData.get(position).getTrackArtistAndAlbum();
-    holder.trackNameAndDuration.setText(trackNameAndDuration);
-    holder.trackArtistAndAlbum.setText(trackArtistAndAlbum);
-    //holder.checkbox.setChecked(playlistTrackData.get(position).isSelected());
-    holder.checkbox.setChecked(listOfCheckboxes.get(position, false));
-    */
     //update the viewHolder's views
     public abstract void updateViewHolder(ViewHolder viewHolder, int position);
-
-    public abstract void changeActionMode();
 
     //called on every scroll, returns the individual view for each track
     //so views are reused if possible - convertView holds the reusedView if it exists
@@ -135,7 +126,7 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
                     //calls the action bar, and
                     //if no checkboxes are ticked, close the action bar
                     //if they are, set the title to be how many are ticked
-                    changeActionMode();
+                    mCallback.callActionBar();
                 }
             });
         }

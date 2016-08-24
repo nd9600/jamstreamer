@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.view.ActionMode;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -22,6 +21,7 @@ import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.ActionBarListActivity;
+import com.leokomarov.jamstreamer.common.CustomListAdapter;
 import com.leokomarov.jamstreamer.common.TrackModel;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.generalUtils;
@@ -30,7 +30,7 @@ import com.leokomarov.jamstreamer.utils.tracklistUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PlaylistActivity extends ActionBarListActivity implements PlaylistAdapter.CallbackInterface {
+public class PlaylistActivity extends ActionBarListActivity implements CustomListAdapter.CallbackInterface {
 
     //playListLV is the overall listview for the activity
 	private ListView playlistLV;
@@ -69,7 +69,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         presenter.setPlaylistTrackData(restoreTracklistFromMemory, tracklist);
 
         //Creates the list adapter to link the LV and data
-        playlistListAdapter = new PlaylistAdapter(this, this, presenter);
+        playlistListAdapter = new PlaylistAdapter(this, presenter);
         setListAdapter(playlistListAdapter);
 
         //Registers that the floating menu will be opened on a long press
@@ -125,15 +125,20 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
     ///*
     //Creates the contextual action bar
 	public void callActionBar(){
-        Log.v("callActionBar", "");
+        if (PlaylistAdapter.tickedCheckboxCounter == 0) {
+            if (mActionMode != null) {
+                mActionMode.finish();
+            }
+
+            return;
+        }
+
         if (getSupportActionBar() == null){
-            Log.v("callActionBar", "Started");
 			mActionMode = startSupportActionMode(mActionModeCallback);
 		} else {
-            Log.v("callActionBar", "Invalidated");
-            //getSupportActionBar().show();
             mActionMode.invalidate();
         }
+        mActionMode.setTitle(PlaylistAdapter.tickedCheckboxCounter + " selected");
 	}
 
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
@@ -141,7 +146,6 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         //called on initial creation
 		@Override
 	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            Log.v("onCreateActionMode", "");
             MenuInflater inflater = getMenuInflater();
             inflater.inflate(R.menu.playlist_contextual_menu, menu);
 	        return true;
@@ -150,7 +154,6 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         //called on initial creation and whenever the actionMode is invalidated
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            Log.v("onPrepareActionMode", "");
 
             String selectAllTitle = "Select all";
             if (! selectAll){ //if selectAll is true, we want the button to say "Select none"
@@ -195,21 +198,14 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
 
                 //if all checkboxes have been unticked, close the action bar
                 //else open the action bar and set the title to however many are unticked
-              	if (PlaylistAdapter.tickedCheckboxCounter == 0){
-              		mode.finish();
-                }
-				else {
-					//callActionBar();
-					mActionMode.setTitle(PlaylistAdapter.tickedCheckboxCounter + " selected");
-                }
+              	callActionBar();
                 playlistListAdapter.notifyDataSetChanged();
                	return true;
 
             //if the button to remove those specific tracks from the playlist is pressed
             } else if (itemId == R.id.removePlaylistItem) {
-                Log.v("onActionItemClicked", "removing from the playlist");
 
-                //this method removes the ticked tracks from the tracklists
+                //removes the ticked tracks from the tracklists
                 //and from the LV's data
                 //then the list adapter is told about the change
                 int numberOfTracksDeleted = presenter.removeTracksFromPlaylist(numberOfTracks);
@@ -222,7 +218,6 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
                 } else if(numberOfTracksDeleted >= 2){
                     textInToast = numberOfTracksDeleted + " tracks removed from the playlist";
                 }
-                Log.v("onActionItemClicked", numberOfTracksDeleted + " tracks removed from the playlist");
                 Toast.makeText(getApplicationContext(), textInToast, Toast.LENGTH_LONG).show();
 
                 //clear the checkboxes and close the action bar
@@ -232,7 +227,6 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
                     if (view != null) {
                         CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
                         checkbox.setChecked(false);
-                        Log.v("onActionItemClicked", "unticking checkbox #" + i);
                     }
                 }
 
@@ -268,14 +262,7 @@ public class PlaylistActivity extends ActionBarListActivity implements PlaylistA
         //called when the action mode is closed
 	    @Override
         public void onDestroyActionMode(ActionMode mode) {
-            System.out.println(" ");
-            System.out.println("onDestroyActionMode");
             PlaylistPresenter.selectAllPressed = false;
-            /*
-	    	if (mActionMode != null){
-	    		mActionMode = null;
-	    	}
-	    	*/
         }
 	};
 	

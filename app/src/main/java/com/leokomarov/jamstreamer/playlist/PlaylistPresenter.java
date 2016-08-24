@@ -3,7 +3,6 @@ package com.leokomarov.jamstreamer.playlist;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -53,7 +52,6 @@ public class PlaylistPresenter extends Presenter {
     //If fromMemory, the tracklist will be restored from memory
     public void setPlaylistTrackData(boolean restoreTracklistFromMemory, ArrayList<HashMap<String, String>> trackList) {
         if (restoreTracklistFromMemory) {
-            Log.v("setPlaylistTrackData", "restoring tracklist from memory");
             ArrayList<HashMap<String, String>> restoredTracklist = tracklistUtils.restoreTracklist(trackPreferences);
             if (! restoredTracklist.isEmpty()) {
                 trackList = restoredTracklist;
@@ -98,14 +96,19 @@ public class PlaylistPresenter extends Presenter {
         switch (menuID) {
             case R.id.playlistFloating_selectTrack:
                 selectAllPressed = false;
-                view.callActionBar();
+
+                //un/tick the checkbox, then call the action bar
                 CheckBox checkbox = (CheckBox) viewClicked.findViewById(R.id.playlist_checkBox);
                 boolean isCheckboxTicked = checkbox.isChecked();
                 checkbox.setChecked(! isCheckboxTicked);
-                PlaylistAdapter.tickCheckbox(indexPosition, isCheckboxTicked);
+                PlaylistAdapter.tickCheckbox(indexPosition, ! isCheckboxTicked);
+
+                view.callActionBar();
 
                 return true;
             case R.id.playlistFloating_viewArtist:
+                //put the correct string in the hierarchy,
+                //then start AlbumsByName
                 generalUtils.putHierarchy(context, "playlistFloatingMenuArtist");
                 String artistName = trackList.get(indexPosition).get("trackArtist");
                 Intent artistsIntent = new Intent(context, AlbumsByName.class);
@@ -114,6 +117,8 @@ public class PlaylistPresenter extends Presenter {
                 view.startNewActivity(artistsIntent, 2);
                 return true;
             case R.id.playlistFloating_viewAlbum:
+                //put the correct string in the hierarchy,
+                //then start TracksByName
                 generalUtils.putHierarchy(context, "playlistFloatingMenuAlbum");
                 String albumName = trackList.get(indexPosition).get("trackAlbum");
                 Intent albumsIntent = new Intent(context, TracksByName.class);
@@ -132,8 +137,6 @@ public class PlaylistPresenter extends Presenter {
         ArrayList<HashMap<String, String>> tracklist = tracklistUtils.restoreTracklist(trackPreferences);
         PlaylistPresenter.selectAllPressed = false;
 
-        Log.v("removeFromPlaylist", "");
-
         ArrayList<Integer> tracksToDelete = new ArrayList<>();
         //add every track that is ticked to a list
         for (int i = 0; i < numberOfTracks; i++){
@@ -142,29 +145,13 @@ public class PlaylistPresenter extends Presenter {
             }
         }
 
-        for (HashMap map: tracklist){
-            Log.v("removeFromPlaylist", "tracklist:" + map);
-        }
-        Log.v("removeFromPlaylist", "tracklist size:" + tracklist.size());
-
-        for (int i: tracksToDelete){
-            Log.v("removeFromPlaylist", "tracksToDelete:" + i);
-        }
-        Log.v("removeFromPlaylist", "tracksToDelete size:" + tracksToDelete.size());
-
         //reverse that list then remove the corresponding tracks from the tracklist,
         //save the tracklist and shuffled tracklist,
         //and update the LV's data
         Collections.sort(tracksToDelete, Collections.reverseOrder());
         for (int i : tracksToDelete){
             tracklist.remove(i);
-        };
-
-        for (HashMap map: tracklist){
-            Log.v("removeFromPlaylist", "tracklist:" + map);
         }
-        Log.v("removeFromPlaylist", "tracklist size:" + tracklist.size());
-
 
         setPlaylistTrackData(false, tracklist);
 

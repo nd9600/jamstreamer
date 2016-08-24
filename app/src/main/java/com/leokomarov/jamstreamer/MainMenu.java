@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -33,6 +32,18 @@ public class MainMenu extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_menu);       
         getSupportActionBar();
+
+        //if the app hasn't been ran before, show the toasts
+        // ie FIRSTRUN_PREFERENCE doesn't contain "firstrun" or "firstrun" == true
+        if (! getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE).contains("firstrun")
+                || getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE).getBoolean("firstrun", true)) {
+            Toast.makeText(getApplicationContext(),"Long-press on an album or track for options", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),"I'd appreciate it if you rate this app. Thanks!", Toast.LENGTH_LONG).show();
+            SharedPreferences firstrunPreference = getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE);
+            SharedPreferences.Editor firstrunEditor = firstrunPreference.edit();
+            firstrunEditor.putBoolean("firstrun", false);
+            firstrunEditor.apply();
+        }
 
         button_playlist = (ImageButton) findViewById(R.id.mainMenu_btnPlaylist);
         textView_artists = (TextView) findViewById(R.id.mainMenu_artists);
@@ -85,18 +96,6 @@ public class MainMenu extends AppCompatActivity {
     			startActivityForResult(topTracksWeekIntent, 2);	
     		}
     	});
-
-    	//if the app hasn't been ran before, show the toasts
-		// ie FIRSTRUN_PREFERENCE doesn't contain "firstrun" or "firstrun" == true
-        if (! getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE).contains("firstrun") 
-				|| getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE).getBoolean("firstrun", true)) {
-        	Toast.makeText(getApplicationContext(),"Long-press on an album or track for options", Toast.LENGTH_LONG).show();
-        	Toast.makeText(getApplicationContext(),"I'd appreciate it if you rate this app. Thanks!", Toast.LENGTH_LONG).show();
-        	SharedPreferences firstrunPreference = getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE);
-            Editor firstrunEditor = firstrunPreference.edit();
-            firstrunEditor.putBoolean("firstrun", false);
-            firstrunEditor.apply();
-		}   
 	}
 
     //Resets the checkboxes once you've left the playlist or top tracks activities
