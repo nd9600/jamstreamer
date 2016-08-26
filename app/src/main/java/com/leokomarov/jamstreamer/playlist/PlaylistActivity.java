@@ -67,9 +67,9 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
         //Initialises the LV and sets the playlist data using the tracklist stored in memory
         //either from the savedInstanceState or trackPreferences
         playlistLV = getListView();
-        presenter.setPlaylistTrackData(restoreTracklistFromMemory, tracklist);
+        presenter.setListData(restoreTracklistFromMemory, tracklist);
 
-        //Creates the list adarent, view, position, idapter to link the LV and data
+        //Creates the list adapter to link the LV and data
         playlistListAdapter = new PlaylistAdapter(this, presenter);
         setListAdapter(playlistListAdapter);
 
@@ -82,7 +82,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
         playlistLV.addHeaderView(header, null, false);
 
         //Initial checkbox setup - the action mode's title is initially "Select all"
-        PlaylistPresenter.selectAllPressed = false;
+        presenter.selectAllPressed = false;
         selectAll = true;
         generalUtils.clearCheckboxes(2);
 
@@ -99,6 +99,9 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
 
     //Called by the presenter to start new activities
     public void startNewActivity(Intent intent, int requestCode){
+        generalUtils.clearCheckboxes(1);
+        generalUtils.clearCheckboxes(2);
+        generalUtils.clearCheckboxes(3);
         startActivityForResult(intent, requestCode);
     }
 
@@ -155,9 +158,8 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
         //called on initial creation and whenever the actionMode is invalidated
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-
             String selectAllTitle = "Select all";
-            if (! selectAll){ //if selectAll is true, we want the button to say "Select none"
+            if (! selectAll){ //if selectAll is false, we want the button to say "Select none"
                 selectAllTitle = "Select none";
             }
             menu.findItem(R.id.playlistSelectAllTracks).setTitle(selectAllTitle);
@@ -167,7 +169,6 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
         //called when a button is clicked
 	    @Override
 	    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-
             int itemId = item.getItemId();
             int numberOfTracks = playlistLV.getCount();
 
@@ -238,7 +239,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
             //if the "delete entire playlist" button is pressed
 			} else if (itemId == R.id.deletePlaylist) {
                 //clear and save the tracklist and shuffled tracklist
-                PlaylistPresenter.selectAllPressed = false;
+                presenter.selectAllPressed = false;
 				presenter.deletePlaylist();
                 playlistListAdapter.notifyDataSetChanged();
 
@@ -263,7 +264,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
         //called when the action mode is closed
 	    @Override
         public void onDestroyActionMode(ActionMode mode) {
-            PlaylistPresenter.selectAllPressed = false;
+            presenter.selectAllPressed = false;
         }
 	};
 	

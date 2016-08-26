@@ -42,20 +42,10 @@ public class TracksByName extends ActionBarListActivity implements CustomListAda
         setContentView(R.layout.original_empty_list);
 
         presenter = new TracksByNamePresenter(this, this, new ListInteractor());
-
-        selectAll = false;
+        selectAll = true;
 		
 		Intent intent = getIntent();
         presenter.populateList(intent);
-
-        button_playlist = (ImageButton) findViewById(R.id.tracks_by_name_btnPlaylist);
-        button_playlist.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent button_playlistIntent = new Intent(getApplicationContext(), PlaylistActivity.class);
-                startNewActivity(button_playlistIntent, 1);
-            }
-        });
 	}
 
     public void setUpListview(){
@@ -75,10 +65,17 @@ public class TracksByName extends ActionBarListActivity implements CustomListAda
                 presenter.listviewOnClick(position);
             }
         });
+
+        button_playlist = (ImageButton) findViewById(R.id.tracks_by_name_btnPlaylist);
+        button_playlist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent button_playlistIntent = new Intent(getApplicationContext(), PlaylistActivity.class);
+                startNewActivity(button_playlistIntent, 1);
+            }
+        });
     }
 
-    //public void makeToast();
-	
 	@Override
     public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, view, menuInfo);
@@ -95,7 +92,6 @@ public class TracksByName extends ActionBarListActivity implements CustomListAda
             if (mActionMode != null) {
                 mActionMode.finish();
             }
-
             return;
         }
 
@@ -110,20 +106,18 @@ public class TracksByName extends ActionBarListActivity implements CustomListAda
 	private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
 		@Override 
 	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.tracks_contextual_menu, menu);
 	       	return true;
 	    }
 	    
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-			menu.clear();
-			MenuInflater inflater = getMenuInflater();
-        	inflater.inflate(R.menu.tracks_contextual_menu, menu);
-        	if (! selectAll){
-	        	menu.findItem(R.id.tracksSelectAllTracks).setTitle("Select all");
-	        }
-	        else {
-	        	menu.findItem(R.id.tracksSelectAllTracks).setTitle("Select none");
-	        }	
+            String selectAllTitle = "Select all";
+            if (! selectAll){ //if selectAll is fa;se, we want the button to say "Select none"
+                selectAllTitle = "Select none";
+            }
+            menu.findItem(R.id.tracksSelectAllTracks).setTitle(selectAllTitle);
 			return true;
 		}
 
@@ -172,15 +166,15 @@ public class TracksByName extends ActionBarListActivity implements CustomListAda
 
 	    @Override
         public void onDestroyActionMode(ActionMode mode) {
-	    	if (mActionMode != null){
-	    		mActionMode = null;
-	    		//mode = null;
-	    	}
+	    	presenter.selectAllPressed = false;
         }
 	};
 
     //Called by the presenter to start new activities
     public void startNewActivity(Intent intent, int requestCode){
+        generalUtils.clearCheckboxes(1);
+        generalUtils.clearCheckboxes(2);
+        generalUtils.clearCheckboxes(3);
         startActivityForResult(intent, requestCode);
     }
 

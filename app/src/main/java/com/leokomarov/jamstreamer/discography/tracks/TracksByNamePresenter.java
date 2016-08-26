@@ -31,11 +31,11 @@ import java.util.List;
 import java.util.Locale;
 
 public class TracksByNamePresenter extends Presenter implements JSONParser.CallbackInterface {
-
     private Context context;
     private TracksByName activity;
     private ListInteractor interactor;
     private ComplexPreferences trackPreferences;
+    public boolean selectAllPressed;
 
     private JSONArray results;
     private ArrayList<HashMap<String, String>> trackList = new ArrayList<>();
@@ -47,6 +47,12 @@ public class TracksByNamePresenter extends Presenter implements JSONParser.Callb
         this.interactor = listInteractor;
         this.trackPreferences = ComplexPreferences.getComplexPreferences(context,
                 context.getString(R.string.trackPreferences), Context.MODE_PRIVATE);
+    }
+
+    //Sets the playlist track data used to generate the listview
+    //If fromMemory, the tracklist will be restored from memory
+    public void setListData(ArrayList<HashMap<String, String>> listData) {
+        interactor.setListData(listData);
     }
 
     public List<TrackModel> getListData(){
@@ -161,6 +167,7 @@ public class TracksByNamePresenter extends Presenter implements JSONParser.Callb
             Toast.makeText(context, "There are no tracks matching this search", Toast.LENGTH_LONG).show();
         }
         else {
+            setListData(trackList);
             activity.setUpListview();
         }
     }
@@ -200,7 +207,7 @@ public class TracksByNamePresenter extends Presenter implements JSONParser.Callb
          indexPositionEditor.putInt("indexPosition", indexPosition);
          indexPositionEditor.apply();
 
-         if(AudioPlayerService.shuffleBoolean){
+         if (AudioPlayerService.shuffleBoolean){
              AudioPlayerService.shuffleBoolean = false;
          }
 

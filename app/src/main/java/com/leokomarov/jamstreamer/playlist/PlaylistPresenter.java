@@ -31,7 +31,7 @@ public class PlaylistPresenter extends Presenter {
     private PlaylistActivity view;
     private ListInteractor interactor;
     private ComplexPreferences trackPreferences;
-    public static boolean selectAllPressed;
+    public boolean selectAllPressed;
 
     public PlaylistPresenter(Context context, PlaylistActivity view, ListInteractor listInteractor){
         this.context = context;
@@ -51,7 +51,7 @@ public class PlaylistPresenter extends Presenter {
 
     //Sets the playlist track data used to generate the listview
     //If fromMemory, the tracklist will be restored from memory
-    public void setPlaylistTrackData(boolean restoreTracklistFromMemory, ArrayList<HashMap<String, String>> trackList) {
+    public void setListData(boolean restoreTracklistFromMemory, ArrayList<HashMap<String, String>> trackList) {
         if (restoreTracklistFromMemory) {
             ArrayList<HashMap<String, String>> restoredTracklist = tracklistUtils.restoreTracklist(trackPreferences);
             if (! restoredTracklist.isEmpty()) {
@@ -112,20 +112,20 @@ public class PlaylistPresenter extends Presenter {
                 //then start AlbumsByName
                 generalUtils.putHierarchy(context, "playlistFloatingMenuArtist");
                 String artistName = trackList.get(indexPosition).get("trackArtist");
-                Intent artistsIntent = new Intent(context, AlbumsByName.class);
-                artistsIntent.putExtra(context.getString(R.string.TAG_ARTIST_NAME), artistName);
+                Intent albumsIntent = new Intent(context, AlbumsByName.class);
+                albumsIntent.putExtra(context.getString(R.string.TAG_ARTIST_NAME), artistName);
 
-                view.startNewActivity(artistsIntent, 2);
+                view.startNewActivity(albumsIntent, 2);
                 return true;
             case R.id.playlistFloating_viewAlbum:
                 //put the correct string in the hierarchy,
                 //then start TracksByName
                 generalUtils.putHierarchy(context, "playlistFloatingMenuAlbum");
                 String albumName = trackList.get(indexPosition).get("trackAlbum");
-                Intent albumsIntent = new Intent(context, TracksByName.class);
-                albumsIntent.putExtra(context.getString(R.string.TAG_ALBUM_NAME), albumName);
+                Intent tracksIntent = new Intent(context, TracksByName.class);
+                tracksIntent.putExtra(context.getString(R.string.TAG_ALBUM_NAME), albumName);
 
-                view.startNewActivity(albumsIntent, 3);
+                view.startNewActivity(tracksIntent, 3);
                 return true;
             default:
                 return false;
@@ -136,7 +136,7 @@ public class PlaylistPresenter extends Presenter {
     //removes the ticked tracks from the playlist
     public int removeTracksFromPlaylist(int numberOfTracks){
         ArrayList<HashMap<String, String>> tracklist = tracklistUtils.restoreTracklist(trackPreferences);
-        PlaylistPresenter.selectAllPressed = false;
+        selectAllPressed = false;
 
         ArrayList<Integer> tracksToDelete = new ArrayList<>();
         //add every track that is ticked to a list
@@ -154,7 +154,7 @@ public class PlaylistPresenter extends Presenter {
             tracklist.remove(i);
         }
 
-        setPlaylistTrackData(false, tracklist);
+        setListData(false, tracklist);
 
         if (! tracklist.isEmpty()){
             new tracklistUtils(view).execute(trackPreferences, "saveAndShuffle", tracklist);
