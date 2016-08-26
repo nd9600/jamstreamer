@@ -4,8 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.discography.AlbumsByNameAdapter;
-import com.leokomarov.jamstreamer.discography.TracksByNameAdapter;
+import com.leokomarov.jamstreamer.discography.albums.AlbumsByNameAdapter;
+import com.leokomarov.jamstreamer.discography.tracks.TracksByNameAdapter;
 import com.leokomarov.jamstreamer.playlist.PlaylistAdapter;
 
 public class generalUtils {

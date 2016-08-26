@@ -14,7 +14,7 @@ import java.util.List;
 public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
 
     public interface CallbackInterface {
-        void callActionBar();
+        void callActionBar(int tickedCheckboxCounter);
     }
 
     //mCallback is the instance of the interface with the callActionBar() method
@@ -126,7 +126,7 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
                     //calls the action bar, and
                     //if no checkboxes are ticked, close the action bar
                     //if they are, set the title to be how many are ticked
-                    mCallback.callActionBar();
+                    mCallback.callActionBar(tickedCheckboxCounter);
                 }
             });
         }

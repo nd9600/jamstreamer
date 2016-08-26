@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.discography;
+package com.leokomarov.jamstreamer.discography.albums;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,6 +20,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.discography.tracks.TracksByName;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
 import com.leokomarov.jamstreamer.searches.ArtistsParser;

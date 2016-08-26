@@ -12,7 +12,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.leokomarov.jamstreamer.discography.TracksByName;
+import com.leokomarov.jamstreamer.discography.tracks.TracksByName;
 import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.searches.AlbumsSearch;

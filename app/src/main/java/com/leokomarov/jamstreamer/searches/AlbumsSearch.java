@@ -10,7 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.discography.AlbumsByName;
+import com.leokomarov.jamstreamer.discography.albums.AlbumsByName;
 import com.leokomarov.jamstreamer.utils.generalUtils;
 
 public class AlbumsSearch extends AppCompatActivity {

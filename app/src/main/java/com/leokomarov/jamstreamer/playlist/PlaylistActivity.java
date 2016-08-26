@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.ActionBarListActivity;
 import com.leokomarov.jamstreamer.common.CustomListAdapter;
+import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.common.TrackModel;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.generalUtils;
@@ -61,14 +62,14 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
         setContentView(R.layout.original_empty_list);
 
         //Initialises the presenter
-        presenter = new PlaylistPresenter(this, this, new PlaylistInteractor());
+        presenter = new PlaylistPresenter(this, this, new ListInteractor());
 
         //Initialises the LV and sets the playlist data using the tracklist stored in memory
         //either from the savedInstanceState or trackPreferences
         playlistLV = getListView();
         presenter.setPlaylistTrackData(restoreTracklistFromMemory, tracklist);
 
-        //Creates the list adapter to link the LV and data
+        //Creates the list adarent, view, position, idapter to link the LV and data
         playlistListAdapter = new PlaylistAdapter(this, presenter);
         setListAdapter(playlistListAdapter);
 
@@ -124,8 +125,8 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
 
     ///*
     //Creates the contextual action bar
-	public void callActionBar(){
-        if (PlaylistAdapter.tickedCheckboxCounter == 0) {
+	public void callActionBar(int tickedCheckboxCounter){
+        if (tickedCheckboxCounter == 0) {
             if (mActionMode != null) {
                 mActionMode.finish();
             }
@@ -138,7 +139,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
 		} else {
             mActionMode.invalidate();
         }
-        mActionMode.setTitle(PlaylistAdapter.tickedCheckboxCounter + " selected");
+        mActionMode.setTitle(tickedCheckboxCounter + " selected");
 	}
 
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback(){
@@ -183,6 +184,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
 
                         //if the select all button is pressed
                         //and the checkbox isn't ticked, tick it
+                        //or vice versa
                         if (selectAll && checkbox.isChecked() == (! selectAll)){
                             checkbox.setChecked(selectAll);
                         }
@@ -190,7 +192,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
               	}
 
                 //set the pressed boolean
-                PlaylistPresenter.selectAllPressed = true;
+                presenter.selectAllPressed = true;
 
                 //since we want the button to change,
                 //set selectAll to the opposite value
@@ -198,8 +200,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
 
                 //if all checkboxes have been unticked, close the action bar
                 //else open the action bar and set the title to however many are unticked
-              	callActionBar();
-                playlistListAdapter.notifyDataSetChanged();
+              	callActionBar(PlaylistAdapter.tickedCheckboxCounter);
                	return true;
 
             //if the button to remove those specific tracks from the playlist is pressed

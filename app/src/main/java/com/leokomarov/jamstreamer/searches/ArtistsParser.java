@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.discography.AlbumsByName;
+import com.leokomarov.jamstreamer.discography.albums.AlbumsByName;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.common.ActionBarListActivity;
 import com.leokomarov.jamstreamer.utils.JSONParser;

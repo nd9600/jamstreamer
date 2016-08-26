@@ -9,10 +9,11 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.common.Presenter;
 import com.leokomarov.jamstreamer.common.TrackModel;
-import com.leokomarov.jamstreamer.discography.AlbumsByName;
-import com.leokomarov.jamstreamer.discography.TracksByName;
+import com.leokomarov.jamstreamer.discography.albums.AlbumsByName;
+import com.leokomarov.jamstreamer.discography.tracks.TracksByName;
 import com.leokomarov.jamstreamer.media_player.AudioPlayer;
 import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
@@ -28,24 +29,24 @@ public class PlaylistPresenter extends Presenter {
 
     private Context context;
     private PlaylistActivity view;
-    private PlaylistInteractor interactor;
+    private ListInteractor interactor;
     private ComplexPreferences trackPreferences;
     public static boolean selectAllPressed;
 
-    public PlaylistPresenter(Context context, PlaylistActivity view, PlaylistInteractor playlistInteractor){
+    public PlaylistPresenter(Context context, PlaylistActivity view, ListInteractor listInteractor){
         this.context = context;
         this.view = view;
-        this.interactor = playlistInteractor;
+        this.interactor = listInteractor;
         this.trackPreferences = ComplexPreferences.getComplexPreferences(context,
                 context.getString(R.string.trackPreferences), Context.MODE_PRIVATE);
     }
 
-    public List<TrackModel> getPlaylistTrackData(){
-        return interactor.getPlaylistTrackData();
+    public List<TrackModel> getListData(){
+        return interactor.getListData();
     }
 
-    public void clearPlaylistTrackData(){
-        interactor.clearPlaylistTrackData();
+    public void clearListData(){
+        interactor.listData();
     }
 
     //Sets the playlist track data used to generate the listview
@@ -57,11 +58,11 @@ public class PlaylistPresenter extends Presenter {
                 trackList = restoredTracklist;
             }
         }
-        interactor.setPlaylistTrackData(trackList);
+        interactor.setListData(trackList);
     }
 
     public void deletePlaylist(){
-        clearPlaylistTrackData();
+        clearListData();
 
         new tracklistUtils(view).execute(trackPreferences, "saveAndShuffle", new ArrayList<HashMap<String, String>>());
     }
@@ -103,7 +104,7 @@ public class PlaylistPresenter extends Presenter {
                 checkbox.setChecked(! isCheckboxTicked);
                 PlaylistAdapter.tickCheckbox(indexPosition, ! isCheckboxTicked);
 
-                view.callActionBar();
+                view.callActionBar(PlaylistAdapter.tickedCheckboxCounter);
 
                 return true;
             case R.id.playlistFloating_viewArtist:
