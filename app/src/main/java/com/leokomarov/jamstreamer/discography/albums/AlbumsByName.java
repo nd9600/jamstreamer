@@ -21,7 +21,7 @@ import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.ActionBarListActivity;
-import com.leokomarov.jamstreamer.discography.tracks.TracksByName;
+import com.leokomarov.jamstreamer.discography.tracks.TracksActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
 import com.leokomarov.jamstreamer.searches.ArtistsParser;
@@ -171,7 +171,7 @@ public class AlbumsByName extends ActionBarListActivity implements JSONParser.Ca
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 					putHierarchy("albums");
 					String albumID = albumList.get(position - 1).get("albumID");
-					Intent intent = new Intent(getApplicationContext(), TracksByName.class);
+					Intent intent = new Intent(getApplicationContext(), TracksActivity.class);
 					intent.putExtra(getString(R.string.TAG_ALBUM_ID), albumID);
 					startActivityForResult(intent, 2);
 				}

@@ -12,7 +12,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.leokomarov.jamstreamer.discography.tracks.TracksByName;
+import com.leokomarov.jamstreamer.discography.tracks.TracksActivity;
 import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.searches.AlbumsSearch;
@@ -92,7 +92,7 @@ public class MainMenu extends AppCompatActivity {
     		@Override
             public void onClick(View v) {
                 generalUtils.putHierarchy(MainMenu.this, "topTracksPerWeek");
-    			Intent topTracksWeekIntent = new Intent(getApplicationContext(), TracksByName.class);
+    			Intent topTracksWeekIntent = new Intent(getApplicationContext(), TracksActivity.class);
     			startActivityForResult(topTracksWeekIntent, 2);	
     		}
     	});

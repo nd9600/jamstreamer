@@ -10,7 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.discography.tracks.TracksByName;
+import com.leokomarov.jamstreamer.discography.tracks.TracksActivity;
 
 public class TracksSearch extends AppCompatActivity {
 	public static final String TAG_TRACK_NAME = "name";
@@ -23,7 +23,7 @@ public class TracksSearch extends AppCompatActivity {
         
         findViewById(R.id.tracksSearchButton).setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-            	Intent intent = new Intent(getApplicationContext(), TracksByName.class);
+            	Intent intent = new Intent(getApplicationContext(), TracksActivity.class);
                 EditText editText = (EditText) findViewById(R.id.tracksByNameField);
                 String trackName = editText.getText().toString();
                 if (trackName.length() >= 2){

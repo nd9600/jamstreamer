@@ -1,7 +1,5 @@
 package com.leokomarov.jamstreamer.discography.tracks;
 
-import android.util.SparseBooleanArray;
-
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.CustomListAdapter;
 import com.leokomarov.jamstreamer.common.TrackModel;
@@ -10,16 +8,12 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class TracksByNameAdapter extends CustomListAdapter {
+public class TracksListAdapter extends CustomListAdapter {
     private final List<TrackModel> listData;
-    public SparseBooleanArray listOfCheckboxes;
-    public int tickedCheckboxCounter;
 
-    protected TracksByNameAdapter(TracksByName tracksActivity, TracksByNamePresenter presenter) {
-        super(tracksActivity, tracksActivity, presenter, presenter.getListData(), R.layout.tracks_by_name, R.id.tracks_by_name_checkBox, R.id.tracks_by_name_trackNameAndDuration, R.id.tracks_by_name_trackArtistAndAlbum);
+    protected TracksListAdapter(TracksActivity tracksActivity, TracksByNamePresenter presenter) {
+        super(tracksActivity, tracksActivity, presenter.getListData(), R.layout.tracks_by_name, R.id.tracks_by_name_checkBox, R.id.tracks_by_name_trackNameAndDuration, R.id.tracks_by_name_trackArtistAndAlbum);
         this.listData = presenter.getListData();
-        this.listOfCheckboxes = super.listOfCheckboxes;
-        this.tickedCheckboxCounter = super.tickedCheckboxCounter;
     }
 
     //update the viewHolder for a track

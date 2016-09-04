@@ -3,6 +3,7 @@ package com.leokomarov.jamstreamer.discography.tracks;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -11,7 +12,6 @@ import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.ListInteractor;
-import com.leokomarov.jamstreamer.common.Presenter;
 import com.leokomarov.jamstreamer.common.TrackModel;
 import com.leokomarov.jamstreamer.discography.albums.AlbumsByName;
 import com.leokomarov.jamstreamer.media_player.AudioPlayer;
@@ -30,18 +30,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class TracksByNamePresenter extends Presenter implements JSONParser.CallbackInterface {
+public class TracksByNamePresenter implements JSONParser.CallbackInterface {
     private Context context;
-    private TracksByName activity;
+    private TracksActivity activity;
     private ListInteractor interactor;
     private ComplexPreferences trackPreferences;
-    public boolean selectAllPressed;
 
     private JSONArray results;
     private ArrayList<HashMap<String, String>> trackList = new ArrayList<>();
     private ArrayList<HashMap<String, String>> albumIDList = new ArrayList<>();
 
-    public TracksByNamePresenter(Context context, TracksByName activity, ListInteractor listInteractor){
+    public TracksByNamePresenter(Context context, TracksActivity activity, ListInteractor listInteractor){
         this.context = context;
         this.activity = activity;
         this.interactor = listInteractor;
@@ -49,7 +48,7 @@ public class TracksByNamePresenter extends Presenter implements JSONParser.Callb
                 context.getString(R.string.trackPreferences), Context.MODE_PRIVATE);
     }
 
-    //Sets the playlist track data used to generate the listview
+    //Sets the track data used to generate the listview
     //If fromMemory, the tracklist will be restored from memory
     public void setListData(ArrayList<HashMap<String, String>> listData) {
         interactor.setListData(listData);
@@ -157,7 +156,7 @@ public class TracksByNamePresenter extends Presenter implements JSONParser.Callb
                     break;
             }
         } catch (Exception e) {
-            System.out.println("Exception:" + e.getMessage());
+            Log.e("TracksPresenter", "Exception: " + e.getMessage());
         }
 
         if (json == null || json.isNull("results")) {
@@ -223,7 +222,7 @@ public class TracksByNamePresenter extends Presenter implements JSONParser.Callb
 
         int menuID = item.getItemId();
         if (menuID == R.id.tracksFloating_selectTrack){
-            selectAllPressed = false;
+            activity.listAdapter.selectAllPressed = false;
             CheckBox checkbox = (CheckBox) viewClicked.findViewById(R.id.tracks_by_name_checkBox);
             checkbox.setChecked(! checkbox.isChecked());
             return true;
@@ -238,7 +237,7 @@ public class TracksByNamePresenter extends Presenter implements JSONParser.Callb
         } else if (menuID == R.id.tracksFloating_viewAlbum) {
             generalUtils.putHierarchy(context, "tracksFloatingMenuAlbum");
             String albumID = albumIDList.get(indexPosition).get("albumID");
-            Intent albumsIntent = new Intent(context, TracksByName.class);
+            Intent albumsIntent = new Intent(context, TracksActivity.class);
             albumsIntent.putExtra(context.getString(R.string.TAG_ALBUM_ID), albumID);
             activity.startNewActivity(albumsIntent, 3);
             return true;
@@ -248,22 +247,27 @@ public class TracksByNamePresenter extends Presenter implements JSONParser.Callb
     }
 
     public int addTrackToPlaylist(int tracksByNameLVLength){
-        selectAllPressed = false;
+        activity.listAdapter.selectAllPressed = false;
 
         ArrayList<HashMap<String, String>> tracksToAddList = new ArrayList<>();
         for (int i = 0; i < tracksByNameLVLength; i++){
-            if (activity.tracksListAdapter.listOfCheckboxes.get(i, false)) {
+            if (activity.listAdapter.listOfCheckboxes.get(i, false)) {
                 tracksToAddList.add(trackList.get(i));
             }
         }
 
+        //Creates a new tracklist made up of
+        //the old tracklist
         ArrayList<HashMap<String, String>> newTrackList = new ArrayList<>();
         if (trackPreferences.getObject("tracks", PlaylistList.class) != null){
             newTrackList.addAll(trackPreferences.getObject("tracks", PlaylistList.class).trackList);
         }
+
+        //and the selected tracks, then saves it to memory
+        //and returns the size to the listActivity
         newTrackList.addAll(tracksToAddList);
         new tracklistUtils(activity).execute(trackPreferences, "saveAndShuffle", newTrackList);
 
-        return newTrackList.size();
+        return tracksToAddList.size();
     }
 }

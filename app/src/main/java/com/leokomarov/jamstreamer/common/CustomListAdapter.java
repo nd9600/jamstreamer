@@ -27,7 +27,9 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
     //listLayoutID is the ID of the layout used for the LV
     private final int listLayoutID;
 
-    private final Presenter presenter;
+    //selectAll is changed when the selectAll/none button is pressed
+    public boolean selectAll;
+    public boolean selectAllPressed;
 
     //trackData is the data used to generate the listview,
     //made up of individual tracks stored as trackModels
@@ -42,11 +44,10 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
     //tickedCheckboxCounter is the number of checked checkboxes
     public int tickedCheckboxCounter = 0;
 
-    protected CustomListAdapter(CallbackInterface callback, ActionBarListActivity listActivity, Presenter presenter, List<TrackModel> trackData, int listLayoutID, int checkboxID, int textView1ID, int textView2ID) {
+    protected CustomListAdapter(CallbackInterface callback, ActionBarListActivity listActivity, List<TrackModel> trackData, int listLayoutID, int checkboxID, int textView1ID, int textView2ID) {
         super(listActivity, listLayoutID, trackData);
         this.mCallback = callback;
         this.listActivity = listActivity;
-        this.presenter = presenter;
         this.trackData = trackData;
         this.listLayoutID = listLayoutID;
         this.checkboxID = checkboxID;
@@ -65,19 +66,20 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
     //or vice versa
     public void tickCheckbox(int position, boolean tickIt){
         if (listOfCheckboxes.get(position, false) == (! tickIt)){
+            Log.v("tickCheckbox", "Setting #" + position + " to " + tickIt);
             listOfCheckboxes.put(position, tickIt);
             tickedCheckboxCounter += tickIt ? 1 : -1;
         }
-        Log.v("tickCheckbox", "Setting #" + position + " to " + tickIt);
-        Log.v("tickCheckbox", "Setting #" + position + " to " + tickIt);
     }
 
-    //Clears the checkbox list and counter for the relevant adapter
+    //Clears the checkbox list and counter for the adapter
     public void clearCheckboxes(){
-        System.out.println("");
-        System.out.println("Clearing checkboxes");
+        Log.v("clearCheckboxes", "");
+        Log.v("clearCheckboxes", "Clearing checkboxes");
         listOfCheckboxes.clear();
         tickedCheckboxCounter = 0;
+        mCallback.callActionBar(0);
+        notifyDataSetChanged();
     }
 
     //ViewHolder holds the track textviews and checkbox
@@ -102,7 +104,7 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
     @SuppressLint("InflateParams")
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
-        View view;
+        final View view;
 
         //If the reused view exists, return it, don't make a new one
         //and stores the track data in the checkbox's tag field
@@ -131,7 +133,12 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
 
                     //sets selectAllPressed to false
                     //and change the checkbox list and counter
-                    presenter.selectAllPressed = false;
+
+                    Log.v("onClick", "");
+                    Log.v("onClick", String.format("Track: ", position, viewHolder.textView1.getText()));
+                    Log.v("onClick", String.format("Setting %s to %s", position, viewHolder.checkbox.isChecked()));
+
+                    selectAllPressed = false;
                     tickCheckbox(position, viewHolder.checkbox.isChecked());
 
                     //calls the action bar, and

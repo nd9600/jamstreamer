@@ -1,6 +1,7 @@
 package com.leokomarov.jamstreamer.utils;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,7 +29,9 @@ public class JSONParser extends AsyncTask<String, Void, JSONObject>  {
 
 	@Override
     protected JSONObject doInBackground(String... urls) {
-		String urlString = urls[0];  
+		String urlString = urls[0];
+        Log.v("JSONParser", "URL: " + urlString);
+
       try {
 	        URL url = new URL(urlString);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -39,7 +42,7 @@ public class JSONParser extends AsyncTask<String, Void, JSONObject>  {
 	        conn.connect();
 	        is = conn.getInputStream();
 		} catch (Exception e) {
-		  System.out.println("Exception:" + e.getMessage());
+          Log.e("JSONParser", "Exception: " + e.getMessage());
 		}
 		
 		try {
@@ -52,14 +55,14 @@ public class JSONParser extends AsyncTask<String, Void, JSONObject>  {
 			is.close();
 			json = sb.toString();
 		} catch (Exception e) {
-			System.out.println("Exception:" + e.getMessage());
+            Log.e("JSONParser", "Exception: " + e.getMessage());
 		}
 
 		try {
 			jObj = new JSONObject(json);
 		} catch (JSONException e) {
-			System.out.println("Exception:" + e.getMessage());
-		}
+            Log.e("JSONParser", "Exception: " + e.getMessage());
+        }
 		return jObj;
     }
 			   

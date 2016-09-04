@@ -12,7 +12,7 @@ public class PlaylistAdapter extends CustomListAdapter {
     private final List<TrackModel> playlistTrackData;
 
     protected PlaylistAdapter(PlaylistActivity playlistActivity, PlaylistPresenter presenter) {
-		super(playlistActivity, playlistActivity, presenter, presenter.getListData(), R.layout.playlist_by_list_item, R.id.playlist_checkBox, R.id.playlist_trackNameAndDuration, R.id.playlist_trackArtistAndAlbum);
+		super(playlistActivity, playlistActivity, presenter.getListData(), R.layout.playlist_by_list_item, R.id.playlist_checkBox, R.id.playlist_trackNameAndDuration, R.id.playlist_trackArtistAndAlbum);
         this.playlistTrackData = presenter.getListData();
 	}
 

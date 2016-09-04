@@ -23,13 +23,12 @@ import com.leokomarov.jamstreamer.common.CustomListAdapter;
 import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 
-public class TracksByName extends ActionBarListActivity implements CustomListAdapter.CallbackInterface {
+public class TracksActivity extends ActionBarListActivity implements CustomListAdapter.CallbackInterface {
 
 	private ListView tracksLV;
-	protected CustomListAdapter tracksListAdapter;
+	protected CustomListAdapter listAdapter;
     private TracksByNamePresenter presenter;
 	protected static ActionMode mActionMode;
-	protected static boolean selectAll;
 
 	private ImageButton button_playlist;
 
@@ -39,7 +38,6 @@ public class TracksByName extends ActionBarListActivity implements CustomListAda
         setContentView(R.layout.original_empty_list);
 
         presenter = new TracksByNamePresenter(this, this, new ListInteractor());
-        selectAll = true;
 		
 		Intent intent = getIntent();
         presenter.populateList(intent);
@@ -52,8 +50,10 @@ public class TracksByName extends ActionBarListActivity implements CustomListAda
         ViewGroup header = (ViewGroup) inflater.inflate(R.layout.tracks_by_name_header, tracksLV, false);
         tracksLV.addHeaderView(header, null, false);
 
-        tracksListAdapter = new TracksByNameAdapter(this, presenter);
-        setListAdapter(tracksListAdapter);
+        listAdapter = new TracksListAdapter(this, presenter);
+        listAdapter.selectAll = true;
+
+        setListAdapter(listAdapter);
         registerForContextMenu(tracksLV);
 
         tracksLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -111,7 +111,7 @@ public class TracksByName extends ActionBarListActivity implements CustomListAda
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             String selectAllTitle = "Select all";
-            if (! selectAll){ //if selectAll is fa;se, we want the button to say "Select none"
+            if (! listAdapter.selectAll){ //if selectAll is false, we want the button to say "Select none"
                 selectAllTitle = "Select none";
             }
             menu.findItem(R.id.tracksSelectAllTracks).setTitle(selectAllTitle);
@@ -127,24 +127,23 @@ public class TracksByName extends ActionBarListActivity implements CustomListAda
               	for (int i = 1; i < tracksLVLength; i++) {
               		View view = tracksLV.getChildAt(i);
               		int indexPosition = i - 1;
-                    tracksListAdapter.tickCheckbox(indexPosition, selectAll);
+                    listAdapter.tickCheckbox(indexPosition, listAdapter.selectAll);
               		
               		if (view != null) {
               			CheckBox checkbox = (CheckBox) view.findViewById(R.id.tracks_by_name_checkBox);
 
-                        //if the select all button is pressed
-                        //and the checkbox isn't ticked, tick it
+                        //if the checkbox isn't ticked, tick it
                         //or vice versa
-                        if (selectAll && checkbox.isChecked() == (! selectAll)){
-                            checkbox.setChecked(selectAll);
+                        if (checkbox.isChecked() == (! listAdapter.selectAll)){
+                            checkbox.setChecked(listAdapter.selectAll);
                         }
               		}
 
 
               	}
-                presenter.selectAllPressed = true;
-                selectAll = ! selectAll;
-                callActionBar(tracksListAdapter.tickedCheckboxCounter);
+                listAdapter.selectAllPressed = true;
+                listAdapter.selectAll = ! listAdapter.selectAll;
+                callActionBar(listAdapter.tickedCheckboxCounter);
                	return true;
             } else if (itemId == R.id.addTrackToPlaylist) {
                 int numberOfTracksAdded = presenter.addTrackToPlaylist(tracksLVLength);
@@ -163,19 +162,19 @@ public class TracksByName extends ActionBarListActivity implements CustomListAda
 
 	    @Override
         public void onDestroyActionMode(ActionMode mode) {
-	    	presenter.selectAllPressed = false;
+            listAdapter.selectAllPressed = false;
         }
 	};
 
     //Called by the presenter to start new activities
     public void startNewActivity(Intent intent, int requestCode){
-        tracksListAdapter.clearCheckboxes();
+        listAdapter.clearCheckboxes();
         startActivityForResult(intent, requestCode);
     }
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        tracksListAdapter.clearCheckboxes();
+        listAdapter.clearCheckboxes();
     }
 	
 	@Override

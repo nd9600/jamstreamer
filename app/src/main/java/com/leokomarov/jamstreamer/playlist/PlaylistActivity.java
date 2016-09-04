@@ -33,16 +33,14 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
     //playListLV is the overall listview for the activity
 	private ListView playlistLV;
 
-    //playlistListAdapter links the LV with the data
-	protected CustomListAdapter playlistListAdapter;
+    //listAdapter links the LV with the data
+	protected CustomListAdapter listAdapter;
 
     //presenter holds the logic
     private PlaylistPresenter presenter;
 
     //mActionMode is the action bar
-    //selectAll is changed when the selectAll/none button is pressed
 	public static ActionMode mActionMode;
-	protected static boolean selectAll;
 
     @SuppressWarnings("unchecked")
 	@Override
@@ -67,8 +65,8 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
         presenter.setListData(restoreTracklistFromMemory, tracklist);
 
         //Creates the list adapter to link the LV and data
-        playlistListAdapter = new PlaylistAdapter(this, presenter);
-        setListAdapter(playlistListAdapter);
+        listAdapter = new PlaylistAdapter(this, presenter);
+        setListAdapter(listAdapter);
 
         //Registers that the floating menu will be opened on a long press
         registerForContextMenu(playlistLV);
@@ -79,9 +77,9 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
         playlistLV.addHeaderView(header, null, false);
 
         //Initial checkbox setup - the action mode's title is initially "Select all"
-        presenter.selectAllPressed = false;
-        selectAll = true;
-        playlistListAdapter.clearCheckboxes();
+        listAdapter.selectAllPressed = false;
+        listAdapter.selectAll = true;
+        listAdapter.clearCheckboxes();
 
         //Creates the click listeners for the tracks
     	playlistLV.setOnItemClickListener(new OnItemClickListener() {
@@ -96,7 +94,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
 
     //Called by the presenter to start new activities
     public void startNewActivity(Intent intent){
-        playlistListAdapter.clearCheckboxes();
+        listAdapter.clearCheckboxes();
         startActivityForResult(intent, 1);
     }
 
@@ -154,7 +152,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
 		@Override
 		public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             String selectAllTitle = "Select all";
-            if (! selectAll){ //if selectAll is false, we want the button to say "Select none"
+            if (! listAdapter.selectAll){ //if selectAll is false, we want the button to say "Select none"
                 selectAllTitle = "Select none";
             }
             menu.findItem(R.id.playlistSelectAllTracks).setTitle(selectAllTitle);
@@ -170,33 +168,32 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
             //if the selectAll button is pressed
             if (itemId == R.id.playlistSelectAllTracks) {
 
+                //set the pressed boolean
+                listAdapter.selectAllPressed = true;
+
               	for (int i = 1; i < numberOfTracks; i++) {
               		View view = playlistLV.getChildAt(i);
               		int indexPosition = i - 1;
-                    playlistListAdapter.tickCheckbox(indexPosition, selectAll);
+                    listAdapter.tickCheckbox(indexPosition, listAdapter.selectAll);
 
               		if (view != null) {
                         CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
 
-                        //if the select all button is pressed
-                        //and the checkbox isn't ticked, tick it
+                        //if the checkbox isn't ticked, tick it
                         //or vice versa
-                        if (selectAll && checkbox.isChecked() == (! selectAll)){
-                            checkbox.setChecked(selectAll);
+                        if (checkbox.isChecked() == (! listAdapter.selectAll)){
+                            checkbox.setChecked(listAdapter.selectAll);
                         }
               		}
               	}
 
-                //set the pressed boolean
-                presenter.selectAllPressed = true;
-
                 //since we want the button to change,
                 //set selectAll to the opposite value
-                selectAll = ! selectAll;
+                listAdapter.selectAll = ! listAdapter.selectAll;
 
                 //if all checkboxes have been unticked, close the action bar
                 //else open the action bar and set the title to however many are unticked
-              	callActionBar(playlistListAdapter.tickedCheckboxCounter);
+              	callActionBar(listAdapter.tickedCheckboxCounter);
                	return true;
 
             //if the button to remove those specific tracks from the playlist is pressed
@@ -206,7 +203,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
                 //and from the LV's data
                 //then the list adapter is told about the change
                 int numberOfTracksDeleted = presenter.removeTracksFromPlaylist(numberOfTracks);
-                playlistListAdapter.notifyDataSetChanged();
+                listAdapter.notifyDataSetChanged();
 
                 //make the toast telling the user how many tracks were removed
                 String textInToast = "";
@@ -220,7 +217,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
                 //clear the checkboxes and close the action bar
                 for (int i = 1; i < numberOfTracks; i++) {
                     View view = playlistLV.getChildAt(i);
-                    playlistListAdapter.tickCheckbox(i, false);
+                    listAdapter.tickCheckbox(i, false);
                     if (view != null) {
                         CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
                         checkbox.setChecked(false);
@@ -234,9 +231,9 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
             //if the "delete entire playlist" button is pressed
 			} else if (itemId == R.id.deletePlaylist) {
                 //clear and save the tracklist and shuffled tracklist
-                presenter.selectAllPressed = false;
+                listAdapter.selectAllPressed = false;
 				presenter.deletePlaylist();
-                playlistListAdapter.notifyDataSetChanged();
+                listAdapter.notifyDataSetChanged();
 
                 //clear the checkboxes and close the action bar
                 for (int i = 1; i < numberOfTracks; i++) {
@@ -247,7 +244,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
                         ((PlaylistAdapter.ViewHolder) view.getTag()).checkbox.setChecked(false);
                     }
                 }
-                playlistListAdapter.clearCheckboxes();
+                listAdapter.clearCheckboxes();
 
 				mode.finish();
 				return true;
@@ -259,13 +256,13 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
         //called when the action mode is closed
 	    @Override
         public void onDestroyActionMode(ActionMode mode) {
-            presenter.selectAllPressed = false;
+            listAdapter.selectAllPressed = false;
         }
 	};
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        playlistListAdapter.clearCheckboxes();
+        listAdapter.clearCheckboxes();
 	}
 	
 	@Override

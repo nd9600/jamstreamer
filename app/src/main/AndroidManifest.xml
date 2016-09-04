@@ -53,7 +53,7 @@
         
         <activity
             android:label="JamStreamer - Tracks"
-            android:name=".discography.tracks.TracksByName" >
+            android:name=".discography.tracks.TracksActivity" >
         </activity>
         
         <activity

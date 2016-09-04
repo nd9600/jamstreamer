@@ -15,7 +15,7 @@ public class ListInteractor {
     }
 
     //Clears the playlist track data
-    public void listData(){
+    public void clearListData(){
         listData.clear();
     }
 
