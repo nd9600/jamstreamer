@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.discography.tracks;
+package com.leokomarov.jamstreamer.discography.albums;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,7 +15,6 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.ActionBarListActivity;
@@ -23,72 +22,76 @@ import com.leokomarov.jamstreamer.common.CustomListAdapter;
 import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 
-public class TracksActivity extends ActionBarListActivity implements CustomListAdapter.CallbackInterface {
+public class AlbumsActivity extends ActionBarListActivity implements CustomListAdapter.CallbackInterface {
 
-	private ListView tracksLV;
+	private ListView albumsLV;
 	protected CustomListAdapter listAdapter;
-    private TracksByNamePresenter presenter;
+    private AlbumsPresenter presenter;
 	protected static ActionMode mActionMode;
 
 	private ImageButton button_playlist;
 
+    public void setPlaylistButtonClickable(boolean clickable){
+        button_playlist.setClickable(clickable);
+    }
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+        getSupportActionBar();//.setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.original_empty_list);
 
-        presenter = new TracksByNamePresenter(this, this, new ListInteractor());
-		
+        presenter = new AlbumsPresenter(this, this, new ListInteractor());
+
 		Intent intent = getIntent();
         presenter.populateList(intent);
 	}
 
     public void setUpListview(){
-        tracksLV = getListView();
+        albumsLV = getListView();
         LayoutInflater inflater = getLayoutInflater();
+        ViewGroup header = (ViewGroup)inflater.inflate(R.layout.albums_by_name_header, albumsLV, false);
+        albumsLV.addHeaderView(header, null, false);
 
-        ViewGroup header = (ViewGroup) inflater.inflate(R.layout.tracks_by_name_header, tracksLV, false);
-        tracksLV.addHeaderView(header, null, false);
-
-        listAdapter = new TracksAdapter(this, presenter);
-        listAdapter.selectAll = true;
-
+        listAdapter = new AlbumsAdapter(this, presenter);
         setListAdapter(listAdapter);
-        registerForContextMenu(tracksLV);
+        registerForContextMenu(albumsLV);
 
-        tracksLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        button_playlist = (ImageButton) findViewById(R.id.albums_by_name_btnPlaylist);
+        button_playlist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent button_playlistIntent = new Intent(getApplicationContext(), PlaylistActivity.class);
+                startActivityForResult(button_playlistIntent, 1);
+            }
+        });
+
+        albumsLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 presenter.listviewOnClick(position);
             }
         });
-
-        button_playlist = (ImageButton) findViewById(R.id.tracks_by_name_btnPlaylist);
-        button_playlist.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent button_playlistIntent = new Intent(getApplicationContext(), PlaylistActivity.class);
-                startNewActivity(button_playlistIntent, 1);
-            }
-        });
-    }
-
-	@Override
-    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, view, menuInfo);
-        getMenuInflater().inflate(R.menu.tracks_floating_menu , menu);       
     }
 	
 	@Override
-	public boolean onContextItemSelected(MenuItem item) {
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, view, menuInfo);
+        getMenuInflater().inflate(R.menu.albums_floating_menu , menu);
+    }
+	
+	@Override
+	public boolean onContextItemSelected(android.view.MenuItem item) {
         return presenter.onContextItemSelected(item);
     }
 
+    //Creates the contextual action bar
     public void callActionBar(int tickedCheckboxCounter){
         if (tickedCheckboxCounter == 0) {
             if (mActionMode != null) {
                 mActionMode.finish();
             }
+
             return;
         }
 
@@ -104,8 +107,8 @@ public class TracksActivity extends ActionBarListActivity implements CustomListA
 		@Override 
 	    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = getMenuInflater();
-            inflater.inflate(R.menu.tracks_contextual_menu, menu);
-	       	return true;
+            inflater.inflate(R.menu.albums_contextual_menu, menu);
+	        return true;
 	    }
 	    
 		@Override
@@ -114,44 +117,40 @@ public class TracksActivity extends ActionBarListActivity implements CustomListA
             if (! listAdapter.selectAll){ //if selectAll is false, we want the button to say "Select none"
                 selectAllTitle = "Select none";
             }
-            menu.findItem(R.id.tracksSelectAllTracks).setTitle(selectAllTitle);
-			return true;
+            menu.findItem(R.id.albumsSelectAllTracks).setTitle(selectAllTitle);
+            return true;
 		}
 
 		@Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-			int itemId = item.getItemId();
-            int numberOfTracks = tracksLV.getCount();
-
-			if (itemId == R.id.tracksSelectAllTracks) {
-              	for (int i = 1; i < numberOfTracks; i++) {
-              		View view = tracksLV.getChildAt(i);
-              		int indexPosition = i - 1;
+        	int itemId = item.getItemId();
+            int numberOfAlbums = albumsLV.getCount();
+            
+            if (itemId == R.id.tracksSelectAllTracks) {
+                for (int i = 1; i < numberOfAlbums; i++) {
+                    View view = albumsLV.getChildAt(i);
+                    int indexPosition = i - 1;
                     listAdapter.tickCheckbox(indexPosition, listAdapter.selectAll);
-              		
-              		if (view != null) {
-              			CheckBox checkbox = (CheckBox) view.findViewById(R.id.tracks_by_name_checkBox);
+
+                    if (view != null) {
+                        CheckBox checkbox = (CheckBox) view.findViewById(R.id.tracks_by_name_checkBox);
 
                         //if the checkbox isn't ticked, tick it
                         //or vice versa
                         if (checkbox.isChecked() == (! listAdapter.selectAll)){
                             checkbox.setChecked(listAdapter.selectAll);
                         }
-              		}
+                    }
 
-              	}
+                }
                 listAdapter.selectAllPressed = true;
                 listAdapter.selectAll = ! listAdapter.selectAll;
                 callActionBar(listAdapter.tickedCheckboxCounter);
-               	return true;
-            } else if (itemId == R.id.addTrackToPlaylist) {
-                int numberOfTracksAdded = presenter.addTrackToPlaylist(numberOfTracks);
-        		
-				if (numberOfTracksAdded == 1){
-					Toast.makeText(getApplicationContext(), "1 track added to the playlist", Toast.LENGTH_LONG).show();
-				} else if(numberOfTracksAdded >= 2){
-					Toast.makeText(getApplicationContext(), numberOfTracksAdded + " tracks added to the playlist", Toast.LENGTH_LONG).show();
-				}
+                return true;
+            } else if (itemId == R.id.addAlbumToPlaylist) {
+				setPlaylistButtonClickable(false);
+                presenter.addAlbumToPlaylist(numberOfAlbums);
+
 				mActionMode.finish();
 				return true;
 			} else {
@@ -161,7 +160,10 @@ public class TracksActivity extends ActionBarListActivity implements CustomListA
 
 	    @Override
         public void onDestroyActionMode(ActionMode mode) {
-            listAdapter.selectAllPressed = false;
+	    	if (mActionMode != null){
+	    		mActionMode = null;
+	    		//mode = null;
+	    	}
         }
 	};
 
@@ -170,20 +172,22 @@ public class TracksActivity extends ActionBarListActivity implements CustomListA
         listAdapter.clearCheckboxes();
         startActivityForResult(intent, requestCode);
     }
-
+    
+    
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        listAdapter.clearCheckboxes();
+        //Todo: change to customListAdapter
+        //listAdapter.clearCheckboxes(null);
     }
-	
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) { 
-	        int itemId = item.getItemId();
-			if (itemId == android.R.id.home) {
-				onBackPressed();
-				return true;
-			}
-	    return super.onOptionsItemSelected(item);
-	}
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 }

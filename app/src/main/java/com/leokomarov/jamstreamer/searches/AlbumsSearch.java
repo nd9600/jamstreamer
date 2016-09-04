@@ -10,7 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.discography.albums.AlbumsByName;
+import com.leokomarov.jamstreamer.discography.albums.AlbumsActivity;
 
 public class AlbumsSearch extends AppCompatActivity {
 	public static final String TAG_ALBUM_NAME = "name";
@@ -23,7 +23,7 @@ public class AlbumsSearch extends AppCompatActivity {
         
         findViewById(R.id.albumsSearchButton).setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-            	Intent intent = new Intent(getApplicationContext(), AlbumsByName.class);
+            	Intent intent = new Intent(getApplicationContext(), AlbumsActivity.class);
                 EditText editText = (EditText) findViewById(R.id.albumsByNameField);
                 String albumName = editText.getText().toString();
                 if (albumName.length() >= 2){

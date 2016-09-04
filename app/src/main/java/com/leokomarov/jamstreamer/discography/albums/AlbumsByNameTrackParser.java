@@ -2,6 +2,7 @@ package com.leokomarov.jamstreamer.discography.albums;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.json.JSONObject;
 
@@ -52,7 +53,7 @@ public class AlbumsByNameTrackParser extends AsyncTask<String, Void, JSONObject>
             json = sb.toString();
             jObj = new JSONObject(json);
         } catch (Exception e) {
-            System.out.println("Exception:" + e.getMessage());
+            Log.e("AlbumsTrackParser", "Exception: " + e.getMessage());
         }
 
         return jObj;

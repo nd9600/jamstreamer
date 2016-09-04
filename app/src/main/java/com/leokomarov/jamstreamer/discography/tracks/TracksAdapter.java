@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class TracksListAdapter extends CustomListAdapter {
+public class TracksAdapter extends CustomListAdapter {
     private final List<TrackModel> listData;
 
-    protected TracksListAdapter(TracksActivity tracksActivity, TracksByNamePresenter presenter) {
+    protected TracksAdapter(TracksActivity tracksActivity, TracksByNamePresenter presenter) {
         super(tracksActivity, tracksActivity, presenter.getListData(), R.layout.tracks_by_name, R.id.tracks_by_name_checkBox, R.id.tracks_by_name_trackNameAndDuration, R.id.tracks_by_name_trackArtistAndAlbum);
         this.listData = presenter.getListData();
     }

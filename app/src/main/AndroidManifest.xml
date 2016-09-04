@@ -48,7 +48,7 @@
 
         <activity
             android:label="JamStreamer - Albums"
-            android:name=".discography.albums.AlbumsByName" >
+            android:name=".discography.albums.AlbumsActivity" >
         </activity>
         
         <activity

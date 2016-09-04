@@ -13,7 +13,7 @@ import android.widget.Toast;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.common.TrackModel;
-import com.leokomarov.jamstreamer.discography.albums.AlbumsByName;
+import com.leokomarov.jamstreamer.discography.albums.AlbumsActivity;
 import com.leokomarov.jamstreamer.media_player.AudioPlayer;
 import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
@@ -48,8 +48,7 @@ public class TracksByNamePresenter implements JSONParser.CallbackInterface {
                 context.getString(R.string.trackPreferences), Context.MODE_PRIVATE);
     }
 
-    //Sets the track data used to generate the listview
-    //If fromMemory, the tracklist will be restored from memory
+    //Sets the data used to generate the listview
     public void setListData(ArrayList<HashMap<String, String>> listData) {
         interactor.setListData(listData);
     }
@@ -215,6 +214,7 @@ public class TracksByNamePresenter implements JSONParser.CallbackInterface {
          in.putExtra("fromNotification", false);
          activity.startNewActivity(in, 3);
      }
+
     public boolean onContextItemSelected(MenuItem item){
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         View viewClicked = info.targetView;
@@ -230,7 +230,7 @@ public class TracksByNamePresenter implements JSONParser.CallbackInterface {
             generalUtils.putHierarchy(context, "tracksFloatingMenuArtist");
 
             String artistName = trackList.get(indexPosition).get("trackArtist");
-            Intent artistsIntent = new Intent(context.getApplicationContext(), AlbumsByName.class);
+            Intent artistsIntent = new Intent(context.getApplicationContext(), AlbumsActivity.class);
             artistsIntent.putExtra(context.getString(R.string.TAG_ARTIST_NAME), artistName);
             activity.startNewActivity(artistsIntent, 2);
             return true;

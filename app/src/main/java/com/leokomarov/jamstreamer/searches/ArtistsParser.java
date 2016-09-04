@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.discography.albums.AlbumsByName;
+import com.leokomarov.jamstreamer.discography.albums.AlbumsActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.common.ActionBarListActivity;
 import com.leokomarov.jamstreamer.utils.JSONParser;
@@ -105,7 +105,7 @@ public class ArtistsParser extends ActionBarListActivity implements JSONParser.C
                     generalUtils.putHierarchy(ArtistsParser.this, "artists");
                     String artistID = ((TextView) view.findViewById(R.id.artists_list_artists_ids)).getText().toString();
 
-					Intent in = new Intent(ArtistsParser.this, AlbumsByName.class);
+					Intent in = new Intent(ArtistsParser.this, AlbumsActivity.class);
 					in.putExtra(TAG_ARTIST_ID, artistID);
 					startActivityForResult(in, 2);
 				}

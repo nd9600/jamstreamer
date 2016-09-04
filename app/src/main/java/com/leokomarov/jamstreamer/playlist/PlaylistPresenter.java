@@ -11,7 +11,7 @@ import android.widget.CheckBox;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.common.TrackModel;
-import com.leokomarov.jamstreamer.discography.albums.AlbumsByName;
+import com.leokomarov.jamstreamer.discography.albums.AlbumsActivity;
 import com.leokomarov.jamstreamer.discography.tracks.TracksActivity;
 import com.leokomarov.jamstreamer.media_player.AudioPlayer;
 import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
@@ -30,7 +30,6 @@ public class PlaylistPresenter {
     private PlaylistActivity activity;
     private ListInteractor interactor;
     private ComplexPreferences trackPreferences;
-
 
     public PlaylistPresenter(Context context, PlaylistActivity activity, ListInteractor listInteractor){
         this.context = context;
@@ -108,10 +107,10 @@ public class PlaylistPresenter {
                 return true;
             case R.id.playlistFloating_viewArtist:
                 //put the correct string in the hierarchy,
-                //then start AlbumsByName
+                //then start AlbumsActivity
                 generalUtils.putHierarchy(context, "playlistFloatingMenuArtist");
                 String artistName = trackList.get(indexPosition).get("trackArtist");
-                Intent albumsIntent = new Intent(context, AlbumsByName.class);
+                Intent albumsIntent = new Intent(context, AlbumsActivity.class);
                 albumsIntent.putExtra(context.getString(R.string.TAG_ARTIST_NAME), artistName);
 
                 activity.startNewActivity(albumsIntent);

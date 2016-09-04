@@ -14,7 +14,7 @@
     <string name="TAG_ALBUM_NAME_FOR_GSON">album_name</string>
     <string name="TAG_ALBUM_NAME">name</string>
     <string name="TAG_RESULTS">results</string>
-    <string name="TAG_ALBUM_ID">album_id</string>
+    <string name="TAG_ALBUM_ID">id</string>
     <string name="TAG_TRACK_ID">id</string>
     <string name="TAG_TRACK_NAME">name</string>
     <string name="TAG_TRACK_DURATION">duration</string>
