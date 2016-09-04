@@ -1,6 +1,5 @@
 package com.leokomarov.jamstreamer.common;
 
-import android.annotation.SuppressLint;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
@@ -10,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import java.util.HashMap;
 import java.util.List;
 
 public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
@@ -44,6 +44,9 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
     //tickedCheckboxCounter is the number of checked checkboxes
     public int tickedCheckboxCounter = 0;
 
+    //maps the hashcodes of track models to their indexes
+    protected HashMap<Integer, Integer> hashcodeToPosition = new HashMap<>();
+
     protected CustomListAdapter(CallbackInterface callback, ActionBarListActivity listActivity, List<TrackModel> trackData, int listLayoutID, int checkboxID, int textView1ID, int textView2ID) {
         super(listActivity, listLayoutID, trackData);
         this.mCallback = callback;
@@ -53,11 +56,20 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
         this.checkboxID = checkboxID;
         this.textView1ID = textView1ID;
         this.textView2ID = textView2ID;
+        updateHashcodeMap();
+
     }
 
     //returns the number of rows to display
     public int getCount() {
         return trackData.size();
+    }
+
+    public void updateHashcodeMap(){
+        hashcodeToPosition.clear();
+        for (int i = 0; i < trackData.size(); i++){
+            hashcodeToPosition.put(trackData.get(i).getMap().hashCode(), i);
+        }
     }
 
     //if the checkbox isn't ticked in the list,
@@ -66,7 +78,6 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
     //or vice versa
     public void tickCheckbox(int position, boolean tickIt){
         if (listOfCheckboxes.get(position, false) == (! tickIt)){
-            Log.v("tickCheckbox", "Setting #" + position + " to " + tickIt);
             listOfCheckboxes.put(position, tickIt);
             tickedCheckboxCounter += tickIt ? 1 : -1;
         }
@@ -74,8 +85,6 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
 
     //Clears the checkbox list and counter for the adapter
     public void clearCheckboxes(){
-        Log.v("clearCheckboxes", "");
-        Log.v("clearCheckboxes", "Clearing checkboxes");
         listOfCheckboxes.clear();
         tickedCheckboxCounter = 0;
         mCallback.callActionBar(0);
@@ -101,16 +110,19 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
 
     //called on every scroll, returns the individual view for each track
     //so views are reused if possible - convertView holds the reusedView if it exists
-    @SuppressLint("InflateParams")
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         final View view;
 
         //If the reused view exists, return it, don't make a new one
-        //and stores the track data in the checkbox's tag field
+        //and store the track data in the checkbox's tag field
         if (convertView != null) {
             view = convertView;
-            ((ViewHolder) view.getTag()).checkbox.setTag(trackData.get(position));
+
+            //get the viewHolder for this view and update its views with information from the listData
+            ViewHolder viewHolder = (ViewHolder) view.getTag();
+            viewHolder.checkbox.setTag(trackData.get(position));
+            updateViewHolder(viewHolder, position);
 
             //if it doesn't exist, inflate a new one
         } else {
@@ -121,10 +133,14 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
             final ViewHolder viewHolder = new ViewHolder();
             setViewHolder(view, viewHolder, checkboxID, textView1ID, textView2ID);
 
-            //set the tag field of the view for this track to be the viewHolder
-            //and set the checkbox's tag field to be the track data
-            view.setTag(viewHolder);
+            //set the checkbox's tag field to be the track data
             viewHolder.checkbox.setTag(trackData.get(position));
+
+            //set the tag field of the view for this track to be the viewHolder
+            view.setTag(viewHolder);
+
+            //use the viewHolder for this view and update its views with information from the listData
+            updateViewHolder(viewHolder, position);
 
             //creates the click listener for the checkbox
             viewHolder.checkbox.setOnClickListener(new View.OnClickListener() {
@@ -133,13 +149,14 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
 
                     //sets selectAllPressed to false
                     //and change the checkbox list and counter
+                    //using the view data - indexPosition in data map
 
-                    Log.v("onClick", "");
-                    Log.v("onClick", String.format("Track: ", position, viewHolder.textView1.getText()));
-                    Log.v("onClick", String.format("Setting %s to %s", position, viewHolder.checkbox.isChecked()));
+                    TrackModel trackModel = ((TrackModel) viewHolder.checkbox.getTag());
+                    int trackModelHashcode = trackModel.getMap().hashCode();
+                    int indexPosition = hashcodeToPosition.get(trackModelHashcode);
 
                     selectAllPressed = false;
-                    tickCheckbox(position, viewHolder.checkbox.isChecked());
+                    tickCheckbox(indexPosition, viewHolder.checkbox.isChecked());
 
                     //calls the action bar, and
                     //if no checkboxes are ticked, close the action bar
@@ -153,22 +170,18 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
         /*
         //if the select all button is pressed, and the checkbox isn't ticked, tick it
         //else if select all isn't pressed and it is ticked, untick it
-		if (PlaylistPresenter.selectAllPressed){
+		if (selectAllPressed){
             System.out.println("selectAllPressed");
-            if (PlaylistActivity.selectAll && ! holder.checkbox.isChecked()){
+            if (selectAll && ! holder.checkbox.isChecked()){
                 System.out.println("setting checkbox to checked");
 				holder.checkbox.setChecked(true);
 			}
-			else if (! PlaylistActivity.selectAll && holder.checkbox.isChecked()){
+			else if (! selectAll && holder.checkbox.isChecked()){
                 System.out.println("setting checkbox to unchecked");
 				holder.checkbox.setChecked(false);
 			}
 		}
 		*/
-
-        //get the viewHolder for this view and update it's views with information from the listData
-        ViewHolder viewHolder = (ViewHolder) view.getTag();
-        updateViewHolder(viewHolder, position);
 
         return view;
     }

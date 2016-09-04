@@ -139,7 +139,6 @@ public class TracksActivity extends ActionBarListActivity implements CustomListA
                         }
               		}
 
-
               	}
                 listAdapter.selectAllPressed = true;
                 listAdapter.selectAll = ! listAdapter.selectAll;

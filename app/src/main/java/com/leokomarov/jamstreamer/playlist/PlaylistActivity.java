@@ -202,7 +202,9 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
                 //removes the ticked tracks from the tracklists
                 //and from the LV's data
                 //then the list adapter is told about the change
+                //and updates its map of hashcodes - indexPositions
                 int numberOfTracksDeleted = presenter.removeTracksFromPlaylist(numberOfTracks);
+                listAdapter.updateHashcodeMap();
                 listAdapter.notifyDataSetChanged();
 
                 //make the toast telling the user how many tracks were removed

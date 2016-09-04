@@ -264,7 +264,7 @@ public class TracksByNamePresenter implements JSONParser.CallbackInterface {
         }
 
         //and the selected tracks, then saves it to memory
-        //and returns the size to the listActivity
+        //and returns the size to the act
         newTrackList.addAll(tracksToAddList);
         new tracklistUtils(activity).execute(trackPreferences, "saveAndShuffle", newTrackList);
 
