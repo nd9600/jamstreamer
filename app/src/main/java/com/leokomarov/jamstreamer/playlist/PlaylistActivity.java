@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -23,9 +22,7 @@ import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.ActionBarListActivity;
 import com.leokomarov.jamstreamer.common.CustomListAdapter;
 import com.leokomarov.jamstreamer.common.ListInteractor;
-import com.leokomarov.jamstreamer.common.TrackModel;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
-import com.leokomarov.jamstreamer.utils.generalUtils;
 import com.leokomarov.jamstreamer.utils.tracklistUtils;
 
 import java.util.ArrayList;
@@ -37,7 +34,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
 	private ListView playlistLV;
 
     //playlistListAdapter links the LV with the data
-	private ArrayAdapter<TrackModel> playlistListAdapter;
+	protected CustomListAdapter playlistListAdapter;
 
     //presenter holds the logic
     private PlaylistPresenter presenter;
@@ -84,7 +81,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
         //Initial checkbox setup - the action mode's title is initially "Select all"
         presenter.selectAllPressed = false;
         selectAll = true;
-        generalUtils.clearCheckboxes(2);
+        playlistListAdapter.clearCheckboxes();
 
         //Creates the click listeners for the tracks
     	playlistLV.setOnItemClickListener(new OnItemClickListener() {
@@ -98,11 +95,9 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
     }
 
     //Called by the presenter to start new activities
-    public void startNewActivity(Intent intent, int requestCode){
-        generalUtils.clearCheckboxes(1);
-        generalUtils.clearCheckboxes(2);
-        generalUtils.clearCheckboxes(3);
-        startActivityForResult(intent, requestCode);
+    public void startNewActivity(Intent intent){
+        playlistListAdapter.clearCheckboxes();
+        startActivityForResult(intent, 1);
     }
 
     //
@@ -178,7 +173,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
               	for (int i = 1; i < numberOfTracks; i++) {
               		View view = playlistLV.getChildAt(i);
               		int indexPosition = i - 1;
-                    PlaylistAdapter.tickCheckbox(indexPosition, selectAll);
+                    playlistListAdapter.tickCheckbox(indexPosition, selectAll);
 
               		if (view != null) {
                         CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
@@ -201,7 +196,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
 
                 //if all checkboxes have been unticked, close the action bar
                 //else open the action bar and set the title to however many are unticked
-              	callActionBar(PlaylistAdapter.tickedCheckboxCounter);
+              	callActionBar(playlistListAdapter.tickedCheckboxCounter);
                	return true;
 
             //if the button to remove those specific tracks from the playlist is pressed
@@ -225,7 +220,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
                 //clear the checkboxes and close the action bar
                 for (int i = 1; i < numberOfTracks; i++) {
                     View view = playlistLV.getChildAt(i);
-                    PlaylistAdapter.tickCheckbox(i, false);
+                    playlistListAdapter.tickCheckbox(i, false);
                     if (view != null) {
                         CheckBox checkbox = (CheckBox) view.findViewById(R.id.playlist_checkBox);
                         checkbox.setChecked(false);
@@ -252,7 +247,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
                         ((PlaylistAdapter.ViewHolder) view.getTag()).checkbox.setChecked(false);
                     }
                 }
-				generalUtils.clearCheckboxes(2);
+                playlistListAdapter.clearCheckboxes();
 
 				mode.finish();
 				return true;
@@ -270,7 +265,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        generalUtils.clearCheckboxes(requestCode);
+        playlistListAdapter.clearCheckboxes();
 	}
 	
 	@Override

@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -22,14 +21,12 @@ import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.ActionBarListActivity;
 import com.leokomarov.jamstreamer.common.CustomListAdapter;
 import com.leokomarov.jamstreamer.common.ListInteractor;
-import com.leokomarov.jamstreamer.common.TrackModel;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
-import com.leokomarov.jamstreamer.utils.generalUtils;
 
 public class TracksByName extends ActionBarListActivity implements CustomListAdapter.CallbackInterface {
 
-	private ListView TracksByNameLV;
-	private ArrayAdapter<TrackModel> TracksByNameListAdapter;
+	private ListView tracksLV;
+	protected CustomListAdapter tracksListAdapter;
     private TracksByNamePresenter presenter;
 	protected static ActionMode mActionMode;
 	protected static boolean selectAll;
@@ -49,17 +46,17 @@ public class TracksByName extends ActionBarListActivity implements CustomListAda
 	}
 
     public void setUpListview(){
-        TracksByNameLV = getListView();
+        tracksLV = getListView();
         LayoutInflater inflater = getLayoutInflater();
 
-        ViewGroup header = (ViewGroup) inflater.inflate(R.layout.tracks_by_name_header, TracksByNameLV, false);
-        TracksByNameLV.addHeaderView(header, null, false);
+        ViewGroup header = (ViewGroup) inflater.inflate(R.layout.tracks_by_name_header, tracksLV, false);
+        tracksLV.addHeaderView(header, null, false);
 
-        TracksByNameListAdapter = new TracksByNameAdapter(this, presenter);
-        setListAdapter(TracksByNameListAdapter);
-        registerForContextMenu(TracksByNameLV);
+        tracksListAdapter = new TracksByNameAdapter(this, presenter);
+        setListAdapter(tracksListAdapter);
+        registerForContextMenu(tracksLV);
 
-        TracksByNameLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        tracksLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 presenter.listviewOnClick(position);
@@ -124,13 +121,13 @@ public class TracksByName extends ActionBarListActivity implements CustomListAda
 		@Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 			int itemId = item.getItemId();
-            int tracksByNameLVLength = TracksByNameLV.getCount();
+            int tracksLVLength = tracksLV.getCount();
 
 			if (itemId == R.id.tracksSelectAllTracks) {
-              	for (int i = 1; i < tracksByNameLVLength; i++) {
-              		View view = TracksByNameLV.getChildAt(i);
+              	for (int i = 1; i < tracksLVLength; i++) {
+              		View view = tracksLV.getChildAt(i);
               		int indexPosition = i - 1;
-                    TracksByNameAdapter.tickCheckbox(indexPosition, selectAll);
+                    tracksListAdapter.tickCheckbox(indexPosition, selectAll);
               		
               		if (view != null) {
               			CheckBox checkbox = (CheckBox) view.findViewById(R.id.tracks_by_name_checkBox);
@@ -147,10 +144,10 @@ public class TracksByName extends ActionBarListActivity implements CustomListAda
               	}
                 presenter.selectAllPressed = true;
                 selectAll = ! selectAll;
-                callActionBar(TracksByNameAdapter.tickedCheckboxCounter);
+                callActionBar(tracksListAdapter.tickedCheckboxCounter);
                	return true;
             } else if (itemId == R.id.addTrackToPlaylist) {
-                int numberOfTracksAdded = presenter.addTrackToPlaylist(tracksByNameLVLength);
+                int numberOfTracksAdded = presenter.addTrackToPlaylist(tracksLVLength);
         		
 				if (numberOfTracksAdded == 1){
 					Toast.makeText(getApplicationContext(), "1 track added to the playlist", Toast.LENGTH_LONG).show();
@@ -172,15 +169,13 @@ public class TracksByName extends ActionBarListActivity implements CustomListAda
 
     //Called by the presenter to start new activities
     public void startNewActivity(Intent intent, int requestCode){
-        generalUtils.clearCheckboxes(1);
-        generalUtils.clearCheckboxes(2);
-        generalUtils.clearCheckboxes(3);
+        tracksListAdapter.clearCheckboxes();
         startActivityForResult(intent, requestCode);
     }
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        generalUtils.clearCheckboxes(requestCode);
+        tracksListAdapter.clearCheckboxes();
     }
 	
 	@Override

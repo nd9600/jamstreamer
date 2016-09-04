@@ -252,7 +252,7 @@ public class TracksByNamePresenter extends Presenter implements JSONParser.Callb
 
         ArrayList<HashMap<String, String>> tracksToAddList = new ArrayList<>();
         for (int i = 0; i < tracksByNameLVLength; i++){
-            if (TracksByNameAdapter.listOfCheckboxes.get(i, false)) {
+            if (activity.tracksListAdapter.listOfCheckboxes.get(i, false)) {
                 tracksToAddList.add(trackList.get(i));
             }
         }

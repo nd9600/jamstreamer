@@ -101,7 +101,8 @@ public class MainMenu extends AppCompatActivity {
     //Resets the checkboxes once you've left the playlist or top tracks activities
     @Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        generalUtils.clearCheckboxes(requestCode);
+        //Todo: possibly remove this
+        //generalUtils.clearCheckboxes(null);
 	}
 
     //Brings up the exit dialog when you press the back button

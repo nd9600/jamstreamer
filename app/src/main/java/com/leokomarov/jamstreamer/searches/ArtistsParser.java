@@ -116,7 +116,8 @@ public class ArtistsParser extends ActionBarListActivity implements JSONParser.C
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		generalUtils.clearCheckboxes(2);
+        //Todo: Possibly remove this
+		//generalUtils.clearCheckboxes(null);
 	}
 	
 	@Override

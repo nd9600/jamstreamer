@@ -1,6 +1,7 @@
 package com.leokomarov.jamstreamer.common;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,9 +38,9 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
     private final int textView2ID;
 
     //listOfCheckboxes says if a checkbox at position _i_ has been checked
-    public static SparseBooleanArray listOfCheckboxes = new SparseBooleanArray();
+    public SparseBooleanArray listOfCheckboxes = new SparseBooleanArray();
     //tickedCheckboxCounter is the number of checked checkboxes
-    public static int tickedCheckboxCounter = 0;
+    public int tickedCheckboxCounter = 0;
 
     protected CustomListAdapter(CallbackInterface callback, ActionBarListActivity listActivity, Presenter presenter, List<TrackModel> trackData, int listLayoutID, int checkboxID, int textView1ID, int textView2ID) {
         super(listActivity, listLayoutID, trackData);
@@ -62,11 +63,21 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
     //put it in the list as ticked
     //and increment the counter
     //or vice versa
-    public static void tickCheckbox(int position, boolean tickIt){
+    public void tickCheckbox(int position, boolean tickIt){
         if (listOfCheckboxes.get(position, false) == (! tickIt)){
             listOfCheckboxes.put(position, tickIt);
             tickedCheckboxCounter += tickIt ? 1 : -1;
         }
+        Log.v("tickCheckbox", "Setting #" + position + " to " + tickIt);
+        Log.v("tickCheckbox", "Setting #" + position + " to " + tickIt);
+    }
+
+    //Clears the checkbox list and counter for the relevant adapter
+    public void clearCheckboxes(){
+        System.out.println("");
+        System.out.println("Clearing checkboxes");
+        listOfCheckboxes.clear();
+        tickedCheckboxCounter = 0;
     }
 
     //ViewHolder holds the track textviews and checkbox
@@ -148,9 +159,8 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
 		}
 		*/
 
-        //get the viewHolder for this view
+        //get the viewHolder for this view and update it's views with information from the listData
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-        //update the viewHolder's views with information from the trackData
         updateViewHolder(viewHolder, position);
 
         return view;

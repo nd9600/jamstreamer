@@ -20,14 +20,13 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.common.ActionBarListActivity;
 import com.leokomarov.jamstreamer.discography.tracks.TracksByName;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
 import com.leokomarov.jamstreamer.searches.ArtistsParser;
-import com.leokomarov.jamstreamer.common.ActionBarListActivity;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.JSONParser;
-import com.leokomarov.jamstreamer.utils.generalUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,7 +40,7 @@ import java.util.Locale;
 public class AlbumsByName extends ActionBarListActivity implements JSONParser.CallbackInterface, AlbumsByNameAdapter.CallbackInterface,
 		AlbumsByNameTrackParser.CallbackInterface {
 	private ListView AlbumsByNameLV;
-	private ArrayAdapter<AlbumsByNameModel>AlbumsByNameListAdapter;
+	private ArrayAdapter<AlbumsByNameModel> AlbumsByNameListAdapter;
 	private List<AlbumsByNameModel> AlbumsByNameModel = new ArrayList<>();
 	protected static ActionMode mActionMode;
 	private JSONArray results;
@@ -387,7 +386,8 @@ public class AlbumsByName extends ActionBarListActivity implements JSONParser.Ca
 	}
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        generalUtils.clearCheckboxes(requestCode);
+        //Todo: change to customListAdapter
+        //AlbumsByNameListAdapter.clearCheckboxes(null);
     }
 
     @Override

@@ -28,14 +28,14 @@ import java.util.List;
 public class PlaylistPresenter extends Presenter {
 
     private Context context;
-    private PlaylistActivity view;
+    private PlaylistActivity activity;
     private ListInteractor interactor;
     private ComplexPreferences trackPreferences;
     public boolean selectAllPressed;
 
-    public PlaylistPresenter(Context context, PlaylistActivity view, ListInteractor listInteractor){
+    public PlaylistPresenter(Context context, PlaylistActivity activity, ListInteractor listInteractor){
         this.context = context;
-        this.view = view;
+        this.activity = activity;
         this.interactor = listInteractor;
         this.trackPreferences = ComplexPreferences.getComplexPreferences(context,
                 context.getString(R.string.trackPreferences), Context.MODE_PRIVATE);
@@ -64,7 +64,7 @@ public class PlaylistPresenter extends Presenter {
     public void deletePlaylist(){
         clearListData();
 
-        new tracklistUtils(view).execute(trackPreferences, "saveAndShuffle", new ArrayList<HashMap<String, String>>());
+        new tracklistUtils(activity).execute(trackPreferences, "saveAndShuffle", new ArrayList<HashMap<String, String>>());
     }
 
     //Starts the audio player
@@ -83,7 +83,7 @@ public class PlaylistPresenter extends Presenter {
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra("fromNotification", false);
 
-        view.startNewActivity(intent, 1);
+        activity.startNewActivity(intent);
     }
 
     //Called when something in the floating menu is selected
@@ -102,9 +102,9 @@ public class PlaylistPresenter extends Presenter {
                 CheckBox checkbox = (CheckBox) viewClicked.findViewById(R.id.playlist_checkBox);
                 boolean isCheckboxTicked = checkbox.isChecked();
                 checkbox.setChecked(! isCheckboxTicked);
-                PlaylistAdapter.tickCheckbox(indexPosition, ! isCheckboxTicked);
+                activity.playlistListAdapter.tickCheckbox(indexPosition, ! isCheckboxTicked);
 
-                view.callActionBar(PlaylistAdapter.tickedCheckboxCounter);
+                activity.callActionBar(activity.playlistListAdapter.tickedCheckboxCounter);
 
                 return true;
             case R.id.playlistFloating_viewArtist:
@@ -115,7 +115,7 @@ public class PlaylistPresenter extends Presenter {
                 Intent albumsIntent = new Intent(context, AlbumsByName.class);
                 albumsIntent.putExtra(context.getString(R.string.TAG_ARTIST_NAME), artistName);
 
-                view.startNewActivity(albumsIntent, 2);
+                activity.startNewActivity(albumsIntent);
                 return true;
             case R.id.playlistFloating_viewAlbum:
                 //put the correct string in the hierarchy,
@@ -125,7 +125,7 @@ public class PlaylistPresenter extends Presenter {
                 Intent tracksIntent = new Intent(context, TracksByName.class);
                 tracksIntent.putExtra(context.getString(R.string.TAG_ALBUM_NAME), albumName);
 
-                view.startNewActivity(tracksIntent, 3);
+                activity.startNewActivity(tracksIntent);
                 return true;
             default:
                 return false;
@@ -141,7 +141,7 @@ public class PlaylistPresenter extends Presenter {
         ArrayList<Integer> tracksToDelete = new ArrayList<>();
         //add every track that is ticked to a list
         for (int i = 0; i < numberOfTracks; i++){
-            if (PlaylistAdapter.listOfCheckboxes.get(i, false)) {
+            if (activity.playlistListAdapter.listOfCheckboxes.get(i, false)) {
                 tracksToDelete.add(i);
             }
         }
@@ -157,12 +157,12 @@ public class PlaylistPresenter extends Presenter {
         setListData(false, tracklist);
 
         if (! tracklist.isEmpty()){
-            new tracklistUtils(view).execute(trackPreferences, "saveAndShuffle", tracklist);
+            new tracklistUtils(activity).execute(trackPreferences, "saveAndShuffle", tracklist);
         } else {
-            new tracklistUtils(view).execute(trackPreferences, "save", tracklist);
+            new tracklistUtils(activity).execute(trackPreferences, "save", tracklist);
         }
 
-        generalUtils.clearCheckboxes(2);
+        activity.playlistListAdapter.clearCheckboxes();
         return tracksToDelete.size();
     }
 

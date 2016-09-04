@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.discography.albums.AlbumsByName;
-import com.leokomarov.jamstreamer.utils.generalUtils;
 
 public class AlbumsSearch extends AppCompatActivity {
 	public static final String TAG_ALBUM_NAME = "name";
@@ -40,7 +39,8 @@ public class AlbumsSearch extends AppCompatActivity {
 		
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        generalUtils.clearCheckboxes(requestCode);
+        //Todo: Possibly remove this
+        //generalUtils.clearCheckboxes(null);
     }
 	
 	@Override
