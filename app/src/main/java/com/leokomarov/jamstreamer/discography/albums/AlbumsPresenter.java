@@ -153,12 +153,10 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface, AlbumsByNa
                     String artistName = results.getJSONObject(i).getString("name");
                     for(int j = 0; j < albumsArray.length(); j++) {
                         JSONObject albumInfo = albumsArray.getJSONObject(j);
-
-                        Log.v("onReq", "albumInfo: " + albumInfo);
-
                         HashMap<String, String> map = new HashMap<>();
                         String albumName = albumInfo.getString(context.getString(R.string.TAG_ALBUM_NAME));
                         String albumID = albumInfo.getString(context.getString(R.string.TAG_ALBUM_ID));
+
                         map.put("albumArtist", artistName);
                         map.put("albumName", albumName);
                         map.put("albumID", albumID);
@@ -169,13 +167,11 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface, AlbumsByNa
             else if (hierarchy.equals("albums")){
                 for(int i = 0; i < results.length(); i++) {
                     JSONObject albumInfo = results.getJSONObject(i);
-
-                    Log.v("onReq", "albumInfo: " + albumInfo);
-
                     HashMap<String, String> map = new HashMap<>();
                     String artistName = albumInfo.getString(context.getString(R.string.TAG_ARTIST_NAME));
                     String albumName = albumInfo.getString(context.getString(R.string.TAG_ALBUM_NAME));
                     String albumID = albumInfo.getString(context.getString(R.string.TAG_ALBUM_ID));
+
                     map.put("albumArtist", artistName);
                     map.put("albumName", albumName);
                     map.put("albumID", albumID);

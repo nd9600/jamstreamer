@@ -6,11 +6,9 @@
     <string name="mainTopTracksWeek">Top tracks this week</string>
 
     <string name="playlist">Playlist</string>
-    <string name="backwardButton">Backward</string>
     <string name="previousButton">Previous</string>
     <string name="playButton">Play</string>
     <string name="nextButton">Next</string>
-    <string name="forwardButton">Forward</string>
     <string name="playlistButton">Playlist</string>
     <string name="repeatButton">Repeat</string>
     <string name="shuffleButton">Shuffle</string>
