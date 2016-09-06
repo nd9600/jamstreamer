@@ -50,14 +50,18 @@ public class AlbumsActivity extends ActionBarListActivity implements CustomListA
     public void setUpListview() {
         albumsLV = getListView();
         LayoutInflater inflater = getLayoutInflater();
-        ViewGroup header = (ViewGroup) inflater.inflate(R.layout.albums_by_name_header, albumsLV, false);
+        ViewGroup header = (ViewGroup) inflater.inflate(R.layout.albums_list_header, albumsLV, false);
         albumsLV.addHeaderView(header, null, false);
 
         listAdapter = new AlbumsAdapter(this, presenter);
         setListAdapter(listAdapter);
         registerForContextMenu(albumsLV);
 
-        button_playlist = (ImageButton) findViewById(R.id.albums_by_name_btnPlaylist);
+        listAdapter.selectAllPressed = false;
+        listAdapter.selectAll = true;
+        listAdapter.clearCheckboxes();
+
+        button_playlist = (ImageButton) findViewById(R.id.albums_btnPlaylist);
         button_playlist.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -117,7 +121,7 @@ public class AlbumsActivity extends ActionBarListActivity implements CustomListA
             if (!listAdapter.selectAll) { //if selectAll is false, we want the button to say "Select none"
                 selectAllTitle = "Select none";
             }
-            menu.findItem(R.id.albumsSelectAllTracks).setTitle(selectAllTitle);
+            menu.findItem(R.id.albums_context_menu_SelectAllTracks).setTitle(selectAllTitle);
             return true;
         }
 
@@ -126,14 +130,14 @@ public class AlbumsActivity extends ActionBarListActivity implements CustomListA
             int itemId = item.getItemId();
             int numberOfAlbums = albumsLV.getCount();
 
-            if (itemId == R.id.tracksSelectAllTracks) {
+            if (itemId == R.id.albums_context_menu_SelectAllTracks) {
                 for (int i = 1; i < numberOfAlbums; i++) {
                     View view = albumsLV.getChildAt(i);
                     int indexPosition = i - 1;
                     listAdapter.tickCheckbox(indexPosition, listAdapter.selectAll);
 
                     if (view != null) {
-                        CheckBox checkbox = (CheckBox) view.findViewById(R.id.tracks_by_name_checkBox);
+                        CheckBox checkbox = (CheckBox) view.findViewById(R.id.albums_checkbox);
 
                         //if the checkbox isn't ticked, tick it
                         //or vice versa
@@ -147,7 +151,7 @@ public class AlbumsActivity extends ActionBarListActivity implements CustomListA
                 listAdapter.selectAll = !listAdapter.selectAll;
                 callActionBar(listAdapter.tickedCheckboxCounter);
                 return true;
-            } else if (itemId == R.id.addAlbumToPlaylist) {
+            } else if (itemId == R.id.albums_context_menu_addAlbumToPlaylist) {
                 setPlaylistButtonClickable(false);
                 presenter.addAlbumToPlaylist(numberOfAlbums);
 

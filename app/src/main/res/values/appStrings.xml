@@ -9,12 +9,15 @@
     <string name="hierarchyPreferences">hierarchy_preferences</string>
     <string name="playingWhileOrientationChangePreferences">playingWhileOrientationChange_preferences</string>
 
+    <string name="TAG_RESULTS">results</string>
     <string name="TAG_TRACKLIST">trackList</string>
-    <string name="TAG_ARTIST_NAME">artist_name</string>
+    <string name="TAG_ALBUMS">albums</string>
+    <string name="TAG_ARTIST_ID">id</string>
+    <string name="TAG_ARTIST_NAME">name</string>
+    <string name="TAG_ARTIST_NAME_IN_LIST_WITH_ALBUM_NAME">artist_name</string>
+    <string name="TAG_ALBUM_ID">id</string>
     <string name="TAG_ALBUM_NAME_FOR_GSON">album_name</string>
     <string name="TAG_ALBUM_NAME">name</string>
-    <string name="TAG_RESULTS">results</string>
-    <string name="TAG_ALBUM_ID">id</string>
     <string name="TAG_TRACK_ID">id</string>
     <string name="TAG_TRACK_NAME">name</string>
     <string name="TAG_TRACK_DURATION">duration</string>

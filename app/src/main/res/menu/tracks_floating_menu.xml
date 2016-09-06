@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <item
-        android:id="@+id/tracksFloating_selectTrack"
+        android:id="@+id/tracks_floating_menu_selectTrack"
         android:title="@string/selectTrack">
     </item>
     
     <item
-        android:id="@+id/tracksFloating_viewArtist"
+        android:id="@+id/tracks_floating_menu_viewArtist"
         android:title="@string/viewArtistFloatingText">
     </item>
     
     <item
-        android:id="@+id/tracksFloating_viewAlbum"
+        android:id="@+id/tracks_floating_menu_viewAlbum"
         android:title="@string/viewAlbumFloatingText">
     </item>
 </menu> 

@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.media_player;
+package com.leokomarov.jamstreamer.audio_player;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;

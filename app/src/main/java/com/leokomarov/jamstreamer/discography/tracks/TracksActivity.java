@@ -27,7 +27,7 @@ public class TracksActivity extends ActionBarListActivity implements CustomListA
 
     private ListView tracksLV;
     protected CustomListAdapter listAdapter;
-    private TracksByNamePresenter presenter;
+    private TracksPresenter presenter;
     protected static ActionMode mActionMode;
 
     private ImageButton button_playlist;
@@ -37,7 +37,7 @@ public class TracksActivity extends ActionBarListActivity implements CustomListA
         super.onCreate(savedInstanceState);
         setContentView(R.layout.original_empty_list);
 
-        presenter = new TracksByNamePresenter(this, this, new ListInteractor());
+        presenter = new TracksPresenter(this, this, new ListInteractor());
 
         Intent intent = getIntent();
         presenter.populateList(intent);
@@ -47,11 +47,13 @@ public class TracksActivity extends ActionBarListActivity implements CustomListA
         tracksLV = getListView();
         LayoutInflater inflater = getLayoutInflater();
 
-        ViewGroup header = (ViewGroup) inflater.inflate(R.layout.tracks_by_name_header, tracksLV, false);
+        ViewGroup header = (ViewGroup) inflater.inflate(R.layout.tracks_list_header, tracksLV, false);
         tracksLV.addHeaderView(header, null, false);
 
         listAdapter = new TracksAdapter(this, presenter);
+        listAdapter.selectAllPressed = false;
         listAdapter.selectAll = true;
+        listAdapter.clearCheckboxes();
 
         setListAdapter(listAdapter);
         registerForContextMenu(tracksLV);
@@ -114,7 +116,7 @@ public class TracksActivity extends ActionBarListActivity implements CustomListA
             if (!listAdapter.selectAll) { //if selectAll is false, we want the button to say "Select none"
                 selectAllTitle = "Select none";
             }
-            menu.findItem(R.id.tracksSelectAllTracks).setTitle(selectAllTitle);
+            menu.findItem(R.id.tracks_context_menu_SelectAllTracks).setTitle(selectAllTitle);
             return true;
         }
 
@@ -123,7 +125,7 @@ public class TracksActivity extends ActionBarListActivity implements CustomListA
             int itemId = item.getItemId();
             int numberOfTracks = tracksLV.getCount();
 
-            if (itemId == R.id.tracksSelectAllTracks) {
+            if (itemId == R.id.tracks_context_menu_SelectAllTracks) {
                 for (int i = 1; i < numberOfTracks; i++) {
                     View view = tracksLV.getChildAt(i);
                     int indexPosition = i - 1;
@@ -144,7 +146,7 @@ public class TracksActivity extends ActionBarListActivity implements CustomListA
                 listAdapter.selectAll = !listAdapter.selectAll;
                 callActionBar(listAdapter.tickedCheckboxCounter);
                 return true;
-            } else if (itemId == R.id.addTrackToPlaylist) {
+            } else if (itemId == R.id.tracks_context_menu_addTrackToPlaylist) {
                 int numberOfTracksAdded = presenter.addTrackToPlaylist(numberOfTracks);
 
                 if (numberOfTracksAdded == 1) {

@@ -15,7 +15,6 @@ import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.common.TrackModel;
 import com.leokomarov.jamstreamer.discography.tracks.TracksActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
-import com.leokomarov.jamstreamer.searches.ArtistsParser;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.JSONParser;
 import com.leokomarov.jamstreamer.utils.generalUtils;
@@ -29,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class AlbumsPresenter implements JSONParser.CallbackInterface, AlbumsByNameTrackParser.CallbackInterface {
+public class AlbumsPresenter implements JSONParser.CallbackInterface {
 
     private Context context;
     private AlbumsActivity activity;
@@ -42,6 +41,8 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface, AlbumsByNa
 
     private int albumsToAddLoop = 0;
     private int onTrackRequestCompletedLoop = 0;
+
+    private String requestType;
 
     public AlbumsPresenter(Context context, AlbumsActivity activity, ListInteractor listInteractor){
         this.context = context;
@@ -68,7 +69,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface, AlbumsByNa
 
         switch (hierarchy) {
             case "artists":
-                searchTerm = intent.getStringExtra(ArtistsParser.TAG_ARTIST_ID);
+                searchTerm = intent.getStringExtra(context.getString(R.string.TAG_ARTIST_ID));
                 unformattedURL = context.getString(R.string.albumsByArtistIDJSONURL);
                 break;
             case "albums":
@@ -84,9 +85,10 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface, AlbumsByNa
                 break;
         }
 
+        requestType = "album";
         String url = String.format(unformattedURL, searchTerm).replace("&amp;", "&").replace(" ", "+");
-        JSONParser jParser = new JSONParser(this);
-        jParser.execute(url);
+        JSONParser albumParser = new JSONParser(this);
+        albumParser.execute(url);
     }
 
     public void listviewOnClick(int position){
@@ -103,14 +105,14 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface, AlbumsByNa
         int indexPosition = info.position - 1;
 
         int menuID = item.getItemId();
-        if (menuID == R.id.albumsFloating_selectAlbum){
+        if (menuID == R.id.albums_floating_menu_selectAlbum){
             activity.listAdapter.selectAllPressed = false;
-            CheckBox checkbox = (CheckBox) viewClicked.findViewById(R.id.albums_by_name_checkBox);
+            CheckBox checkbox = (CheckBox) viewClicked.findViewById(R.id.albums_checkbox);
             checkbox.setChecked(! checkbox.isChecked());
 
             activity.callActionBar(activity.listAdapter.tickedCheckboxCounter);
             return true;
-        } else if (menuID == R.id.albumsFloating_viewArtist) {
+        } else if (menuID == R.id.albums_floating_menu_viewArtist) {
             generalUtils.putHierarchy(context, "albumsFloatingMenuArtist");
 
             String artistName = albumList.get(indexPosition).get("albumArtist");
@@ -134,8 +136,10 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface, AlbumsByNa
                 String unformattedURL = context.getString(R.string.tracksByAlbumIDJSONURL);
                 String url = String.format(unformattedURL, albumID).replace("&amp;", "&");
 
-                Toast.makeText(context, "Adding album, please wait", Toast.LENGTH_SHORT).show();
-                AlbumsByNameTrackParser trackParser = new AlbumsByNameTrackParser(this, context);
+                Toast.makeText(context, String.format("Adding album #%s", albumsToAddLoop), Toast.LENGTH_SHORT).show();
+
+                requestType = "track";
+                JSONParser trackParser = new JSONParser(this);
                 trackParser.execute(url);
             }
         }
@@ -143,17 +147,44 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface, AlbumsByNa
 
     @Override
     public void onRequestCompleted(JSONObject json) {
+        if (requestType.equals("album")){
+            albumRequest(json);
+        } else if (requestType.equals("track")){
+            trackRequest(json);
+        }
+    }
+
+    public void albumRequest(JSONObject json) {
         try {
             results = json.getJSONArray(context.getString(R.string.TAG_RESULTS));
             SharedPreferences hierarchyPreference = context.getSharedPreferences(context.getString(R.string.hierarchyPreferences), 0);
             String hierarchy = hierarchyPreference.getString("hierarchy", "none");
-            if (hierarchy.equals("artists") || hierarchy.equals("albumsFloatingMenuArtist") || hierarchy.equals("tracksFloatingMenuArtist") || hierarchy.equals("playlistFloatingMenuArtist")){
-                for(int i = 0; i < results.length(); i++) {
-                    JSONArray albumsArray = results.getJSONObject(i).getJSONArray("albums");
-                    String artistName = results.getJSONObject(i).getString("name");
-                    for(int j = 0; j < albumsArray.length(); j++) {
-                        JSONObject albumInfo = albumsArray.getJSONObject(j);
+            switch (hierarchy) {
+                case "artists":
+                case "albumsFloatingMenuArtist":
+                case "tracksFloatingMenuArtist":
+                case "playlistFloatingMenuArtist":
+                    for (int i = 0; i < results.length(); i++) {
+                        JSONArray albumsArray = results.getJSONObject(i).getJSONArray(context.getString(R.string.TAG_ALBUMS));
+                        String artistName = results.getJSONObject(i).getString(context.getString(R.string.TAG_ARTIST_NAME));
+                        for (int j = 0; j < albumsArray.length(); j++) {
+                            JSONObject albumInfo = albumsArray.getJSONObject(j);
+                            HashMap<String, String> map = new HashMap<>();
+                            String albumName = albumInfo.getString(context.getString(R.string.TAG_ALBUM_NAME));
+                            String albumID = albumInfo.getString(context.getString(R.string.TAG_ALBUM_ID));
+
+                            map.put("albumArtist", artistName);
+                            map.put("albumName", albumName);
+                            map.put("albumID", albumID);
+                            albumList.add(map);
+                        }
+                    }
+                    break;
+                case "albums":
+                    for (int i = 0; i < results.length(); i++) {
+                        JSONObject albumInfo = results.getJSONObject(i);
                         HashMap<String, String> map = new HashMap<>();
+                        String artistName = albumInfo.getString(context.getString(R.string.TAG_ARTIST_NAME_IN_LIST_WITH_ALBUM_NAME));
                         String albumName = albumInfo.getString(context.getString(R.string.TAG_ALBUM_NAME));
                         String albumID = albumInfo.getString(context.getString(R.string.TAG_ALBUM_ID));
 
@@ -162,24 +193,10 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface, AlbumsByNa
                         map.put("albumID", albumID);
                         albumList.add(map);
                     }
-                }
-            }
-            else if (hierarchy.equals("albums")){
-                for(int i = 0; i < results.length(); i++) {
-                    JSONObject albumInfo = results.getJSONObject(i);
-                    HashMap<String, String> map = new HashMap<>();
-                    String artistName = albumInfo.getString(context.getString(R.string.TAG_ARTIST_NAME));
-                    String albumName = albumInfo.getString(context.getString(R.string.TAG_ALBUM_NAME));
-                    String albumID = albumInfo.getString(context.getString(R.string.TAG_ALBUM_ID));
-
-                    map.put("albumArtist", artistName);
-                    map.put("albumName", albumName);
-                    map.put("albumID", albumID);
-                    albumList.add(map);
-                }
+                    break;
             }
         } catch (Exception e) {
-            Log.e("onRequestCompleted", "Exception: " + e.getMessage());
+            Log.e("albumRequest", "Exception: " + e.getMessage());
         }
 
         if (json == null || json.isNull("results")) {
@@ -194,14 +211,13 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface, AlbumsByNa
         }
     }
 
-    @Override
-    public void onTrackRequestCompleted(JSONObject json) {
+    public void trackRequest(JSONObject json) {
         try {
             JSONArray results = json.getJSONArray(context.getString(R.string.TAG_RESULTS));
             onTrackRequestCompletedLoop++;
             for(int i = 0; i < results.length(); i++) {
                 JSONArray tracksArray = results.getJSONObject(i).getJSONArray("tracks");
-                String artistName = results.getJSONObject(i).getString(context.getString(R.string.TAG_ARTIST_NAME));
+                String artistName = results.getJSONObject(i).getString(context.getString(R.string.TAG_ARTIST_NAME_IN_LIST_WITH_ALBUM_NAME));
                 String albumName = results.getJSONObject(i).getString(context.getString(R.string.TAG_ALBUM_NAME));
                 for(int j = 0; j < tracksArray.length(); j++) {
                     JSONObject trackInfo = tracksArray.getJSONObject(j);
@@ -238,7 +254,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface, AlbumsByNa
                 }
             }
         } catch (Exception e) {
-            Log.e("onTrackRequestCompleted", "Exception: " + e.getMessage());
+            Log.e("trackRequest", "Exception: " + e.getMessage());
         }
     }
 }

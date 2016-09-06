@@ -2,20 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/playlistSelectAllTracks"
+        android:id="@+id/playlist_context_menu_SelectAllTracks"
         android:title="@string/selectAll"
         app:showAsAction="always">
     </item>
     
     <item
-        android:id="@+id/removePlaylistItem"
+        android:id="@+id/playlist_context_menu_removePlaylistItem"
         android:title="@string/playlistRemoveCAB"
         android:icon="@drawable/bin"
         app:showAsAction="ifRoom">
     </item>
     
     <item
-        android:id="@+id/deletePlaylist"
+        android:id="@+id/playlist_context_menu_deletePlaylist"
         android:title="@string/deletePlaylistCAB"
         app:showAsAction="ifRoom">
     </item>

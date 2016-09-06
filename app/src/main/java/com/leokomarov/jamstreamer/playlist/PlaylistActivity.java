@@ -73,7 +73,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
 
         //Inflates the header and adds it to the LV
         LayoutInflater inflater = getLayoutInflater();
-        ViewGroup header = (ViewGroup) inflater.inflate(R.layout.playlist_header, playlistLV, false);
+        ViewGroup header = (ViewGroup) inflater.inflate(R.layout.playlist_list_header, playlistLV, false);
         playlistLV.addHeaderView(header, null, false);
 
         //Initial checkbox setup - the action mode's title is initially "Select all"
@@ -155,7 +155,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
             if (! listAdapter.selectAll){ //if selectAll is false, we want the button to say "Select none"
                 selectAllTitle = "Select none";
             }
-            menu.findItem(R.id.playlistSelectAllTracks).setTitle(selectAllTitle);
+            menu.findItem(R.id.playlist_context_menu_SelectAllTracks).setTitle(selectAllTitle);
 			return true;
 		}
 
@@ -166,7 +166,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
             int numberOfTracks = playlistLV.getCount();
 
             //if the selectAll button is pressed
-            if (itemId == R.id.playlistSelectAllTracks) {
+            if (itemId == R.id.playlist_context_menu_SelectAllTracks) {
 
                 //set the pressed boolean
                 listAdapter.selectAllPressed = true;
@@ -197,7 +197,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
                	return true;
 
             //if the button to remove those specific tracks from the playlist is pressed
-            } else if (itemId == R.id.removePlaylistItem) {
+            } else if (itemId == R.id.playlist_context_menu_removePlaylistItem) {
 
                 //removes the ticked tracks from the tracklists
                 //and from the LV's data
@@ -225,13 +225,13 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
                         checkbox.setChecked(false);
                     }
                 }
+                listAdapter.clearCheckboxes();
 
 				mode.finish();
-
 				return true;
 
             //if the "delete entire playlist" button is pressed
-			} else if (itemId == R.id.deletePlaylist) {
+			} else if (itemId == R.id.playlist_context_menu_deletePlaylist) {
                 //clear and save the tracklist and shuffled tracklist
                 listAdapter.selectAllPressed = false;
 				presenter.deletePlaylist();
@@ -247,6 +247,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
                     }
                 }
                 listAdapter.clearCheckboxes();
+                Toast.makeText(getApplicationContext(), "Playlist deleted", Toast.LENGTH_LONG).show();
 
 				mode.finish();
 				return true;

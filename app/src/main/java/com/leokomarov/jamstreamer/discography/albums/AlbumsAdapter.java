@@ -12,7 +12,7 @@ public class AlbumsAdapter extends CustomListAdapter {
     private final List<TrackModel> listData;
 
     protected AlbumsAdapter(AlbumsActivity playlistActivity, AlbumsPresenter presenter) {
-        super(playlistActivity, playlistActivity, presenter.getListData(), R.layout.albums_by_name, R.id.albums_by_name_checkBox, R.id.albums_by_name_albumName, R.id.albums_by_name_albumArtist);
+        super(playlistActivity, playlistActivity, presenter.getListData(), R.layout.albums_list, R.id.albums_checkbox, R.id.albums_album_name, R.id.albums_album_artist);
         this.listData = presenter.getListData();
     }
 

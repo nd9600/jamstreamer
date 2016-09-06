@@ -11,8 +11,8 @@ import java.util.List;
 public class TracksAdapter extends CustomListAdapter {
     private final List<TrackModel> listData;
 
-    protected TracksAdapter(TracksActivity tracksActivity, TracksByNamePresenter presenter) {
-        super(tracksActivity, tracksActivity, presenter.getListData(), R.layout.tracks_by_name, R.id.tracks_by_name_checkBox, R.id.tracks_by_name_trackNameAndDuration, R.id.tracks_by_name_trackArtistAndAlbum);
+    protected TracksAdapter(TracksActivity tracksActivity, TracksPresenter presenter) {
+        super(tracksActivity, tracksActivity, presenter.getListData(), R.layout.tracks_list, R.id.tracks_by_name_checkBox, R.id.tracks_by_name_trackNameAndDuration, R.id.tracks_by_name_trackArtistAndAlbum);
         this.listData = presenter.getListData();
     }
 

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
     <item
-        android:id="@+id/albumsFloating_selectAlbum"
+        android:id="@+id/albums_floating_menu_selectAlbum"
         android:title="@string/selectAlbum">
     </item>
     
     <item
-        android:id="@+id/albumsFloating_viewArtist"
+        android:id="@+id/albums_floating_menu_viewArtist"
         android:title="@string/viewArtistFloatingText">
     </item>
 </menu> 

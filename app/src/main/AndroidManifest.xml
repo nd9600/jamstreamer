@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.leokomarov.jamstreamer"
     android:installLocation="auto"
-    android:versionCode="13"
-    android:versionName="0.0.2.4e" >
+    android:versionCode="14"
+    android:versionName="0.0.2.4f" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
@@ -54,13 +54,13 @@
         
         <activity
             android:label="JamStreamer - Audio player"
-            android:name="com.leokomarov.jamstreamer.media_player.AudioPlayer" >
+            android:name="com.leokomarov.jamstreamer.audio_player.AudioPlayer" >
         </activity>
         
         <service
             android:enabled="true"
             android:label="JamStreamer - Audio player"
-            android:name="com.leokomarov.jamstreamer.media_player.AudioPlayerService"
+            android:name="com.leokomarov.jamstreamer.audio_player.AudioPlayerService"
             android:exported="false" >
         </service>
 

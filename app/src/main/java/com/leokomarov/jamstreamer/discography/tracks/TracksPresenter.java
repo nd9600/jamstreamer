@@ -14,8 +14,8 @@ import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.common.TrackModel;
 import com.leokomarov.jamstreamer.discography.albums.AlbumsActivity;
-import com.leokomarov.jamstreamer.media_player.AudioPlayer;
-import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
+import com.leokomarov.jamstreamer.audio_player.AudioPlayer;
+import com.leokomarov.jamstreamer.audio_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.JSONParser;
@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class TracksByNamePresenter implements JSONParser.CallbackInterface {
+public class TracksPresenter implements JSONParser.CallbackInterface {
     private Context context;
     private TracksActivity activity;
     private ListInteractor interactor;
@@ -40,7 +40,7 @@ public class TracksByNamePresenter implements JSONParser.CallbackInterface {
     private ArrayList<HashMap<String, String>> trackList = new ArrayList<>();
     private ArrayList<HashMap<String, String>> albumIDList = new ArrayList<>();
 
-    public TracksByNamePresenter(Context context, TracksActivity activity, ListInteractor listInteractor){
+    public TracksPresenter(Context context, TracksActivity activity, ListInteractor listInteractor){
         this.context = context;
         this.activity = activity;
         this.interactor = listInteractor;
@@ -221,12 +221,12 @@ public class TracksByNamePresenter implements JSONParser.CallbackInterface {
         int indexPosition = info.position - 1;
 
         int menuID = item.getItemId();
-        if (menuID == R.id.tracksFloating_selectTrack){
+        if (menuID == R.id.tracks_floating_menu_selectTrack){
             activity.listAdapter.selectAllPressed = false;
             CheckBox checkbox = (CheckBox) viewClicked.findViewById(R.id.tracks_by_name_checkBox);
             checkbox.setChecked(! checkbox.isChecked());
             return true;
-        } else if (menuID == R.id.tracksFloating_viewArtist) {
+        } else if (menuID == R.id.tracks_floating_menu_viewArtist) {
             generalUtils.putHierarchy(context, "tracksFloatingMenuArtist");
 
             String artistName = trackList.get(indexPosition).get("trackArtist");
@@ -234,7 +234,7 @@ public class TracksByNamePresenter implements JSONParser.CallbackInterface {
             artistsIntent.putExtra(context.getString(R.string.TAG_ARTIST_NAME), artistName);
             activity.startNewActivity(artistsIntent, 2);
             return true;
-        } else if (menuID == R.id.tracksFloating_viewAlbum) {
+        } else if (menuID == R.id.tracks_floating_menu_viewAlbum) {
             generalUtils.putHierarchy(context, "tracksFloatingMenuAlbum");
             String albumID = albumIDList.get(indexPosition).get("albumID");
             Intent albumsIntent = new Intent(context, TracksActivity.class);

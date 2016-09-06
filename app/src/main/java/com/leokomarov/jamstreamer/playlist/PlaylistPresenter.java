@@ -13,8 +13,8 @@ import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.common.TrackModel;
 import com.leokomarov.jamstreamer.discography.albums.AlbumsActivity;
 import com.leokomarov.jamstreamer.discography.tracks.TracksActivity;
-import com.leokomarov.jamstreamer.media_player.AudioPlayer;
-import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
+import com.leokomarov.jamstreamer.audio_player.AudioPlayer;
+import com.leokomarov.jamstreamer.audio_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.generalUtils;
 import com.leokomarov.jamstreamer.utils.tracklistUtils;
@@ -93,7 +93,7 @@ public class PlaylistPresenter {
 
         int menuID = item.getItemId();
         switch (menuID) {
-            case R.id.playlistFloating_selectTrack:
+            case R.id.playlist_floating_menu_selectTrack:
                 activity.listAdapter.selectAllPressed = false;
 
                 //un/tick the checkbox, then call the action bar
@@ -105,7 +105,7 @@ public class PlaylistPresenter {
                 activity.callActionBar(activity.listAdapter.tickedCheckboxCounter);
 
                 return true;
-            case R.id.playlistFloating_viewArtist:
+            case R.id.playlist_floating_menu_viewArtist:
                 //put the correct string in the hierarchy,
                 //then start AlbumsActivity
                 generalUtils.putHierarchy(context, "playlistFloatingMenuArtist");
@@ -115,7 +115,7 @@ public class PlaylistPresenter {
 
                 activity.startNewActivity(albumsIntent);
                 return true;
-            case R.id.playlistFloating_viewAlbum:
+            case R.id.playlist_floating_menu_viewAlbum:
                 //put the correct string in the hierarchy,
                 //then start TracksActivity
                 generalUtils.putHierarchy(context, "playlistFloatingMenuAlbum");

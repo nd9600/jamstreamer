@@ -111,73 +111,58 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="#ffffff"
-        android:gravity="center"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp">
+        android:layout_marginRight="10dp"
+        android:weightSum="1.0"
+        android:gravity="left|center_vertical|start">
            
          <ImageButton
-            android:id="@+id/btnRepeat"
+             android:id="@+id/btnRepeat"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:src="@drawable/img_repeat_default"
+             android:background="@null"
+             android:contentDescription="@string/repeatButton"
+             android:layout_weight="0.2"/>
+            
+        <ImageButton
+            android:id="@+id/btnPrevious"
+            android:src="@drawable/button_previous"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/img_repeat_default"
-            android:layout_marginRight="5dp"
             android:background="@null"
-            android:contentDescription="@string/repeatButton"/>
-            
-            <ImageButton
-                android:id="@+id/btnPrevious"
-                android:src="@drawable/button_previous"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:contentDescription="@string/previousButton"/>
-            
-            <!--
-            <ImageButton
-                android:id="@+id/btnBackward"
-                android:src="@drawable/button_backward"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:contentDescription="@string/backwardButton"/>
-            -->
-            
-            <ImageButton
-                android:id="@+id/btnPlay"
-                android:src="@drawable/button_play"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:contentDescription="@string/playButton"/>
+            android:contentDescription="@string/previousButton"
+            android:layout_weight="0.2"/>
 
-            <!--
-            <ImageButton
-                android:id="@+id/btnForward"
-                android:src="@drawable/button_forward"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:contentDescription="@string/forwardButton"/>
-            -->
+        <ImageButton
+            android:id="@+id/btnPlay"
+            android:src="@drawable/button_play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:contentDescription="@string/playButton"
+            android:layout_weight="0.2"/>
 
-            <ImageButton
-                android:id="@+id/btnNext"
-                android:src="@drawable/button_next"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:contentDescription="@string/nextButton"/>
-            
-            <ImageButton
-            	android:id="@+id/btnShuffle"
-            	android:layout_width="wrap_content"
-            	android:layout_height="wrap_content"
-            	android:src="@drawable/img_shuffle_default"
-            	android:layout_marginLeft="5dp"
-            	android:background="@null"
-            	android:contentDescription="@string/shuffleButton"/>
+        <ImageButton
+            android:id="@+id/btnNext"
+            android:src="@drawable/button_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:contentDescription="@string/nextButton"
+            android:layout_weight="0.2"/>
+
+        <ImageButton
+            android:id="@+id/btnShuffle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/img_shuffle_default"
+            android:background="@null"
+            android:contentDescription="@string/shuffleButton"
+            android:layout_weight="0.2"/>
+
     </LinearLayout>
  
 </RelativeLayout>

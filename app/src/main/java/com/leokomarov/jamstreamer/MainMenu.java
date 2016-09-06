@@ -1,6 +1,7 @@
 package com.leokomarov.jamstreamer;
 
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,7 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.discography.tracks.TracksActivity;
-import com.leokomarov.jamstreamer.media_player.AudioPlayerService;
+import com.leokomarov.jamstreamer.audio_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.searches.AlbumsSearch;
 import com.leokomarov.jamstreamer.searches.ArtistsSearch;
@@ -115,6 +116,10 @@ public class MainMenu extends AppCompatActivity {
         		public void onClick(DialogInterface dialog, int id) {
         			stopService(new Intent(MainMenu.this, AudioPlayerService.class));
         			MainMenu.this.finish();
+                    int notificationID = 46798;
+                    NotificationManager notificationManager =
+                            (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+                    notificationManager.cancel(notificationID);
         		}
         })
         .setNegativeButton("No", null)

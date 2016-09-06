@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/albumsSelectAllTracks"
+        android:id="@+id/albums_context_menu_SelectAllTracks"
         android:title="@string/selectAll"
-        android:showAsAction="always">
+        app:showAsAction="ifRoom">
     </item>
     
     <item
-        android:id="@+id/addAlbumToPlaylist"
+        android:id="@+id/albums_context_menu_addAlbumToPlaylist"
         android:title="@string/addAlbumToPlaylistCAB"
-        android:showAsAction="always">
+        app:showAsAction="ifRoom">
     </item>
 </menu> 
