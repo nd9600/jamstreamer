@@ -14,5 +14,5 @@
     
     <string name="tracksByNameJSONURL">http://api.jamendo.com/v3.0/tracks?client_id=19482a65&amp;format=jsonpretty&amp;order=popularity_total&amp;limit=25&amp;namesearch=%1$s</string>
     <string name="trackByIDURL">http://storage-new.newjamendo.com/?from=app-b6747d04&amp;format=mp31&amp;trackid=%1$s</string>
-    <string name="trackInformation">http://api.jamendo.com/v3.0/tracks/?client_id=19482a65&amp;format=jsonpretty&amp;imagesize=300&amp;id=%1$s</string>
+    <string name="trackInformationURL">http://api.jamendo.com/v3.0/tracks/?client_id=19482a65&amp;format=jsonpretty&amp;imagesize=300&amp;id=%1$s</string>
 </resources>

@@ -8,7 +8,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -21,13 +20,16 @@ public class AudioParser extends AsyncTask<String, Void, Bitmap> {
     InputStream is = null;
 	JSONObject jObj = null;
 	String json = "";
+
 	private static final String TAG_RESULTS = "results";
 	private static final String TAG_ALBUM_IMAGE = "album_image";
 	protected static Bitmap albumImageStore;
 
 	@Override
     protected Bitmap doInBackground(String... parameters) {
-	    String urlString = parameters[0];    	
+	    String urlString = parameters[0];
+        Log.v("AudioParser", "URL: " + urlString);
+
 	    try {
 	        URL url = new URL(urlString);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -38,7 +40,7 @@ public class AudioParser extends AsyncTask<String, Void, Bitmap> {
 	        conn.connect();
 	        is = conn.getInputStream();
 		} catch (Exception e) {
-            Log.e("AudioParser", "Exception: " + e.getMessage());
+            Log.e("AudioParser", "Exception on connect: " + e.getMessage());
 		}
 		
 		try {
@@ -50,16 +52,11 @@ public class AudioParser extends AsyncTask<String, Void, Bitmap> {
 			}
 			is.close();
 			json = sb.toString();
+            jObj = new JSONObject(json);
 		} catch (Exception e) {
-            Log.e("AudioParser", "Exception: " + e.getMessage());
+            Log.e("AudioParser", "Exception after reading data: " + e.getMessage());
 		}
 
-		try {
-			jObj = new JSONObject(json);
-		} catch (JSONException e) {
-            Log.e("AudioParser", "JSONException: " + e.getMessage());
-		}
-		
     	JSONArray results;
     	Bitmap albumImage = null;
     	try {
@@ -84,7 +81,7 @@ public class AudioParser extends AsyncTask<String, Void, Bitmap> {
             albumImage = BitmapFactory.decodeStream((InputStream) new URL(imageURL).getContent());
             albumImageStore = albumImage;
         } catch (Exception e){
-            Log.e("AudioParser", "Exception: " + e.getMessage());
+            Log.e("AudioParser", "Exception while getting bitmap: " + e.getMessage());
 		}
     	return albumImage;
     }
