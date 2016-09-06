@@ -15,11 +15,14 @@ import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.media.session.MediaController;
+import android.media.session.MediaSession;
+import android.media.session.MediaSessionManager;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.leokomarov.jamstreamer.R;
@@ -31,20 +34,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class AudioPlayerService extends Service implements OnErrorListener, OnPreparedListener, OnCompletionListener{
-	protected static MediaPlayer mediaPlayer;
-	protected static AudioManager audioManager;
-	protected static WifiLock wifiLock;
-	protected static boolean prepared;
+    protected static MediaPlayer mediaPlayer;
+    protected static AudioManager audioManager;
+    private static MediaSessionManager mManager;
+    private static MediaSession mSession;
+    private static MediaController mController;
+
+    private static WifiLock wifiLock;
+    protected static boolean prepared;
 	private static int lastKnownAudioFocusState;
 	private static boolean wasPlayingWhenTransientLoss;
 	private static int originalVolume;
-	protected static boolean repeatBoolean;
-	public static boolean shuffleBoolean;
-	private String artistAndAlbumStore = "";
+    protected static boolean repeatBoolean;
+    protected static boolean shuffleBoolean;
+	private static String artistAndAlbumStore = "";
 
     //used to stop playback when you detach headphones
-    private IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-    private HeadsetIntentReceiver headsetReceiver = new HeadsetIntentReceiver();
+    private static IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+    private static HeadsetIntentReceiver headsetReceiver = new HeadsetIntentReceiver();
 
     //called on instantiation
     @Override
@@ -139,6 +146,10 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 	            notificationIntent.putExtra("fromNotification", true);
 	            PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 	            builder.setContentIntent(contentIntent);
+
+                //for the expanded notification with buttons
+                builder.setStyle(new NotificationCompat.MediaStyle());
+                builder.setLargeIcon(AudioParser.albumImageStore);
 
                 int notificationID = 46798;
                 NotificationManager notificationManager =
