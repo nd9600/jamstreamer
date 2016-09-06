@@ -136,8 +136,8 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
                         String trackName = trackInfo.getString(context.getString(R.string.TAG_TRACK_NAME));
                         long durationLong = Long.valueOf(trackInfo.getString(context.getString(R.string.TAG_TRACK_DURATION)));
                         String trackDuration = String.format(Locale.US, "%d:%02d", durationLong / 60, durationLong % 60);
-                        String artistName = trackInfo.getString(context.getString(R.string.TAG_ARTIST_NAME));
-                        String albumName = trackInfo.getString(context.getString(R.string.TAG_ALBUM_NAME));
+                        String artistName = trackInfo.getString(context.getString(R.string.TAG_ARTIST_NAME_LITERAL));
+                        String albumName = trackInfo.getString(context.getString(R.string.TAG_ALBUM_NAME_LITERAL));
                         String albumID = trackInfo.getString("album_id");
 
                         HashMap<String, String> albumIDMap = new HashMap<>();

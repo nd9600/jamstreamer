@@ -3,3 +3,4 @@
 - Be able to quit from anywhere
 
 - Make proper search options - sorting, filters, &c
+- Change the shuffling to make a list of ints, not shuffle the whole tracklist

@@ -184,7 +184,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
                     for (int i = 0; i < results.length(); i++) {
                         JSONObject albumInfo = results.getJSONObject(i);
                         HashMap<String, String> map = new HashMap<>();
-                        String artistName = albumInfo.getString(context.getString(R.string.TAG_ARTIST_NAME_IN_LIST_WITH_ALBUM_NAME));
+                        String artistName = albumInfo.getString(context.getString(R.string.TAG_ARTIST_NAME_LITERAL));
                         String albumName = albumInfo.getString(context.getString(R.string.TAG_ALBUM_NAME));
                         String albumID = albumInfo.getString(context.getString(R.string.TAG_ALBUM_ID));
 
@@ -217,7 +217,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
             onTrackRequestCompletedLoop++;
             for(int i = 0; i < results.length(); i++) {
                 JSONArray tracksArray = results.getJSONObject(i).getJSONArray("tracks");
-                String artistName = results.getJSONObject(i).getString(context.getString(R.string.TAG_ARTIST_NAME_IN_LIST_WITH_ALBUM_NAME));
+                String artistName = results.getJSONObject(i).getString(context.getString(R.string.TAG_ARTIST_NAME_LITERAL));
                 String albumName = results.getJSONObject(i).getString(context.getString(R.string.TAG_ALBUM_NAME));
                 for(int j = 0; j < tracksArray.length(); j++) {
                     JSONObject trackInfo = tracksArray.getJSONObject(j);
