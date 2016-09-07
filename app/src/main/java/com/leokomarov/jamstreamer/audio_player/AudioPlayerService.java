@@ -35,13 +35,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class AudioPlayerService extends Service implements OnErrorListener, OnPreparedListener, OnCompletionListener {
-
-    public static boolean shuffleBoolean;
-    protected static boolean repeatBoolean;
-
     protected static MediaPlayer mediaPlayer;
     protected static boolean prepared;
     private static WifiLock wifiLock;
+    private ComplexPreferences trackPreferences;
 
     protected static AudioManager audioManager;
     private static int lastKnownAudioFocusState;
@@ -49,6 +46,9 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     private static int originalVolume;
 
     private static String artistAndAlbumStore = "";
+
+    public static boolean shuffleBoolean;
+    protected static boolean repeatBoolean;
 
     //used to stop playback when you detach headphones
     private static IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
@@ -64,11 +64,82 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     public static final String ACTION_PREVIOUS = "action_previous";
     public static final String ACTION_STOP = "action_stop";
 
+    private ArrayList<HashMap<String, String>> getTracklistFromMemory(){
+        if (!shuffleBoolean) {
+            return tracklistUtils.restoreTracklist(trackPreferences);
+        } else {
+            PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
+            return shuffledTrackPreferencesObject.trackList;
+        }
+    }
+
+    private void initMediaSessions(final String trackName, final String artistAndAlbum) {
+        mSession = new MediaSessionCompat(this, "jamstreamerMediaSession");
+        mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        try {
+            Log.v("initMediaSessions", "making new mController");
+            mController = new MediaControllerCompat(getApplicationContext(), mSession.getSessionToken());
+        } catch (RemoteException e) {
+            Log.e("AudioPlayerService", "RemoteException: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        mSession.setCallback(new MediaSessionCompat.Callback() {
+            @Override
+            public void onPlay() {
+                super.onPlay();
+
+                Log.v("AudioPlayerService", "onPlay");
+                AudioPlayer.pauseOrPlay();
+                buildNotification(trackName, artistAndAlbum, generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
+            }
+
+            @Override
+            public void onPause() {
+                super.onPause();
+
+                Log.v("MediaPlayerService", "onPause");
+                AudioPlayer.pauseOrPlay();
+                buildNotification(trackName, artistAndAlbum, generateAction(android.R.drawable.ic_media_play, "Play", ACTION_PLAY));
+            }
+
+            @Override
+            public void onSkipToNext() {
+                super.onSkipToNext();
+
+                Log.v("MediaPlayerService", "onSkipToNext");
+                AudioPlayer.gotoNext();
+                buildNotification(trackName, artistAndAlbum, generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
+            }
+
+            @Override
+            public void onSkipToPrevious() {
+                super.onSkipToPrevious();
+
+                Log.v("MediaPlayerService", "onSkipToPrevious");
+                AudioPlayer.gotoPrevious();
+                buildNotification(trackName, artistAndAlbum, generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
+            }
+
+            @Override
+            public void onStop() {
+                super.onStop();
+
+                Log.v("MediaPlayerService", "onStop");
+                //Stop media player here
+                generalUtils.closeNotification(AudioPlayerService.this);
+                Intent audioPlayerServiceIntent = new Intent(getApplicationContext(), AudioPlayerService.class);
+                stopService(audioPlayerServiceIntent);
+            }
+        });
+    }
+
     private void handleIntent(Intent intent) {
 
         Log.v("handleIntent", intent.getAction());
 
-        if (intent == null || intent.getAction() == null) {
+        if ((! prepared) || intent.getAction() == null) {
             return;
         }
 
@@ -89,7 +160,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
     private NotificationCompat.Action generateAction(int icon, String title, String intentAction) {
 
-        Log.v("generateAction", intentAction);
+        //Log.v("generateAction", intentAction);
 
         Intent intent = new Intent(getApplicationContext(), AudioPlayerService.class);
         intent.setAction(intentAction);
@@ -101,7 +172,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
     private void buildNotification(String trackName, String artistAndAlbum, NotificationCompat.Action action) {
 
-        Log.v("buildNotification", trackName);
+        //Log.v("buildNotification", trackName);
 
         //this defines the activity that's opened when
         //the notification is pressed
@@ -115,7 +186,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         builder.setContentTitle(trackName);
         builder.setContentText(artistAndAlbum);
         builder.setContentIntent(pendingClickIntent);
-        builder.setOngoing(true);
+        //builder.setOngoing(true);
         builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
         //for notification controls, ignored pre-4.1
@@ -138,76 +209,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         notificationManager.notify(generalUtils.notificationID, builder.build());
     }
 
-    private void initMediaSessions(final String trackName, final String artistAndAlbum) {
-        mSession = new MediaSessionCompat(this, "jamstreamerMediaSession");
-        mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
-                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-        try {
-            Log.v("initMediaSessions", "making new mController");
-            mController = new MediaControllerCompat(getApplicationContext(), mSession.getSessionToken());
-        } catch (RemoteException e) {
-            Log.e("AudioPlayerService", "RemoteException: " + e.getMessage());
-            e.printStackTrace();
-        }
-
-        mSession.setCallback(new MediaSessionCompat.Callback() {
-             @Override
-             public void onPlay() {
-                 super.onPlay();
-
-                 Log.v("AudioPlayerService", "onPlay");
-                 AudioPlayer.pauseOrPlay();
-                 buildNotification(trackName, artistAndAlbum, generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
-             }
-
-             @Override
-             public void onPause() {
-                 super.onPause();
-
-                 Log.v("MediaPlayerService", "onPause");
-                 AudioPlayer.pauseOrPlay();
-                 buildNotification(trackName, artistAndAlbum, generateAction(android.R.drawable.ic_media_play, "Play", ACTION_PLAY));
-             }
-
-             @Override
-             public void onSkipToNext() {
-                 super.onSkipToNext();
-
-                 Log.v("MediaPlayerService", "onSkipToNext");
-                 AudioPlayer.gotoNext();
-                 buildNotification(trackName, artistAndAlbum, generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
-             }
-
-             @Override
-             public void onSkipToPrevious() {
-                 super.onSkipToPrevious();
-
-                 Log.v("MediaPlayerService", "onSkipToPrevious");
-                 AudioPlayer.gotoPrevious();
-                 buildNotification(trackName, artistAndAlbum, generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
-             }
-
-             @Override
-             public void onStop() {
-                 super.onStop();
-
-                 Log.v("MediaPlayerService", "onStop");
-                 //Stop media player here
-                 generalUtils.closeNotification(AudioPlayerService.this);
-                 Intent audioPlayerServiceIntent = new Intent(getApplicationContext(), AudioPlayerService.class);
-                 stopService(audioPlayerServiceIntent);
-             }
-        });
-    }
-
-    /*
-    //called on instantiation
-    @Override
-    public void onCreate() {
-        super.onCreate();
-    }
-    */
-
     //called every time the service is started with startService()
     @Override
     public int onStartCommand(Intent audioPlayerServiceIntent, int flags, int startId) {
@@ -215,63 +216,63 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         Log.v("onStartCommand", audioPlayerServiceIntent.getAction());
 
         audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        trackPreferences = ComplexPreferences.getComplexPreferences(this,
+                getString(R.string.trackPreferences), MODE_PRIVATE);
 
         SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
         int indexPosition;
 
-        ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-                getString(R.string.trackPreferences), MODE_PRIVATE);
-        ArrayList<HashMap<String, String>> trackList;
-
-        //restores the tracklist
-        if (! AudioPlayerService.shuffleBoolean) {
-            trackList = tracklistUtils.restoreTracklist(trackPreferences);
+        //gets the indexPosition and restores the tracklist
+        if (! shuffleBoolean) {
             indexPosition = indexPositionPreference.getInt("indexPosition", 0);
         } else {
-            PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
-            trackList = shuffledTrackPreferencesObject.trackList;
             indexPosition = indexPositionPreference.getInt("shuffledIndexPosition", 0);
         }
+        ArrayList<HashMap<String, String>> tracklist = getTracklistFromMemory();
 
-        //gets the trackIDs
-        int newtrackID = Integer.parseInt(trackList.get(indexPosition).get("trackID"));
-        SharedPreferences currentTrackPreference = getSharedPreferences(getString(R.string.currentTrackPreferences), 0);
-        int currentTrackID = currentTrackPreference.getInt("currentTrack", 0);
-
-        //if the player doesn't exist, or the tracks that was playing is
-        //different from the new one, play the new track
-        if ((mediaPlayer == null) || (newtrackID != currentTrackID)) {
-            Log.v("service-onStartCommand", "Playing new song");
-
-            if (mSession == null) {
-                String trackName = trackList.get(indexPosition).get("trackName");
-                String artistName = trackList.get(indexPosition).get("trackArtist");
-                String albumName = trackList.get(indexPosition).get("trackAlbum");
-                String artistAndAlbum = String.format("%s - %s", artistName, albumName);
-                initMediaSessions(trackName, artistAndAlbum);
-            }
-            handleIntent(audioPlayerServiceIntent);
-            playSong(trackList, indexPosition);
+        if (mSession == null) {
+            String trackName = tracklist.get(indexPosition).get("trackName");
+            String artistName = tracklist.get(indexPosition).get("trackArtist");
+            String albumName = tracklist.get(indexPosition).get("trackAlbum");
+            String artistAndAlbum = String.format("%s - %s", artistName, albumName);
+            initMediaSessions(trackName, artistAndAlbum);
         }
+        handleIntent(audioPlayerServiceIntent);
 
-        //if it does, and the track that was playing is the same as the current one,
-        //set the player's views
-        else {
-            String trackName = trackList.get(indexPosition).get("trackName");
-            String trackDuration = trackList.get(indexPosition).get("trackDuration");
-            String artistName = trackList.get(indexPosition).get("trackArtist");
-            String albumName = trackList.get(indexPosition).get("trackAlbum");
-            AudioPlayer.songTitleLabel.setText(String.format("%s - %s", trackName, artistName));
-            AudioPlayer.albumLabel.setText(albumName);
-            AudioPlayer.songTotalDurationLabel.setText(trackDuration);
-            AudioPlayer.albumArt.setImageBitmap(AudioParser.albumImageStore);
-        }
+        playSong(indexPosition, tracklist);
 
         return super.onStartCommand(audioPlayerServiceIntent, flags, startId);
     }
 
-    protected void playSong(ArrayList<HashMap<String, String>> trackList, int indexPosition) {
-        if (trackList != null && trackList.size() != 0) {
+    protected void playSong(int indexPosition, ArrayList<HashMap<String, String>> tracklist) {
+
+        Log.v("playSong", "indexPosition: " + indexPosition);
+
+        //gets the trackIDs
+        SharedPreferences currentTrackPreference = getSharedPreferences(getString(R.string.currentTrackPreferences), 0);
+        int previousTrackID = currentTrackPreference.getInt("currentTrack", 0);
+        int newTrackID = Integer.parseInt(tracklist.get(indexPosition).get("trackID"));
+
+        //if the player doesn't exist, or the tracks that was playing is
+        //different from the new one, play the new track
+
+        if ((mediaPlayer != null) && (newTrackID == previousTrackID)) {
+            //if the player exists, and the track that was playing is the same as the current one,
+            //set the player's views
+            String trackName = tracklist.get(indexPosition).get("trackName");
+            String trackDuration = tracklist.get(indexPosition).get("trackDuration");
+            String artistName = tracklist.get(indexPosition).get("trackArtist");
+            String albumName = tracklist.get(indexPosition).get("trackAlbum");
+            AudioPlayer.songTitleLabel.setText(String.format("%s - %s", trackName, artistName));
+            AudioPlayer.albumLabel.setText(albumName);
+            AudioPlayer.songTotalDurationLabel.setText(trackDuration);
+            AudioPlayer.albumArt.setImageBitmap(AudioParser.albumImageStore);
+            return;
+        }
+
+        Log.v("service-playSong", "Playing new song");
+
+        if (tracklist.size() != 0) {
 
             //create the player if it doesn't exist
             //if it does, reset it and close the notification
@@ -287,27 +288,24 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
                 mediaPlayer.reset();
             }
 
-            int newtrackID = Integer.parseInt(trackList.get(indexPosition).get("trackID"));
-
             //saves the current trackID in memory
-            SharedPreferences currentTrackPreference = getSharedPreferences(getString(R.string.currentTrackPreferences), 0);
             SharedPreferences.Editor currentTrackEditor = currentTrackPreference.edit();
-            currentTrackEditor.putInt("currentTrack", newtrackID);
+            currentTrackEditor.putInt("currentTrack", newTrackID);
             currentTrackEditor.apply();
 
             //gets the mp3 and info urls for this track
             //info url used for album art
             String unformattedURL = getResources().getString(R.string.trackByIDURL);
-            String mp3url = String.format(unformattedURL, newtrackID).replace("&amp;", "&");
+            String mp3url = String.format(unformattedURL, newTrackID).replace("&amp;", "&");
             Log.v("service-playSong", "mp3url = " + mp3url);
             String unformattedTrackInfoURL = getResources().getString(R.string.trackInformationURL);
-            String trackInfoURL = String.format(unformattedTrackInfoURL, newtrackID).replace("&amp;", "&");
+            String trackInfoURL = String.format(unformattedTrackInfoURL, newTrackID).replace("&amp;", "&");
 
             //gets the track info from the tracklist
-            String trackName = trackList.get(indexPosition).get("trackName");
-            String artistName = trackList.get(indexPosition).get("trackArtist");
-            String trackDuration = trackList.get(indexPosition).get("trackDuration");
-            String albumName = trackList.get(indexPosition).get("trackAlbum");
+            String trackName = tracklist.get(indexPosition).get("trackName");
+            String artistName = tracklist.get(indexPosition).get("trackArtist");
+            String trackDuration = tracklist.get(indexPosition).get("trackDuration");
+            String albumName = tracklist.get(indexPosition).get("trackAlbum");
             String artistAndAlbum = artistName + " - " + albumName;
 
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -346,31 +344,9 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
                 mediaPlayer.setOnErrorListener(this);
 
                 mediaPlayer.prepareAsync();
-
-                /*
-                //make the notification
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-                builder.setSmallIcon(R.drawable.img_ic_launcher);
-                builder.setContentTitle(trackName);
-                builder.setContentText(artistName + " - " + albumName);
-                builder.setOngoing(true);
-                builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
-
-                //this defines the activity that's opened when
-                //the notification is pressed
-                Intent notificationIntent = new Intent(this, AudioPlayer.class);
-                notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-                notificationIntent.putExtra("fromNotification", true);
-                PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                builder.setContentIntent(contentIntent);
-
-                NotificationManager notificationManager =
-                        (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-                notificationManager.notify(generalUtils.notificationID, builder.build());
-                */
             } catch (NullPointerException e) {
                 android.util.Log.e("AudioPlayerService", "NullPointerException: " + e.getMessage());
-                //android.util.Log.e("AudioPlayerService", "trackList.get(i): " + trackList.get(indexPosition));
+                //android.util.Log.e("AudioPlayerService", "tracklist.get(i): " + tracklist.get(indexPosition));
             } catch (Exception e) {
                 Log.e("AudioPlayerService", "Exception: " + e.getMessage());
             }
@@ -445,11 +421,10 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
 
             if (!shuffleBoolean) {
-                ArrayList<HashMap<String, String>> trackList = tracklistUtils.restoreTracklist(trackPreferences);
+                ArrayList<HashMap<String, String>> tracklist = tracklistUtils.restoreTracklist(trackPreferences);
                 int indexPosition = indexPositionPreference.getInt("indexPosition", -1);
 
-                assert trackList != null;
-                if (indexPosition + 1 <= trackList.size() - 1) {
+                if (indexPosition + 1 <= tracklist.size() - 1) {
                     AudioPlayer.button_play.setClickable(false);
                     AudioPlayer.button_next.setClickable(false);
                     AudioPlayer.button_previous.setClickable(false);
@@ -457,11 +432,11 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
                     AudioPlayer.button_shuffle.setClickable(false);
                     AudioPlayer.songProgressBar.setClickable(false);
                     AudioPlayer.button_play.setImageResource(R.drawable.button_play);
-                    mp.reset();
+
                     indexPosition++;
                     indexPositionEditor.putInt("indexPosition", indexPosition);
                     indexPositionEditor.apply();
-                    playSong(indexPosition);
+                    playSong(indexPosition, getTracklistFromMemory());
                 }
             } else {
                 PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
@@ -476,11 +451,11 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
                     AudioPlayer.button_shuffle.setClickable(false);
                     AudioPlayer.songProgressBar.setClickable(false);
                     AudioPlayer.button_play.setImageResource(R.drawable.button_play);
-                    mp.reset();
+
                     shuffledIndexPosition++;
                     indexPositionEditor.putInt("shuffledIndexPosition", shuffledIndexPosition);
                     indexPositionEditor.apply();
-                    playSong(shuffledIndexPosition);
+                    playSong(shuffledIndexPosition, getTracklistFromMemory());
                 }
             }
         }

@@ -7,6 +7,7 @@ import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -291,6 +292,8 @@ public class AudioPlayer extends AppCompatActivity {
             ArrayList<HashMap<String, String>> trackList;
             SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
             int indexPosition;
+
+            Log.v("audioPlayer", "setting all the views");
 
             if (AudioPlayerService.shuffleBoolean){
                 PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
