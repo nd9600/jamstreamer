@@ -1,5 +1,6 @@
 package com.leokomarov.jamstreamer.audio_player;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
@@ -42,6 +43,8 @@ public class AudioPlayer extends AppCompatActivity {
 
     private static ComplexPreferences trackPreferences;
 
+    private static Context context;
+
     //called when the activity is re-launched while at the top of the activity stack instead of a new instance of the activity being started
     //since all intents creating it have the FLAG_ACTIVITY_SINGLE_TOP flag
     @Override
@@ -63,6 +66,7 @@ public class AudioPlayer extends AppCompatActivity {
 
         trackPreferences = ComplexPreferences.getComplexPreferences(this,
                 getString(R.string.trackPreferences), MODE_PRIVATE);
+        context = this;
 
         afterCreation(getIntent());
     }
@@ -100,13 +104,14 @@ public class AudioPlayer extends AppCompatActivity {
         }
     }
 
-    public void gotoPrevious(){
+    public static void gotoPrevious(){
         if(AudioPlayerService.mediaPlayer.getCurrentPosition() >= 3000){
             AudioPlayerService.mediaPlayer.seekTo(0);
         } else {
 
-            Intent audioServiceIntent = new Intent(getApplicationContext(), AudioPlayerService.class);
-            SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
+            Intent audioServiceIntent = new Intent(context, AudioPlayerService.class);
+            audioServiceIntent.setAction(AudioPlayerService.ACTION_PLAY);
+            SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
             SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
 
             //start the previous song
@@ -117,7 +122,7 @@ public class AudioPlayer extends AppCompatActivity {
                     indexPosition--;
                     indexPositionEditor.putInt("indexPosition", indexPosition);
                     indexPositionEditor.apply();
-                    startService(audioServiceIntent);
+                    context.startService(audioServiceIntent);
                 }
             }
             else {
@@ -127,20 +132,22 @@ public class AudioPlayer extends AppCompatActivity {
                     shuffledIndexPosition--;
                     indexPositionEditor.putInt("shuffledIndexPosition", shuffledIndexPosition);
                     indexPositionEditor.apply();
-                    startService(audioServiceIntent);
+                    context.startService(audioServiceIntent);
                 }
             }
         }
     }
 
-    public void gotoNext(){
-        Intent audioServiceIntent = new Intent(getApplicationContext(), AudioPlayerService.class);
+    public static void gotoNext(){
         //if on repeat, seek to the start
         if (AudioPlayerService.repeatBoolean){
             AudioPlayerService.mediaPlayer.seekTo(0);
         }
         else {
-            SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
+            Intent audioServiceIntent = new Intent(context, AudioPlayerService.class);
+            audioServiceIntent.setAction(AudioPlayerService.ACTION_PLAY);
+
+            SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
             SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
 
             //if not shuffling, start the next normal track
@@ -152,7 +159,7 @@ public class AudioPlayer extends AppCompatActivity {
                     indexPosition++;
                     indexPositionEditor.putInt("indexPosition", indexPosition);
                     indexPositionEditor.apply();
-                    startService(audioServiceIntent);
+                    context.startService(audioServiceIntent);
                 }
             }
             else {
@@ -164,7 +171,7 @@ public class AudioPlayer extends AppCompatActivity {
                     shuffledIndexPosition++;
                     indexPositionEditor.putInt("shuffledIndexPosition", shuffledIndexPosition);
                     indexPositionEditor.apply();
-                    startService(audioServiceIntent);
+                    context.startService(audioServiceIntent);
                 }
             }
         }
@@ -209,6 +216,8 @@ public class AudioPlayer extends AppCompatActivity {
 	public void afterCreation(Intent intent){
 		setContentView(R.layout.audio_player);	
 		getSupportActionBar();//.setDisplayHomeAsUpEnabled(true);
+
+        //sets the media stream that the volume buttons control
 		setVolumeControlStream(AudioManager.STREAM_MUSIC);
 		
 		button_play = (ImageButton) findViewById(R.id.btnPlay);
@@ -271,9 +280,10 @@ public class AudioPlayer extends AppCompatActivity {
         //start the audio service
         Boolean fromNotification = intent.getBooleanExtra("fromNotification", false);
         if (! fromNotification){
-            Intent audioService = new Intent(getApplicationContext(), AudioPlayerService.class);
-            startService(audioService);
             button_play.setImageResource(R.drawable.button_pause);
+            Intent audioServiceIntent = new Intent(getApplicationContext(), AudioPlayerService.class);
+            audioServiceIntent.setAction(AudioPlayerService.ACTION_PLAY);
+            startService(audioServiceIntent);
         }
 
         //else set all the activity's views

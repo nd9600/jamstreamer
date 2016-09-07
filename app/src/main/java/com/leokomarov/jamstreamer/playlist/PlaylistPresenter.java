@@ -74,7 +74,7 @@ public class PlaylistPresenter {
 
         if(AudioPlayerService.shuffleBoolean){
             AudioPlayerService.shuffleBoolean = false;
-            AudioPlayer.button_shuffle.setImageResource(R.drawable.img_repeat_default);
+            AudioPlayer.button_shuffle.setImageResource(R.drawable.img_shuffle_default);
         }
 
         Intent intent = new Intent(context, AudioPlayer.class);
