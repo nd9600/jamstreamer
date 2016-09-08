@@ -186,7 +186,7 @@ public class AudioPlayer extends AppCompatActivity {
         if (! fromNotification){
             button_play.setImageResource(R.drawable.button_pause);
             Intent audioServiceIntent = new Intent(getApplicationContext(), AudioPlayerService.class);
-            audioServiceIntent.setAction(AudioPlayerService.ACTION_FIRST_PLAY);
+            audioServiceIntent.setAction(AudioPlayerService.ACTION_MAKE_NOTIFICATION);
             startService(audioServiceIntent);
         }
 
@@ -237,7 +237,7 @@ public class AudioPlayer extends AppCompatActivity {
 		button_play.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				AudioPlayerService.pauseOrPlay();
+				AudioPlayerService.playOrPause();
 
                 if (AudioPlayerService.mediaPlayer != null){
                     mHandler.postDelayed(mUpdateTime, 100);
