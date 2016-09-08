@@ -64,8 +64,8 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     //used with notification and lockscreen controls
     private static MediaSessionCompat mSession;
     private static MediaControllerCompat mController;
-    private NotificationCompat.Builder builder;
-    private NotificationCompat.Action notificationAction;
+    private static NotificationCompat.Builder builder;
+    private static NotificationCompat.Action notificationAction;
     protected static Bitmap albumImage;
 
     public static final String ACTION_MAKE_NOTIFICATION = "action_make_notification";
@@ -111,11 +111,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             AudioParser audioParser = new AudioParser();
             audioParser.execute(currentTrackInfoURL, currentArtistAndAlbum);
             previousArtistAndAlbum = currentArtistAndAlbum;
-            /*
-        } else if (albumImage != null) {
-            Log.v("updateAlbumArt", "setting album art in activity");
-            AudioPlayer.setAlbumArt();
-        */
         } else {
             notificationListener(null);
         }
@@ -155,7 +150,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
                 Log.v("AudioPlayerService", "onSkipToNext");
                 gotoNext();
-                //buildNotification(true, generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
             }
 
             @Override
@@ -164,7 +158,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
                 Log.v("AudioPlayerService", "onSkipToPrevious");
                 gotoPrevious();
-                //buildNotification(true, generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
             }
 
             @Override
@@ -189,9 +182,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     }
 
     protected void handleIntent(Intent intent) {
-
-        Log.v("handleIntent", "" + intent);
-
         if (intent.getAction() == null) {
             return;
         }
@@ -219,23 +209,18 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         if (albumImage != null){
             AudioPlayerService.albumImage = albumImage;
         }
-        context.builder.setLargeIcon(AudioPlayerService.albumImage);
+        builder.setLargeIcon(AudioPlayerService.albumImage);
 
         //builder.setLargeIcon(((BitmapDrawable) AudioPlayer.albumArt.getDrawable()).getBitmap());
-        context.builder.addAction(generateAction(android.R.drawable.ic_media_previous, "Previous", ACTION_PREVIOUS));
-        context.builder.addAction(context.notificationAction);
-        context.builder.addAction(generateAction(android.R.drawable.ic_media_next, "Next", ACTION_NEXT));
+        builder.addAction(generateAction(android.R.drawable.ic_media_previous, "Previous", ACTION_PREVIOUS));
+        builder.addAction(notificationAction);
+        builder.addAction(generateAction(android.R.drawable.ic_media_next, "Next", ACTION_NEXT));
         NotificationCompat.MediaStyle style = new NotificationCompat.MediaStyle().setMediaSession(mSession.getSessionToken());
         style.setShowActionsInCompactView(0, 1, 2);
-        context.builder.setStyle(style);
-
-        Log.v("notificationListener", "made advanced notification");
-        Log.v("notificationListener", "notificationAction: " +  context.notificationAction.hashCode());
-        Log.v("notificationListener", "builder.mContentTitle: " +  context.builder.mContentTitle);
-        Log.v("notificationListener", "builder.mContentText: " +  context.builder.mContentText);
+        builder.setStyle(style);
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(generalUtils.notificationID, context.builder.build());
+        notificationManager.notify(generalUtils.notificationID, builder.build());
     }
 
     private static NotificationCompat.Action generateAction(int icon, String title, String intentAction) {
@@ -258,11 +243,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     // in listener called from AudioParser, make advanced notification
     // in listener, notify
     private static void buildNotification(boolean update, NotificationCompat.Action action) {
-
-        Log.v("buildNotification", " ");
-        Log.v("buildNotification", currentTrackName);
-        Log.v("buildNotification", currentArtistAndAlbum);
-
         //this defines the activity that's opened when
         //the notification is pressed
         Intent clickIntent = new Intent(context, AudioPlayer.class);
@@ -274,32 +254,27 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         stopIntent.setAction(ACTION_STOP);
         PendingIntent pendingStopIntent = PendingIntent.getService(context, 1, stopIntent, 0);
 
-        context.builder = new NotificationCompat.Builder(context);
-        context.builder.setSmallIcon(R.drawable.img_ic_launcher);
-        context.builder.setContentTitle(currentTrackName);
-        context.builder.setContentText(currentArtistAndAlbum);
-        context.builder.setContentIntent(pendingClickIntent);
-        context.builder.setDeleteIntent(pendingStopIntent);
+        builder = new NotificationCompat.Builder(context);
+        builder.setSmallIcon(R.drawable.img_ic_launcher);
+        builder.setContentTitle(currentTrackName);
+        builder.setContentText(currentArtistAndAlbum);
+        builder.setContentIntent(pendingClickIntent);
+        builder.setDeleteIntent(pendingStopIntent);
         //builder.setOngoing(true);
-        context.builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
         if (Build.VERSION.SDK_INT >= 16){
             //for notification controls, ignored pre-4.1
             //sets the album art if it's been stored in AudioParser
-            Log.v("buildNotification", "action: " +  action.hashCode());
-            context.notificationAction = action;
+            notificationAction = action;
             if (update) {
                 updateAlbumArt();
             }  else {
-                Log.v("updateAlbumArt", "doing nothing");
                 notificationListener(null);
             }
         } else {
-            Log.v("buildNotification", "builder.mContentText: " +  context.builder.mContentText);
-            Log.v("buildNotification", "builder.mContentTitle: " +  context.builder.mContentTitle);
-
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(generalUtils.notificationID, context.builder.build());
+            notificationManager.notify(generalUtils.notificationID, builder.build());
         }
 
     }
