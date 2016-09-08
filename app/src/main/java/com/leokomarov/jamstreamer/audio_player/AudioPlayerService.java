@@ -70,7 +70,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     public static final String ACTION_STOP = "action_stop";
 
     //used to stop the song playing twice
-    public static boolean goThroughPlaySong;
     public static boolean playFirstSong;
 
     @Override
@@ -84,8 +83,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
         tracklist = getTracklistFromMemory();
         tracklistHasChanged = false;
-        goThroughPlaySong = false;
-        playFirstSong = false;
     }
 
     private static ArrayList<HashMap<String, String>> getTracklistFromMemory(){
@@ -274,40 +271,31 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     }
 
     private static void playInitialSong(){
-        SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
-        int indexPosition;
 
-        //gets the indexPosition
-        if (! shuffleBoolean) {
-            indexPosition = indexPositionPreference.getInt("indexPosition", 0);
-        } else {
-            indexPosition = indexPositionPreference.getInt("shuffledIndexPosition", 0);
-        }
-
-        Log.v("playInitialSong", "goThroughPlaySong: " + goThroughPlaySong);
         Log.v("playInitialSong", "playFirstSong: " + playFirstSong);
         if (playFirstSong) {
-            Log.v("playInitialSong", "true false");
-            goThroughPlaySong = true;
             playFirstSong = false;
+
+            SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
+            int indexPosition;
+
+            //gets the indexPosition
+            if (! shuffleBoolean) {
+                indexPosition = indexPositionPreference.getInt("indexPosition", 0);
+            } else {
+                indexPosition = indexPositionPreference.getInt("shuffledIndexPosition", 0);
+            }
+
+            playSong(indexPosition);
         }/* else {
             Log.v("playInitialSong", "setting true");
             goThroughPlaySong = true;
         }
         */
-        playSong(indexPosition);
+
     }
 
     protected static void playSong(int indexPosition) {
-
-        Log.v("service-playSong", "goThroughPlaySong: " + goThroughPlaySong);
-        if (goThroughPlaySong) {
-            goThroughPlaySong = false;
-        } else {
-            Log.v("service-playSong", "doing nothing");
-            return;
-        }
-
         if (tracklistHasChanged) {
             Log.v("service-playSong", "tracklistHasChanged");
             tracklist = getTracklistFromMemory();
@@ -448,9 +436,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             mp.stop();
         }
 
-        if (repeatBoolean) {
-            mp.seekTo(0);
-        } else {
+        if (! repeatBoolean){
             prepared = false;
             audioManager.abandonAudioFocus(onAudioFocusChangeListener);
             unregisterReceiver(headsetReceiver);
@@ -460,42 +446,8 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             }
             generalUtils.closeNotification(this);
             AudioPlayer.setPlayButtonImage(true);
-            ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
-                    getString(R.string.trackPreferences), MODE_PRIVATE);
-            SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
-            SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
-
-            if (!shuffleBoolean) {
-                ArrayList<HashMap<String, String>> tracklist = tracklistUtils.restoreTracklist(trackPreferences);
-                int indexPosition = indexPositionPreference.getInt("indexPosition", -1);
-
-                if (indexPosition + 1 <= tracklist.size() - 1) {
-                    AudioPlayer.setViewsClickable(false);
-                    AudioPlayer.setPlayButtonImage(true);
-
-                    indexPosition++;
-                    indexPositionEditor.putInt("indexPosition", indexPosition);
-                    indexPositionEditor.apply();
-                    goThroughPlaySong = true;
-                    playSong(indexPosition);
-                }
-            } else {
-                PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
-                ArrayList<HashMap<String, String>> shuffledTracklist = shuffledTrackPreferencesObject.trackList;
-                int shuffledIndexPosition = indexPositionPreference.getInt("shuffledIndexPosition", -1);
-
-                if (shuffledIndexPosition + 1 <= shuffledTracklist.size() - 1) {
-                    AudioPlayer.setViewsClickable(false);
-                    AudioPlayer.setPlayButtonImage(true);
-
-                    shuffledIndexPosition++;
-                    indexPositionEditor.putInt("shuffledIndexPosition", shuffledIndexPosition);
-                    indexPositionEditor.apply();
-                    goThroughPlaySong = true;
-                    playSong(shuffledIndexPosition);
-                }
-            }
         }
+        gotoNext();
     }
 
     //pause audio if it's playing
@@ -531,7 +483,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
                 indexPositionEditor.putInt(nameOfIndexPosition, indexPosition);
                 indexPositionEditor.apply();
 
-                goThroughPlaySong = true;
                 playSong(indexPosition);
             }
         }
@@ -558,7 +509,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
                 indexPosition++;
                 indexPositionEditor.putInt(nameOfIndexPosition, indexPosition);
                 indexPositionEditor.apply();
-                goThroughPlaySong = true;
                 playSong(indexPosition);
             }
         }

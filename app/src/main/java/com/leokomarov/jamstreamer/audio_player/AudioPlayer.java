@@ -217,6 +217,7 @@ public class AudioPlayer extends AppCompatActivity {
             button_play.setImageResource(R.drawable.button_pause);
             Intent audioServiceIntent = new Intent(getApplicationContext(), AudioPlayerService.class);
             audioServiceIntent.setAction(AudioPlayerService.ACTION_MAKE_NOTIFICATION);
+            AudioPlayerService.playFirstSong = true;
             startService(audioServiceIntent);
         }
 
