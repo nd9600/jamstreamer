@@ -69,6 +69,10 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     public static final String ACTION_PREVIOUS = "action_previous";
     public static final String ACTION_STOP = "action_stop";
 
+    //used to stop the song playing twice
+    public static boolean goThroughPlaySong;
+    public static boolean playFirstSong;
+
     @Override
     public void onCreate(){
         super.onCreate();
@@ -80,6 +84,8 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
         tracklist = getTracklistFromMemory();
         tracklistHasChanged = false;
+        goThroughPlaySong = false;
+        playFirstSong = false;
     }
 
     private static ArrayList<HashMap<String, String>> getTracklistFromMemory(){
@@ -141,7 +147,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
                 super.onSkipToNext();
 
                 Log.v("MediaPlayerService", "onSkipToNext");
-                //updateAlbumArt("");
                 gotoNext();
                 buildNotification(generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
             }
@@ -151,7 +156,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
                 super.onSkipToPrevious();
 
                 Log.v("MediaPlayerService", "onSkipToPrevious");
-                //updateAlbumArt("");
                 gotoPrevious();
                 buildNotification(generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
             }
@@ -206,15 +210,10 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     }
 
     private static NotificationCompat.Action generateAction(int icon, String title, String intentAction) {
-
-        Log.v("generateAction", intentAction);
-
-        Intent intent = new Intent(context, AudioPlayerService.class);
+                Intent intent = new Intent(context, AudioPlayerService.class);
         intent.setAction(intentAction);
         PendingIntent pendingIntent = PendingIntent.getService(context, 1, intent, 0);
         NotificationCompat.Action.Builder builder = new NotificationCompat.Action.Builder(icon, title, pendingIntent);
-
-        Log.v("generateAction", "before build");
 
         return builder.build();
     }
@@ -271,8 +270,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         }
         handleIntent(audioPlayerServiceIntent);
 
-        //playSong(indexPosition);
-
         return super.onStartCommand(audioPlayerServiceIntent, flags, startId);
     }
 
@@ -287,10 +284,29 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             indexPosition = indexPositionPreference.getInt("shuffledIndexPosition", 0);
         }
 
+        Log.v("playInitialSong", "goThroughPlaySong: " + goThroughPlaySong);
+        Log.v("playInitialSong", "playFirstSong: " + playFirstSong);
+        if (playFirstSong) {
+            Log.v("playInitialSong", "true false");
+            goThroughPlaySong = true;
+            playFirstSong = false;
+        }/* else {
+            Log.v("playInitialSong", "setting true");
+            goThroughPlaySong = true;
+        }
+        */
         playSong(indexPosition);
     }
 
     protected static void playSong(int indexPosition) {
+
+        Log.v("service-playSong", "goThroughPlaySong: " + goThroughPlaySong);
+        if (goThroughPlaySong) {
+            goThroughPlaySong = false;
+        } else {
+            Log.v("service-playSong", "doing nothing");
+            return;
+        }
 
         if (tracklistHasChanged) {
             Log.v("service-playSong", "tracklistHasChanged");
@@ -364,7 +380,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             try {
                 //sets the initial text in the player;
                 AudioPlayer.setMetadataAndAlbumArt(trackAndArtist, albumName, trackDuration);
-
 
                 //sets the album art if it's been stored in AudioParser
                 updateAlbumArt(artistAndAlbum);
@@ -461,6 +476,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
                     indexPosition++;
                     indexPositionEditor.putInt("indexPosition", indexPosition);
                     indexPositionEditor.apply();
+                    goThroughPlaySong = true;
                     playSong(indexPosition);
                 }
             } else {
@@ -475,6 +491,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
                     shuffledIndexPosition++;
                     indexPositionEditor.putInt("shuffledIndexPosition", shuffledIndexPosition);
                     indexPositionEditor.apply();
+                    goThroughPlaySong = true;
                     playSong(shuffledIndexPosition);
                 }
             }
@@ -490,7 +507,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             AudioPlayer.setPlayButtonImage(true);
         }
         else if(mediaPlayer != null) {
-            int audioFocusResult = AudioPlayerService.audioManager.requestAudioFocus(AudioPlayerService.onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+            int audioFocusResult = audioManager.requestAudioFocus(AudioPlayerService.onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             if (audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 mediaPlayer.start();
                 AudioPlayer.setPlayButtonImage(false);
@@ -500,68 +517,49 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     }
 
     public static void gotoPrevious(){
-        if(AudioPlayerService.mediaPlayer.getCurrentPosition() >= 3000){
-            AudioPlayerService.mediaPlayer.seekTo(0);
+        if(mediaPlayer.getCurrentPosition() >= 3000){
+            mediaPlayer.seekTo(0);
         } else {
             SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
             SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
 
             //start the previous song
-            if (! AudioPlayerService.shuffleBoolean){
-                int indexPosition = indexPositionPreference.getInt("indexPosition", 1);
+            String nameOfIndexPosition = (shuffleBoolean ? "shuffledIndexPosition" : "indexPosition");
+            int indexPosition = indexPositionPreference.getInt(nameOfIndexPosition, 1);
+            if (indexPosition != 0){
+                indexPosition--;
+                indexPositionEditor.putInt(nameOfIndexPosition, indexPosition);
+                indexPositionEditor.apply();
 
-                if (indexPosition != 0){
-                    indexPosition--;
-                    indexPositionEditor.putInt("indexPosition", indexPosition);
-                    indexPositionEditor.apply();
-                    playSong(indexPosition);
-                }
-            }
-            else {
-                int shuffledIndexPosition = indexPositionPreference.getInt("shuffledIndexPosition", 1);
-
-                if (shuffledIndexPosition != 0){
-                    shuffledIndexPosition--;
-                    indexPositionEditor.putInt("shuffledIndexPosition", shuffledIndexPosition);
-                    indexPositionEditor.apply();
-                    playSong(shuffledIndexPosition);
-                }
+                goThroughPlaySong = true;
+                playSong(indexPosition);
             }
         }
     }
 
     public static void gotoNext(){
         //if on repeat, seek to the start
-        if (AudioPlayerService.repeatBoolean){
-            AudioPlayerService.mediaPlayer.seekTo(0);
+        if (repeatBoolean){
+            mediaPlayer.seekTo(0);
         }
         else {
+            //else get the shuffled/tracklist
+            ArrayList<HashMap<String, String>> trackList = (shuffleBoolean ? tracklistUtils.restoreTracklist(trackPreferences) : trackPreferences.getObject("shuffledTracks", PlaylistList.class).trackList);
+
+            //and shuffled/indexPosition
             SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
             SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
 
-            //if not shuffling, start the next normal track
-            if (! AudioPlayerService.shuffleBoolean){
-                ArrayList<HashMap<String, String>> trackList = tracklistUtils.restoreTracklist(trackPreferences);
-                int indexPosition = indexPositionPreference.getInt("indexPosition", -1);
+            String nameOfIndexPosition = (shuffleBoolean ? "shuffledIndexPosition" : "indexPosition");
+            int indexPosition = indexPositionPreference.getInt(nameOfIndexPosition, -1);
 
-                if ((indexPosition + 1) <= (trackList.size() - 1)){
-                    indexPosition++;
-                    indexPositionEditor.putInt("indexPosition", indexPosition);
-                    indexPositionEditor.apply();
-                    playSong(indexPosition);
-                }
-            }
-            else {
-                //if shuffling, start the next track in the shuffled tracklist
-                PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
-                ArrayList<HashMap<String, String>> shuffledTracklist = shuffledTrackPreferencesObject.trackList;
-                int shuffledIndexPosition = indexPositionPreference.getInt("shuffledIndexPosition", -1);
-                if (shuffledIndexPosition + 1 <= shuffledTracklist.size() - 1){
-                    shuffledIndexPosition++;
-                    indexPositionEditor.putInt("shuffledIndexPosition", shuffledIndexPosition);
-                    indexPositionEditor.apply();
-                    playSong(shuffledIndexPosition);
-                }
+            //if the next indexPosition is within the trackList, play the next song
+            if ((indexPosition + 1) <= (trackList.size() - 1)){
+                indexPosition++;
+                indexPositionEditor.putInt(nameOfIndexPosition, indexPosition);
+                indexPositionEditor.apply();
+                goThroughPlaySong = true;
+                playSong(indexPosition);
             }
         }
 
