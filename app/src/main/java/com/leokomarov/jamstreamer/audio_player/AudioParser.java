@@ -23,7 +23,6 @@ public class AudioParser extends AsyncTask<String, Void, Bitmap> {
 
 	private static final String TAG_RESULTS = "results";
 	private static final String TAG_ALBUM_IMAGE = "album_image";
-	protected static Bitmap albumImageStore;
 
 	@Override
     protected Bitmap doInBackground(String... parameters) {
@@ -79,7 +78,6 @@ public class AudioParser extends AsyncTask<String, Void, Bitmap> {
             }
 
             albumImage = BitmapFactory.decodeStream((InputStream) new URL(imageURL).getContent());
-            albumImageStore = albumImage;
         } catch (Exception e){
             Log.e("AudioParser", "Exception while getting bitmap: " + e.getMessage());
 		}
@@ -89,6 +87,7 @@ public class AudioParser extends AsyncTask<String, Void, Bitmap> {
 	@Override
     protected void onPostExecute(Bitmap albumImage) {
 		AudioPlayer.albumArt.setImageBitmap(albumImage);
+        AudioPlayerService.notificationListener(albumImage);
     }
     	
 }

@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.media.AudioManager.OnAudioFocusChangeListener;
 import android.media.MediaPlayer;
@@ -16,6 +17,7 @@ import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiManager.WifiLock;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.RemoteException;
@@ -46,9 +48,10 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     private static boolean wasPlayingWhenTransientLoss;
     private static int originalVolume;
 
-    private static String trackNameStore = "Track name";
-    private static String artistAndAlbumStore = "Artist - album";
-    private static String trackInfoURLStore = "";
+    private static String currentTrackName = "Track name";
+    private static String previousArtistAndAlbum = "";
+    private static String currentArtistAndAlbum = "Artist - album";
+    private static String currentTrackInfoURL = "";
 
     public static boolean tracklistHasChanged;
     public static boolean shuffleBoolean;
@@ -61,6 +64,9 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     //used with notification and lockscreen controls
     private static MediaSessionCompat mSession;
     private static MediaControllerCompat mController;
+    private NotificationCompat.Builder builder;
+    private NotificationCompat.Action notificationAction;
+    protected static Bitmap albumImage;
 
     public static final String ACTION_MAKE_NOTIFICATION = "action_make_notification";
     public static final String ACTION_PLAY = "action_play";
@@ -81,30 +87,37 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
                 getString(R.string.trackPreferences), MODE_PRIVATE);
         context = this;
 
-        tracklist = getTracklistFromMemory();
+        updateTracklist();
         tracklistHasChanged = false;
     }
 
-    private static ArrayList<HashMap<String, String>> getTracklistFromMemory(){
+    private static void updateTracklist(){
         if (!shuffleBoolean) {
-            return tracklistUtils.restoreTracklist(trackPreferences);
+            tracklist = tracklistUtils.restoreTracklist(trackPreferences);
         } else {
             PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
-            return shuffledTrackPreferencesObject.trackList;
+            tracklist = shuffledTrackPreferencesObject.trackList;
         }
     }
 
-    private static void updateAlbumArt(String artistAndAlbum){
-        //if there isn't any album art, or the artistAndAlbumStore has changed
-        //update the album art and artistAndAlbumStore
-        if ((! artistAndAlbumStore.equals(artistAndAlbum)) || AudioParser.albumImageStore == null) {
+    private static void updateAlbumArt(){
+        //if there isn't any album art, or the ArtistAndAlbum has changed
+        //update the album art and previousArtistAndAlbum
+        if ((! previousArtistAndAlbum.equals(currentArtistAndAlbum)) || albumImage == null) {
             Log.v("updateAlbumArt", "getting new album art");
+            Log.v("updateAlbumArt", "text different: " + (!previousArtistAndAlbum.equals(currentArtistAndAlbum)));
+            Log.v("updateAlbumArt", "imageStore null: " + (albumImage == null));
+
             AudioParser audioParser = new AudioParser();
-            audioParser.execute(trackInfoURLStore, artistAndAlbum);
-            artistAndAlbumStore = artistAndAlbum;
-        } else if (AudioParser.albumImageStore != null) {
+            audioParser.execute(currentTrackInfoURL, currentArtistAndAlbum);
+            previousArtistAndAlbum = currentArtistAndAlbum;
+            /*
+        } else if (albumImage != null) {
             Log.v("updateAlbumArt", "setting album art in activity");
             AudioPlayer.setAlbumArt();
+        */
+        } else {
+            notificationListener(null);
         }
     }
 
@@ -113,7 +126,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
                 MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
         try {
-            Log.v("initMediaSessions", "making new mController");
             mController = new MediaControllerCompat(getApplicationContext(), mSession.getSessionToken());
         } catch (RemoteException e) {
             Log.e("AudioPlayerService", "RemoteException: " + e.getMessage());
@@ -127,34 +139,32 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
                 Log.v("AudioPlayerService", "onPlay");
                 playOrPause();
-                buildNotification(generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
             }
 
             @Override
             public void onPause() {
                 super.onPause();
 
-                Log.v("MediaPlayerService", "onPause");
+                Log.v("AudioPlayerService", "onPause");
                 playOrPause();
-                buildNotification(generateAction(android.R.drawable.ic_media_play, "Play", ACTION_PLAY));
             }
 
             @Override
             public void onSkipToNext() {
                 super.onSkipToNext();
 
-                Log.v("MediaPlayerService", "onSkipToNext");
+                Log.v("AudioPlayerService", "onSkipToNext");
                 gotoNext();
-                buildNotification(generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
+                //buildNotification(true, generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
             }
 
             @Override
             public void onSkipToPrevious() {
                 super.onSkipToPrevious();
 
-                Log.v("MediaPlayerService", "onSkipToPrevious");
+                Log.v("AudioPlayerService", "onSkipToPrevious");
                 gotoPrevious();
-                buildNotification(generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
+                //buildNotification(true, generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
             }
 
             @Override
@@ -172,8 +182,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
                 generalUtils.closeNotification(AudioPlayerService.this);
                 AudioPlayer.setPlayButtonImage(true);
                 Intent audioPlayerServiceIntent = new Intent(getApplicationContext(), AudioPlayerService.class);
-
-                Log.v("AudioPlayerService", "before stopping intent");
 
                 stopService(audioPlayerServiceIntent);
             }
@@ -206,8 +214,32 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         }
     }
 
+    public static void notificationListener(Bitmap albumImage){
+
+        if (albumImage != null){
+            AudioPlayerService.albumImage = albumImage;
+        }
+        context.builder.setLargeIcon(AudioPlayerService.albumImage);
+
+        //builder.setLargeIcon(((BitmapDrawable) AudioPlayer.albumArt.getDrawable()).getBitmap());
+        context.builder.addAction(generateAction(android.R.drawable.ic_media_previous, "Previous", ACTION_PREVIOUS));
+        context.builder.addAction(context.notificationAction);
+        context.builder.addAction(generateAction(android.R.drawable.ic_media_next, "Next", ACTION_NEXT));
+        NotificationCompat.MediaStyle style = new NotificationCompat.MediaStyle().setMediaSession(mSession.getSessionToken());
+        style.setShowActionsInCompactView(0, 1, 2);
+        context.builder.setStyle(style);
+
+        Log.v("notificationListener", "made advanced notification");
+        Log.v("notificationListener", "notificationAction: " +  context.notificationAction.hashCode());
+        Log.v("notificationListener", "builder.mContentTitle: " +  context.builder.mContentTitle);
+        Log.v("notificationListener", "builder.mContentText: " +  context.builder.mContentText);
+
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(generalUtils.notificationID, context.builder.build());
+    }
+
     private static NotificationCompat.Action generateAction(int icon, String title, String intentAction) {
-                Intent intent = new Intent(context, AudioPlayerService.class);
+        Intent intent = new Intent(context, AudioPlayerService.class);
         intent.setAction(intentAction);
         PendingIntent pendingIntent = PendingIntent.getService(context, 1, intent, 0);
         NotificationCompat.Action.Builder builder = new NotificationCompat.Action.Builder(icon, title, pendingIntent);
@@ -215,9 +247,21 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         return builder.build();
     }
 
-    private static void buildNotification(NotificationCompat.Action action) {
+
+    //if pre 4.1
+    // make simple notification
+    // notify
+    //if >4.1
+    // make simple notification
+    // get album art
+    // wait
+    // in listener called from AudioParser, make advanced notification
+    // in listener, notify
+    private static void buildNotification(boolean update, NotificationCompat.Action action) {
 
         Log.v("buildNotification", " ");
+        Log.v("buildNotification", currentTrackName);
+        Log.v("buildNotification", currentArtistAndAlbum);
 
         //this defines the activity that's opened when
         //the notification is pressed
@@ -230,38 +274,39 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         stopIntent.setAction(ACTION_STOP);
         PendingIntent pendingStopIntent = PendingIntent.getService(context, 1, stopIntent, 0);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder.setSmallIcon(R.drawable.img_ic_launcher);
-        builder.setContentTitle(trackNameStore);
-        builder.setContentText(artistAndAlbumStore);
-        builder.setContentIntent(pendingClickIntent);
-        builder.setDeleteIntent(pendingStopIntent);
+        context.builder = new NotificationCompat.Builder(context);
+        context.builder.setSmallIcon(R.drawable.img_ic_launcher);
+        context.builder.setContentTitle(currentTrackName);
+        context.builder.setContentText(currentArtistAndAlbum);
+        context.builder.setContentIntent(pendingClickIntent);
+        context.builder.setDeleteIntent(pendingStopIntent);
         //builder.setOngoing(true);
-        builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
+        context.builder.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
 
-        //for notification controls, ignored pre-4.1
-        NotificationCompat.MediaStyle style = new NotificationCompat.MediaStyle().setMediaSession(mSession.getSessionToken());
+        if (Build.VERSION.SDK_INT >= 16){
+            //for notification controls, ignored pre-4.1
+            //sets the album art if it's been stored in AudioParser
+            Log.v("buildNotification", "action: " +  action.hashCode());
+            context.notificationAction = action;
+            if (update) {
+                updateAlbumArt();
+            }  else {
+                Log.v("updateAlbumArt", "doing nothing");
+                notificationListener(null);
+            }
+        } else {
+            Log.v("buildNotification", "builder.mContentText: " +  context.builder.mContentText);
+            Log.v("buildNotification", "builder.mContentTitle: " +  context.builder.mContentTitle);
 
-        Log.v("builder", "albumImageStore: " + (AudioParser.albumImageStore == null));
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(generalUtils.notificationID, context.builder.build());
+        }
 
-        builder.setLargeIcon(AudioParser.albumImageStore);
-        //builder.setLargeIcon(((BitmapDrawable) AudioPlayer.albumArt.getDrawable()).getBitmap());
-        builder.setStyle(style);
-        builder.addAction(generateAction(android.R.drawable.ic_media_previous, "Previous", ACTION_PREVIOUS));
-        builder.addAction(action);
-        builder.addAction(generateAction(android.R.drawable.ic_media_next, "Next", ACTION_NEXT));
-        style.setShowActionsInCompactView(0, 1, 2);
-
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(generalUtils.notificationID, builder.build());
     }
 
     //called every time the service is started with startService()
     @Override
     public int onStartCommand(Intent audioPlayerServiceIntent, int flags, int startId) {
-
-        Log.v("onStartCommand", "" + audioPlayerServiceIntent.getAction());
-
         if (mSession == null) {
             initMediaSessions();
         }
@@ -272,7 +317,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
     private static void playInitialSong(){
 
-        Log.v("playInitialSong", "playFirstSong: " + playFirstSong);
         if (playFirstSong) {
             playFirstSong = false;
 
@@ -287,22 +331,16 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             }
 
             playSong(indexPosition);
-        }/* else {
-            Log.v("playInitialSong", "setting true");
-            goThroughPlaySong = true;
         }
-        */
 
     }
 
     protected static void playSong(int indexPosition) {
         if (tracklistHasChanged) {
             Log.v("service-playSong", "tracklistHasChanged");
-            tracklist = getTracklistFromMemory();
+            updateTracklist();
             tracklistHasChanged = false;
         }
-
-        Log.v("service-playSong", "indexPosition: " + indexPosition);
 
         //gets the trackIDs
         SharedPreferences currentTrackPreference = context.getSharedPreferences(context.getString(R.string.currentTrackPreferences), 0);
@@ -323,7 +361,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             String albumName = tracklist.get(indexPosition).get("trackAlbum");
             String trackAndArtist = String.format("%s - %s", trackName, artistName);
             AudioPlayer.setMetadataAndAlbumArt(trackAndArtist, albumName, trackDuration);
-            buildNotification(generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
+            buildNotification(false, generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
 
             return;
         }
@@ -351,7 +389,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             String mp3url = String.format(unformattedURL, newTrackID).replace("&amp;", "&");
             Log.v("service-playSong", "mp3url = " + mp3url);
             String unformattedTrackInfoURL = context.getString(R.string.trackInformationURL);
-            trackInfoURLStore = String.format(unformattedTrackInfoURL, newTrackID).replace("&amp;", "&");
+            currentTrackInfoURL = String.format(unformattedTrackInfoURL, newTrackID).replace("&amp;", "&");
 
             //gets the track info from the tracklist
             String trackName = tracklist.get(indexPosition).get("trackName");
@@ -361,16 +399,13 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             String artistAndAlbum = String.format("%s - %s", artistName, albumName);
             String trackAndArtist = String.format("%s - %s", trackName, artistName);
 
-            trackNameStore = trackName;
-            artistAndAlbumStore = artistAndAlbum;
+            currentTrackName = trackName;
+            currentArtistAndAlbum = artistAndAlbum;
 
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             try {
                 //sets the initial text in the player;
                 AudioPlayer.setMetadataAndAlbumArt(trackAndArtist, albumName, trackDuration);
-
-                //sets the album art if it's been stored in AudioParser
-                updateAlbumArt(artistAndAlbum);
 
                 //set wake and wifilocks and the player data source
                 Log.v("service-playSong", "Preparing");
@@ -385,7 +420,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
                 mediaPlayer.setOnErrorListener(context);
 
                 mediaPlayer.prepareAsync();
-                buildNotification(generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
+                buildNotification(true, generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
             } catch (NullPointerException e) {
                 android.util.Log.e("AudioPlayerService", "NullPointerException: " + e.getMessage());
             } catch (Exception e) {
@@ -457,12 +492,14 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         if ( mediaPlayer.isPlaying() ) {
             mediaPlayer.pause();
             AudioPlayer.setPlayButtonImage(true);
+            buildNotification(false, generateAction(android.R.drawable.ic_media_play, "Play", ACTION_PLAY));
         }
         else if(mediaPlayer != null) {
             int audioFocusResult = audioManager.requestAudioFocus(AudioPlayerService.onAudioFocusChangeListener, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             if (audioFocusResult == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 mediaPlayer.start();
                 AudioPlayer.setPlayButtonImage(false);
+                buildNotification(false, generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
             }
             AudioPlayer.updateProgressBar();
         }

@@ -103,7 +103,7 @@ public class AudioPlayer extends AppCompatActivity {
     }
 
     public static void setAlbumArt(){
-        albumArt.setImageBitmap(AudioParser.albumImageStore);
+        albumArt.setImageBitmap(AudioPlayerService.albumImage);
     }
 
     public static void startProgressBar(int max){
@@ -250,8 +250,8 @@ public class AudioPlayer extends AppCompatActivity {
             albumLabel.setText(albumName);
             songTotalDurationLabel.setText(trackDuration);
 
-            if (AudioParser.albumImageStore != null){
-                albumArt.setImageBitmap(AudioParser.albumImageStore);
+            if (AudioPlayerService.albumImage != null){
+                albumArt.setImageBitmap(AudioPlayerService.albumImage);
             }
         }
 
