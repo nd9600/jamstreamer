@@ -82,6 +82,36 @@ public class AudioPlayer extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public static void setViewsClickable(boolean clickable){
+        button_play.setClickable(clickable);
+        button_next.setClickable(clickable);
+        button_previous.setClickable(clickable);
+        button_repeat.setClickable(clickable);
+        button_shuffle.setClickable(clickable);
+        songProgressBar.setClickable(clickable);
+    }
+
+    public static void setMetadataAndAlbumArt(String trackAndArtist, String albumName, String trackDuration){
+        songTitleLabel.setText(trackAndArtist);
+        albumLabel.setText(albumName);
+        songTotalDurationLabel.setText(trackDuration);
+        setAlbumArt();
+    }
+
+    public static void setPlayButtonImage(boolean play){
+        button_play.setImageResource(play ? R.drawable.button_play : R.drawable.button_pause);
+    }
+
+    public static void setAlbumArt(){
+        albumArt.setImageBitmap(AudioParser.albumImageStore);
+    }
+
+    public static void startProgressBar(int max){
+        AudioPlayer.songProgressBar.setProgress(0);
+        AudioPlayer.songProgressBar.setMax(max);
+        AudioPlayer.updateProgressBar();
+    }
+
     //Updates the progress bar in 100ms
     public static void updateProgressBar() {
         mHandler.postDelayed(mUpdateTime, 100);
