@@ -18,7 +18,8 @@ import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.searches.AlbumsSearch;
 import com.leokomarov.jamstreamer.searches.ArtistsSearch;
 import com.leokomarov.jamstreamer.searches.TracksSearch;
-import com.leokomarov.jamstreamer.utils.generalUtils;
+import com.leokomarov.jamstreamer.utils.GeneralUtils;
+import com.leokomarov.jamstreamer.utils.TracklistUtils;
 
 public class MainMenu extends AppCompatActivity {
 	private ImageButton button_playlist;
@@ -32,6 +33,8 @@ public class MainMenu extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_menu);       
         getSupportActionBar();
+
+        TracklistUtils.shuffleTrackList(null, 15);
 
         //if the app hasn't been ran before, show the toasts
         // ie FIRSTRUN_PREFERENCE doesn't contain "firstrun" or "firstrun" == true
@@ -64,7 +67,7 @@ public class MainMenu extends AppCompatActivity {
     	textView_artists.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
-    			generalUtils.putHierarchy(MainMenu.this, "artists");
+    			GeneralUtils.putHierarchy(MainMenu.this, "artists");
     			Intent artistIntent = new Intent(getApplicationContext(), ArtistsSearch.class);
     			startActivity(artistIntent);
     		}
@@ -73,7 +76,7 @@ public class MainMenu extends AppCompatActivity {
     	textView_albums.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
-                generalUtils.putHierarchy(MainMenu.this, "albums");
+                GeneralUtils.putHierarchy(MainMenu.this, "albums");
     			Intent albumIntent = new Intent(getApplicationContext(), AlbumsSearch.class);
     			startActivity(albumIntent);	
     		}
@@ -82,7 +85,7 @@ public class MainMenu extends AppCompatActivity {
     	textView_tracks.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
-                generalUtils.putHierarchy(MainMenu.this, "tracks");
+                GeneralUtils.putHierarchy(MainMenu.this, "tracks");
     			Intent trackIntent = new Intent(getApplicationContext(), TracksSearch.class);
     			startActivity(trackIntent);	
     		}
@@ -91,7 +94,7 @@ public class MainMenu extends AppCompatActivity {
     	textView_topTracksThisWeek.setOnClickListener(new View.OnClickListener() {
     		@Override
             public void onClick(View v) {
-                generalUtils.putHierarchy(MainMenu.this, "topTracksPerWeek");
+                GeneralUtils.putHierarchy(MainMenu.this, "topTracksPerWeek");
     			Intent topTracksWeekIntent = new Intent(getApplicationContext(), TracksActivity.class);
     			startActivityForResult(topTracksWeekIntent, 2);	
     		}
@@ -102,7 +105,7 @@ public class MainMenu extends AppCompatActivity {
     @Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //Todo: possibly remove this
-        //generalUtils.clearCheckboxes(null);
+        //GeneralUtils.clearCheckboxes(null);
 	}
 
     //Brings up the exit dialog when you press the back button
@@ -115,7 +118,7 @@ public class MainMenu extends AppCompatActivity {
         		public void onClick(DialogInterface dialog, int id) {
         			stopService(new Intent(MainMenu.this, AudioPlayerService.class));
         			MainMenu.this.finish();
-                    generalUtils.closeNotification(MainMenu.this);
+                    GeneralUtils.closeNotification(MainMenu.this);
                 }
         })
         .setNegativeButton("No", null)

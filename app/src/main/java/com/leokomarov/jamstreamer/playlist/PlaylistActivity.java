@@ -23,7 +23,7 @@ import com.leokomarov.jamstreamer.common.ActionBarListActivity;
 import com.leokomarov.jamstreamer.common.CustomListAdapter;
 import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
-import com.leokomarov.jamstreamer.utils.tracklistUtils;
+import com.leokomarov.jamstreamer.utils.TracklistUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -273,7 +273,7 @@ public class PlaylistActivity extends ActionBarListActivity implements CustomLis
     	super.onSaveInstanceState(savedInstanceState);
         ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(this,
                 getString(R.string.trackPreferences), Context.MODE_PRIVATE);
-        ArrayList<HashMap<String, String>> tracklist = tracklistUtils.restoreTracklist(trackPreferences);
+        ArrayList<HashMap<String, String>> tracklist = TracklistUtils.restoreTracklist(trackPreferences);
         savedInstanceState.putSerializable(getString(R.string.TAG_TRACKLIST), tracklist);
     }
     

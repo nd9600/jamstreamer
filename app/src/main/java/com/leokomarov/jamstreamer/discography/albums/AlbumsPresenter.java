@@ -17,8 +17,8 @@ import com.leokomarov.jamstreamer.discography.tracks.TracksActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.JSONParser;
-import com.leokomarov.jamstreamer.utils.generalUtils;
-import com.leokomarov.jamstreamer.utils.tracklistUtils;
+import com.leokomarov.jamstreamer.utils.GeneralUtils;
+import com.leokomarov.jamstreamer.utils.TracklistUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,7 +37,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
 
     private JSONArray results;
     private ArrayList<HashMap<String, String>> albumList = new ArrayList<>();
-    private ArrayList<HashMap<String, String>> trackList = new ArrayList<>();
+    private ArrayList<HashMap<String, String>> tracklist = new ArrayList<>();
 
     private int albumsToAddLoop = 0;
     private int onTrackRequestCompletedLoop = 0;
@@ -92,7 +92,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
     }
 
     public void listviewOnClick(int position){
-        generalUtils.putHierarchy(context, "albums");
+        GeneralUtils.putHierarchy(context, "albums");
         String albumID = albumList.get(position - 1).get("albumID");
         Intent intent = new Intent(context, TracksActivity.class);
         intent.putExtra(context.getString(R.string.TAG_ALBUM_ID), albumID);
@@ -113,7 +113,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
             activity.callActionBar(activity.listAdapter.tickedCheckboxCounter);
             return true;
         } else if (menuID == R.id.albums_floating_menu_viewArtist) {
-            generalUtils.putHierarchy(context, "albumsFloatingMenuArtist");
+            GeneralUtils.putHierarchy(context, "albumsFloatingMenuArtist");
 
             String artistName = albumList.get(indexPosition).get("albumArtist");
             Intent artistsIntent = new Intent(context, AlbumsActivity.class);
@@ -234,17 +234,17 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
                     trackMap.put("trackArtist", artistName);
                     trackMap.put("trackAlbum", albumName);
 
-                    trackList.add(trackMap);
+                    tracklist.add(trackMap);
                 }
             }
 
             if (onTrackRequestCompletedLoop == albumsToAddLoop){
                 ArrayList<HashMap<String, String>> newTrackList = new ArrayList<>();
                 if (trackPreferences.getObject("tracks", PlaylistList.class) != null){
-                    newTrackList.addAll(trackPreferences.getObject("tracks", PlaylistList.class).trackList);
+                    newTrackList.addAll(trackPreferences.getObject("tracks", PlaylistList.class).tracklist);
                 }
-                newTrackList.addAll(trackList);
-                new tracklistUtils(activity).execute(trackPreferences, "saveAndShuffle", newTrackList);
+                newTrackList.addAll(tracklist);
+                new TracklistUtils(activity).execute(trackPreferences, "saveAndShuffle", newTrackList);
 
                 activity.setPlaylistButtonClickable(true);
                 if (albumsToAddLoop == 1){

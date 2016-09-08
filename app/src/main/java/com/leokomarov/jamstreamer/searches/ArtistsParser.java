@@ -20,8 +20,8 @@ import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.ActionBarListActivity;
 import com.leokomarov.jamstreamer.discography.albums.AlbumsActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
+import com.leokomarov.jamstreamer.utils.GeneralUtils;
 import com.leokomarov.jamstreamer.utils.JSONParser;
-import com.leokomarov.jamstreamer.utils.generalUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -100,7 +100,7 @@ public class ArtistsParser extends ActionBarListActivity implements JSONParser.C
 			lv.setOnItemClickListener(new OnItemClickListener() {
 				@Override
 				public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    generalUtils.putHierarchy(ArtistsParser.this, "artists");
+                    GeneralUtils.putHierarchy(ArtistsParser.this, "artists");
                     String artistID = ((TextView) view.findViewById(R.id.artists_list_artists_ids)).getText().toString();
 
 					Intent in = new Intent(ArtistsParser.this, AlbumsActivity.class);
@@ -115,7 +115,7 @@ public class ArtistsParser extends ActionBarListActivity implements JSONParser.C
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //Todo: Possibly remove this
-		//generalUtils.clearCheckboxes(null);
+		//GeneralUtils.clearCheckboxes(null);
 	}
 	
 	@Override

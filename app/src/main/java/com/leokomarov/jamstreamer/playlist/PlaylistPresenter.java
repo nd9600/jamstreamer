@@ -16,8 +16,8 @@ import com.leokomarov.jamstreamer.discography.tracks.TracksActivity;
 import com.leokomarov.jamstreamer.audio_player.AudioPlayer;
 import com.leokomarov.jamstreamer.audio_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
-import com.leokomarov.jamstreamer.utils.generalUtils;
-import com.leokomarov.jamstreamer.utils.tracklistUtils;
+import com.leokomarov.jamstreamer.utils.GeneralUtils;
+import com.leokomarov.jamstreamer.utils.TracklistUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,20 +49,20 @@ public class PlaylistPresenter {
 
     //Sets the playlist track data used to generate the listview
     //If fromMemory, the tracklist will be restored from memory
-    public void setListData(boolean restoreTracklistFromMemory, ArrayList<HashMap<String, String>> trackList) {
+    public void setListData(boolean restoreTracklistFromMemory, ArrayList<HashMap<String, String>> tracklist) {
         if (restoreTracklistFromMemory) {
-            ArrayList<HashMap<String, String>> restoredTracklist = tracklistUtils.restoreTracklist(trackPreferences);
+            ArrayList<HashMap<String, String>> restoredTracklist = TracklistUtils.restoreTracklist(trackPreferences);
             if (! restoredTracklist.isEmpty()) {
-                trackList = restoredTracklist;
+                tracklist = restoredTracklist;
             }
         }
-        interactor.setListData(trackList);
+        interactor.setListData(tracklist);
     }
 
     public void deletePlaylist(){
         clearListData();
 
-        new tracklistUtils(activity).execute(trackPreferences, "saveAndShuffle", new ArrayList<HashMap<String, String>>());
+        new TracklistUtils().execute(trackPreferences, "saveAndShuffle", new ArrayList<HashMap<String, String>>());
     }
 
     //Starts the audio player
@@ -86,7 +86,7 @@ public class PlaylistPresenter {
 
     //Called when something in the floating menu is selected
     public boolean onContextItemSelected(MenuItem item){
-        ArrayList<HashMap<String, String>> trackList = tracklistUtils.restoreTracklist(trackPreferences);
+        ArrayList<HashMap<String, String>> tracklist = TracklistUtils.restoreTracklist(trackPreferences);
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         View viewClicked = info.targetView;
         int indexPosition = info.position - 1;
@@ -108,8 +108,8 @@ public class PlaylistPresenter {
             case R.id.playlist_floating_menu_viewArtist:
                 //put the correct string in the hierarchy,
                 //then start AlbumsActivity
-                generalUtils.putHierarchy(context, "playlistFloatingMenuArtist");
-                String artistName = trackList.get(indexPosition).get("trackArtist");
+                GeneralUtils.putHierarchy(context, "playlistFloatingMenuArtist");
+                String artistName = tracklist.get(indexPosition).get("trackArtist");
                 Intent albumsIntent = new Intent(context, AlbumsActivity.class);
                 albumsIntent.putExtra(context.getString(R.string.TAG_ARTIST_NAME), artistName);
 
@@ -118,8 +118,8 @@ public class PlaylistPresenter {
             case R.id.playlist_floating_menu_viewAlbum:
                 //put the correct string in the hierarchy,
                 //then start TracksActivity
-                generalUtils.putHierarchy(context, "playlistFloatingMenuAlbum");
-                String albumName = trackList.get(indexPosition).get("trackAlbum");
+                GeneralUtils.putHierarchy(context, "playlistFloatingMenuAlbum");
+                String albumName = tracklist.get(indexPosition).get("trackAlbum");
                 Intent tracksIntent = new Intent(context, TracksActivity.class);
                 tracksIntent.putExtra(context.getString(R.string.TAG_ALBUM_NAME), albumName);
 
@@ -133,7 +133,7 @@ public class PlaylistPresenter {
     //called in the action mode callback,
     //removes the ticked tracks from the playlist
     public int removeTracksFromPlaylist(int numberOfTracks){
-        ArrayList<HashMap<String, String>> tracklist = tracklistUtils.restoreTracklist(trackPreferences);
+        ArrayList<HashMap<String, String>> tracklist = TracklistUtils.restoreTracklist(trackPreferences);
         activity.listAdapter.selectAllPressed = false;
 
         ArrayList<Integer> tracksToDelete = new ArrayList<>();
@@ -155,9 +155,9 @@ public class PlaylistPresenter {
         setListData(false, tracklist);
 
         if (! tracklist.isEmpty()){
-            new tracklistUtils(activity).execute(trackPreferences, "saveAndShuffle", tracklist);
+            new TracklistUtils().execute(trackPreferences, "saveAndShuffle", tracklist);
         } else {
-            new tracklistUtils(activity).execute(trackPreferences, "save", tracklist);
+            new TracklistUtils().execute(trackPreferences, "save", tracklist);
         }
 
         activity.listAdapter.clearCheckboxes();

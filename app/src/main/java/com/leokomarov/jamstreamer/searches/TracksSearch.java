@@ -40,7 +40,7 @@ public class TracksSearch extends AppCompatActivity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //Todo: Possibly remove this
-        //generalUtils.clearCheckboxes(null);
+        //GeneralUtils.clearCheckboxes(null);
     }
 	
 	@Override

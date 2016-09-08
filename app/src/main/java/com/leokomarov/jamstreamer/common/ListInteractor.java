@@ -20,9 +20,9 @@ public class ListInteractor {
     }
 
     //Sets the playlist track data
-    public void setListData(ArrayList<HashMap<String, String>> trackList){
+    public void setListData(ArrayList<HashMap<String, String>> tracklist){
         listData.clear();
-        for (HashMap<String, String> map : trackList) {
+        for (HashMap<String, String> map : tracklist) {
             listData.add(new TrackModel(map));
         }
     }

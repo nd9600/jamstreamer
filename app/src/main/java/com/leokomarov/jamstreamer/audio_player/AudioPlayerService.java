@@ -29,8 +29,8 @@ import android.util.Log;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
-import com.leokomarov.jamstreamer.utils.generalUtils;
-import com.leokomarov.jamstreamer.utils.tracklistUtils;
+import com.leokomarov.jamstreamer.utils.GeneralUtils;
+import com.leokomarov.jamstreamer.utils.TracklistUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -93,10 +93,10 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
     private static void updateTracklist(){
         if (!shuffleBoolean) {
-            tracklist = tracklistUtils.restoreTracklist(trackPreferences);
+            tracklist = TracklistUtils.restoreTracklist(trackPreferences);
         } else {
             PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
-            tracklist = shuffledTrackPreferencesObject.trackList;
+            tracklist = shuffledTrackPreferencesObject.tracklist;
         }
     }
 
@@ -172,7 +172,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
                 if (wifiLock.isHeld()) {
                     wifiLock.release();
                 }
-                generalUtils.closeNotification(AudioPlayerService.this);
+                GeneralUtils.closeNotification(AudioPlayerService.this);
                 AudioPlayer.setPlayButtonImage(true);
                 Intent audioPlayerServiceIntent = new Intent(getApplicationContext(), AudioPlayerService.class);
 
@@ -220,7 +220,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         builder.setStyle(style);
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(generalUtils.notificationID, builder.build());
+        notificationManager.notify(GeneralUtils.notificationID, builder.build());
     }
 
     private static NotificationCompat.Action generateAction(int icon, String title, String intentAction) {
@@ -274,7 +274,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             }
         } else {
             NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify(generalUtils.notificationID, builder.build());
+            notificationManager.notify(GeneralUtils.notificationID, builder.build());
         }
 
     }
@@ -454,7 +454,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             if (wifiLock.isHeld()) {
                 wifiLock.release();
             }
-            generalUtils.closeNotification(this);
+            GeneralUtils.closeNotification(this);
             AudioPlayer.setPlayButtonImage(true);
         }
         gotoNext();
@@ -507,7 +507,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         }
         else {
             //else get the shuffled/tracklist
-            ArrayList<HashMap<String, String>> trackList = (shuffleBoolean ? tracklistUtils.restoreTracklist(trackPreferences) : trackPreferences.getObject("shuffledTracks", PlaylistList.class).trackList);
+            ArrayList<HashMap<String, String>> tracklist = (shuffleBoolean ? TracklistUtils.restoreTracklist(trackPreferences) : trackPreferences.getObject("shuffledTracks", PlaylistList.class).tracklist);
 
             //and shuffled/indexPosition
             SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
@@ -516,8 +516,8 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             String nameOfIndexPosition = (shuffleBoolean ? "shuffledIndexPosition" : "indexPosition");
             int indexPosition = indexPositionPreference.getInt(nameOfIndexPosition, -1);
 
-            //if the next indexPosition is within the trackList, play the next song
-            if ((indexPosition + 1) <= (trackList.size() - 1)){
+            //if the next indexPosition is within the tracklist, play the next song
+            if ((indexPosition + 1) <= (tracklist.size() - 1)){
                 indexPosition++;
                 indexPositionEditor.putInt(nameOfIndexPosition, indexPosition);
                 indexPositionEditor.apply();
@@ -588,7 +588,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         if (mediaPlayer != null) {
             if (mediaPlayer.isPlaying()) {
                 mediaPlayer.stop();
-                generalUtils.closeNotification(this);
+                GeneralUtils.closeNotification(this);
             }
             mediaPlayer = null;
         }

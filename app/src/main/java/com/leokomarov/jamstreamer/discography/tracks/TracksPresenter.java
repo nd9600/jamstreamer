@@ -18,9 +18,9 @@ import com.leokomarov.jamstreamer.audio_player.AudioPlayer;
 import com.leokomarov.jamstreamer.audio_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
+import com.leokomarov.jamstreamer.utils.GeneralUtils;
 import com.leokomarov.jamstreamer.utils.JSONParser;
-import com.leokomarov.jamstreamer.utils.generalUtils;
-import com.leokomarov.jamstreamer.utils.tracklistUtils;
+import com.leokomarov.jamstreamer.utils.TracklistUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,7 +37,7 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
     private ComplexPreferences trackPreferences;
 
     private JSONArray results;
-    private ArrayList<HashMap<String, String>> trackList = new ArrayList<>();
+    private ArrayList<HashMap<String, String>> tracklist = new ArrayList<>();
     private ArrayList<HashMap<String, String>> albumIDList = new ArrayList<>();
 
     public TracksPresenter(Context context, TracksActivity activity, ListInteractor listInteractor){
@@ -123,7 +123,7 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
                             trackMap.put("trackDuration", trackDuration);
                             trackMap.put("trackArtist", artistName);
                             trackMap.put("trackAlbum", albumName);
-                            trackList.add(trackMap);
+                            tracklist.add(trackMap);
                         }
                     }
                     break;
@@ -150,7 +150,7 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
                         trackMap.put("trackDuration", trackDuration);
                         trackMap.put("trackArtist", artistName);
                         trackMap.put("trackAlbum", albumName);
-                        trackList.add(trackMap);
+                        tracklist.add(trackMap);
                     }
                     break;
             }
@@ -161,11 +161,11 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
         if (json == null || json.isNull("results")) {
             Toast.makeText(context, "Please retry, there has been an error downloading the track list", Toast.LENGTH_LONG).show();
         }
-        else if (json.has("results") && trackList.isEmpty()){
+        else if (json.has("results") && tracklist.isEmpty()){
             Toast.makeText(context, "There are no tracks matching this search", Toast.LENGTH_LONG).show();
         }
         else {
-            setListData(trackList);
+            setListData(tracklist);
             activity.setUpListview();
         }
     }
@@ -177,9 +177,9 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
 
          int indexPosition = 0;
          int oldTrackListSize = 0;
-         if (trackPreferences.getObject("tracks", PlaylistList.class) != null && trackPreferences.getObject("tracks", PlaylistList.class).trackList.size() != 0){
-             newTrackList.addAll(trackPreferences.getObject("tracks", PlaylistList.class).trackList);
-             oldTrackListSize = trackPreferences.getObject("tracks", PlaylistList.class).trackList.size();
+         if (trackPreferences.getObject("tracks", PlaylistList.class) != null && trackPreferences.getObject("tracks", PlaylistList.class).tracklist.size() != 0){
+             newTrackList.addAll(trackPreferences.getObject("tracks", PlaylistList.class).tracklist);
+             oldTrackListSize = trackPreferences.getObject("tracks", PlaylistList.class).tracklist.size();
          }
 
          switch (hierarchy) {
@@ -187,18 +187,18 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
              case "albums":
              case "tracksFloatingMenuAlbum":
              case "playlistFloatingMenuAlbum":
-                 newTrackList.addAll(trackList);
+                 newTrackList.addAll(tracklist);
                  indexPosition = oldTrackListSize + position - 1;
                  break;
              case "tracks":
              case "topTracksPerWeek":
-                 newTrackList.add(trackList.get(position - 1));
+                 newTrackList.add(tracklist.get(position - 1));
                  indexPosition = oldTrackListSize;
                  break;
          }
 
-         generalUtils.putHierarchy(context, "tracks");
-         new tracklistUtils(activity).execute(trackPreferences, "saveAndShuffle", newTrackList);
+         GeneralUtils.putHierarchy(context, "tracks");
+         new TracklistUtils(activity).execute(trackPreferences, "saveAndShuffle", newTrackList);
 
          SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
          SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
@@ -227,15 +227,15 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
             checkbox.setChecked(! checkbox.isChecked());
             return true;
         } else if (menuID == R.id.tracks_floating_menu_viewArtist) {
-            generalUtils.putHierarchy(context, "tracksFloatingMenuArtist");
+            GeneralUtils.putHierarchy(context, "tracksFloatingMenuArtist");
 
-            String artistName = trackList.get(indexPosition).get("trackArtist");
+            String artistName = tracklist.get(indexPosition).get("trackArtist");
             Intent artistsIntent = new Intent(context.getApplicationContext(), AlbumsActivity.class);
             artistsIntent.putExtra(context.getString(R.string.TAG_ARTIST_NAME), artistName);
             activity.startNewActivity(artistsIntent, 2);
             return true;
         } else if (menuID == R.id.tracks_floating_menu_viewAlbum) {
-            generalUtils.putHierarchy(context, "tracksFloatingMenuAlbum");
+            GeneralUtils.putHierarchy(context, "tracksFloatingMenuAlbum");
             String albumID = albumIDList.get(indexPosition).get("albumID");
             Intent albumsIntent = new Intent(context, TracksActivity.class);
             albumsIntent.putExtra(context.getString(R.string.TAG_ALBUM_ID), albumID);
@@ -252,7 +252,7 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
         ArrayList<HashMap<String, String>> tracksToAddList = new ArrayList<>();
         for (int i = 0; i < tracksByNameLVLength; i++){
             if (activity.listAdapter.listOfCheckboxes.get(i, false)) {
-                tracksToAddList.add(trackList.get(i));
+                tracksToAddList.add(tracklist.get(i));
             }
         }
 
@@ -260,13 +260,13 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
         //the old tracklist
         ArrayList<HashMap<String, String>> newTrackList = new ArrayList<>();
         if (trackPreferences.getObject("tracks", PlaylistList.class) != null){
-            newTrackList.addAll(trackPreferences.getObject("tracks", PlaylistList.class).trackList);
+            newTrackList.addAll(trackPreferences.getObject("tracks", PlaylistList.class).tracklist);
         }
 
         //and the selected tracks, then saves it to memory
         //and returns the size to the act
         newTrackList.addAll(tracksToAddList);
-        new tracklistUtils(activity).execute(trackPreferences, "saveAndShuffle", newTrackList);
+        new TracklistUtils(activity).execute(trackPreferences, "saveAndShuffle", newTrackList);
 
         return tracksToAddList.size();
     }

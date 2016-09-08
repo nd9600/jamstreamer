@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 
 import com.leokomarov.jamstreamer.R;
 
-public class generalUtils {
+public class GeneralUtils {
 
     public static int notificationID = 46798;
 

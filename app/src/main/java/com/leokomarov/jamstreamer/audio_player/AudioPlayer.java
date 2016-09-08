@@ -19,7 +19,7 @@ import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
-import com.leokomarov.jamstreamer.utils.tracklistUtils;
+import com.leokomarov.jamstreamer.utils.TracklistUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -223,7 +223,7 @@ public class AudioPlayer extends AppCompatActivity {
 
         //else set all the activity's views
         else {
-            ArrayList<HashMap<String, String>> trackList;
+            ArrayList<HashMap<String, String>> tracklist;
             SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
             int indexPosition;
 
@@ -231,15 +231,15 @@ public class AudioPlayer extends AppCompatActivity {
 
             if (AudioPlayerService.shuffleBoolean){
                 PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
-                trackList = shuffledTrackPreferencesObject.trackList;
+                tracklist = shuffledTrackPreferencesObject.tracklist;
                 indexPosition = indexPositionPreference.getInt("shuffledIndexPosition", 0);
             }
             else {
-                trackList = tracklistUtils.restoreTracklist(trackPreferences);
+                tracklist = TracklistUtils.restoreTracklist(trackPreferences);
                 indexPosition = indexPositionPreference.getInt("indexPosition", 0);
             }
 
-            HashMap<String, String> trackMap = trackList.get(indexPosition);
+            HashMap<String, String> trackMap = tracklist.get(indexPosition);
 
             String trackName = trackMap.get("trackName");
             String artistName = trackMap.get("trackArtist");
