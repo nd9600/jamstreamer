@@ -11,6 +11,7 @@ import android.widget.CheckBox;
 import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.audio_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.common.TrackModel;
 import com.leokomarov.jamstreamer.discography.tracks.TracksActivity;
@@ -242,6 +243,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
                 newTrackList.addAll(TracklistUtils.restoreTracklist(trackPreferences));
                 newTrackList.addAll(tracklist);
 
+                AudioPlayerService.tracklistHasChanged = true;
                 new TracklistUtils().execute(trackPreferences, newTrackList);
 
                 activity.setPlaylistButtonClickable(true);

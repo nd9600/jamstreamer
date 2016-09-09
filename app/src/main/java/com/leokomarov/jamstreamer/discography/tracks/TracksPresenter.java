@@ -202,6 +202,7 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
 
          GeneralUtils.putHierarchy(context, "tracks");
 
+         AudioPlayerService.tracklistHasChanged = true;
          new TracklistUtils().execute(trackPreferences, newTrackList);
 
          SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
@@ -267,6 +268,7 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
         //and the selected tracks, then saves it to memory
         //and returns the size to the act
         newTrackList.addAll(tracksToAddList);
+        AudioPlayerService.tracklistHasChanged = true;
         new TracklistUtils().execute(trackPreferences, newTrackList);
 
         return tracksToAddList.size();

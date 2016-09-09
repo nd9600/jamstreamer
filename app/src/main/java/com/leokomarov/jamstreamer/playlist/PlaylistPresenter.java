@@ -3,18 +3,19 @@ package com.leokomarov.jamstreamer.playlist;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.audio_player.AudioPlayer;
+import com.leokomarov.jamstreamer.audio_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.common.TrackModel;
 import com.leokomarov.jamstreamer.discography.albums.AlbumsActivity;
 import com.leokomarov.jamstreamer.discography.tracks.TracksActivity;
-import com.leokomarov.jamstreamer.audio_player.AudioPlayer;
-import com.leokomarov.jamstreamer.audio_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.GeneralUtils;
 import com.leokomarov.jamstreamer.utils.TracklistUtils;
@@ -62,6 +63,7 @@ public class PlaylistPresenter {
     public void deletePlaylist(){
         clearListData();
 
+        AudioPlayerService.tracklistHasChanged = true;
         new TracklistUtils().execute(trackPreferences, new ArrayList<HashMap<String, String>>());
     }
 
@@ -71,6 +73,8 @@ public class PlaylistPresenter {
         SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
         indexPositionEditor.putInt("indexPosition", indexPosition);
         indexPositionEditor.apply();
+
+        Log.v("startAudioPlayer", "clicked: " + indexPosition);
 
         if(AudioPlayerService.shuffleBoolean){
             AudioPlayerService.shuffleBoolean = false;
@@ -153,6 +157,7 @@ public class PlaylistPresenter {
 
         setListData(false, tracklist);
 
+        AudioPlayerService.tracklistHasChanged = true;
         new TracklistUtils().execute(trackPreferences, tracklist);
 
         activity.listAdapter.clearCheckboxes();

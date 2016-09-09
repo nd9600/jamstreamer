@@ -221,19 +221,20 @@ public class AudioPlayer extends AppCompatActivity {
         //else set all the activity's views
         else {
             SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
-            String nameOfIndexPosition = (AudioPlayerService.shuffleBoolean ? "shuffledIndexPosition" : "indexPosition");
-            int indexPosition = indexPositionPreference.getInt(nameOfIndexPosition, -1);
+            int indexPosition = indexPositionPreference.getInt("indexPosition", -1);
 
             Log.v("audioPlayer", "setting all the views");
-            Log.v("audioPlayerService", "" + indexPosition);
+            Log.v("audioPlayerService", "indexPosition: " + indexPosition);
 
             if (AudioPlayerService.shuffleBoolean){
                 indexPosition = AudioPlayerService.shufflelist[indexPosition];
-                for (int i : AudioPlayerService.shufflelist){
-                    Log.v("audioPlayer", "" + i);
-                }
+                //for (int i : AudioPlayerService.shufflelist){
+                //   Log.v("audioPlayer", "" + i);
+                //}
                 Log.v("audioPlayerService", "" + indexPosition);
             }
+
+            AudioPlayerService.updateTracklistIfChanged();
 
             HashMap<String, String> trackMap = AudioPlayerService.tracklist.get(indexPosition);
 
