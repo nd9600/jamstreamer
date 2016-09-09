@@ -42,7 +42,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     private static ComplexPreferences trackPreferences;
     private static AudioPlayerService context;
     protected static ArrayList<HashMap<String, String>> tracklist;
-    protected static int[] shuffleList;
+    protected static int[] shufflelist;
 
     protected static AudioManager audioManager;
     private static int lastKnownAudioFocusState;
@@ -101,13 +101,18 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         Random random = new Random();
         int min = 0;
 
-        int[] listOfInts = new int[tracklist.size()];
+        shufflelist = new int[tracklist.size()];
         for (int i = 0; i < tracklist.size(); i++){
             int j = random.nextInt((i - min) + 1) + min;
             if (j != i){
-                listOfInts[i] = listOfInts[j];
+                shufflelist[i] = shufflelist[j];
             }
-            listOfInts[j] = i;
+            shufflelist[j] = i;
+        }
+
+        Log.v("tracklist.size()", "" + tracklist.size());
+        for (int i : shufflelist){
+            Log.v("audioPlayerService", "" + i);
         }
     }
 
@@ -524,18 +529,22 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
             String nameOfIndexPosition = (shuffleBoolean ? "shuffledIndexPosition" : "indexPosition");
             int indexPosition = indexPositionPreference.getInt(nameOfIndexPosition, -1);
-
-            updateShufflelist();
-
+            
             //if the next indexPosition is within the tracklist, play the next song
             if ((indexPosition + 1) <= (tracklist.size() - 1)){
                 indexPosition++;
                 indexPositionEditor.putInt(nameOfIndexPosition, indexPosition);
                 indexPositionEditor.apply();
 
+                Log.v("audioPlayerService", "" + indexPosition);
+
                 //shuffledIndexPosition is the 2 in [5,2,4,1,3][2] = 4
                 if (AudioPlayerService.shuffleBoolean){
-                    indexPosition = shuffleList[indexPosition];
+                    indexPosition = shufflelist[indexPosition];
+                    for (int i : shufflelist){
+                        Log.v("audioPlayerService", "" + i);
+                    }
+                    Log.v("audioPlayerService", "" + indexPosition);
                 }
 
                 playSong(indexPosition);

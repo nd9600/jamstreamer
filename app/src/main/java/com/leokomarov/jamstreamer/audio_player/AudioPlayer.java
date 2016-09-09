@@ -225,9 +225,14 @@ public class AudioPlayer extends AppCompatActivity {
             int indexPosition = indexPositionPreference.getInt(nameOfIndexPosition, -1);
 
             Log.v("audioPlayer", "setting all the views");
+            Log.v("audioPlayerService", "" + indexPosition);
 
             if (AudioPlayerService.shuffleBoolean){
-                indexPosition = AudioPlayerService.shuffleList[indexPosition];
+                indexPosition = AudioPlayerService.shufflelist[indexPosition];
+                for (int i : AudioPlayerService.shufflelist){
+                    Log.v("audioPlayer", "" + i);
+                }
+                Log.v("audioPlayerService", "" + indexPosition);
             }
 
             HashMap<String, String> trackMap = AudioPlayerService.tracklist.get(indexPosition);
