@@ -62,14 +62,14 @@ public class PlaylistPresenter {
     public void deletePlaylist(){
         clearListData();
 
-        new TracklistUtils().execute(trackPreferences, "saveAndShuffle", new ArrayList<HashMap<String, String>>());
+        new TracklistUtils().execute(trackPreferences, new ArrayList<HashMap<String, String>>());
     }
 
     //Starts the audio player
     public void startAudioPlayer(int indexPosition){
         SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
         SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
-        indexPositionEditor.putInt("indexPosition", indexPosition );
+        indexPositionEditor.putInt("indexPosition", indexPosition);
         indexPositionEditor.apply();
 
         if(AudioPlayerService.shuffleBoolean){
@@ -80,7 +80,6 @@ public class PlaylistPresenter {
         Intent intent = new Intent(context, AudioPlayer.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         intent.putExtra("fromNotification", false);
-
         activity.startNewActivity(intent);
     }
 
@@ -154,11 +153,7 @@ public class PlaylistPresenter {
 
         setListData(false, tracklist);
 
-        if (! tracklist.isEmpty()){
-            new TracklistUtils().execute(trackPreferences, "saveAndShuffle", tracklist);
-        } else {
-            new TracklistUtils().execute(trackPreferences, "save", tracklist);
-        }
+        new TracklistUtils().execute(trackPreferences, tracklist);
 
         activity.listAdapter.clearCheckboxes();
         return tracksToDelete.size();

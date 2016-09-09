@@ -19,7 +19,6 @@ import com.leokomarov.jamstreamer.searches.AlbumsSearch;
 import com.leokomarov.jamstreamer.searches.ArtistsSearch;
 import com.leokomarov.jamstreamer.searches.TracksSearch;
 import com.leokomarov.jamstreamer.utils.GeneralUtils;
-import com.leokomarov.jamstreamer.utils.TracklistUtils;
 
 public class MainMenu extends AppCompatActivity {
 	private ImageButton button_playlist;
@@ -33,8 +32,6 @@ public class MainMenu extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_menu);       
         getSupportActionBar();
-
-        TracklistUtils.shuffleTrackList(null, 15);
 
         //if the app hasn't been ran before, show the toasts
         // ie FIRSTRUN_PREFERENCE doesn't contain "firstrun" or "firstrun" == true

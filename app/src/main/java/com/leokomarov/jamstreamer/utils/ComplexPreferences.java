@@ -4,9 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
 
 public class ComplexPreferences {
 
@@ -16,7 +13,7 @@ public class ComplexPreferences {
 	private SharedPreferences preferences;
 	private SharedPreferences.Editor editor;
 	private static Gson GSON = new Gson();
-	Type typeOfObject = new TypeToken<Object>() {}.getType();
+	//Type typeOfObject = new TypeToken<Object>() {}.getType();
 
 	private ComplexPreferences(Context context, String namePreferences, int mode) {
 		this.context = context;
@@ -43,7 +40,7 @@ public class ComplexPreferences {
 			throw new IllegalArgumentException("object is null");
 		}
 		
-		if(key.equals("") || key == null){
+		if(key == null || key.equals("")){
 			throw new IllegalArgumentException("key is empty or null");
 		}
 		
@@ -63,7 +60,7 @@ public class ComplexPreferences {
 			try{
 				return GSON.fromJson(gson, a);
 			} catch (Exception e) {
-				throw new IllegalArgumentException("Object storaged with key " + key + " is instanceof other class");				
+				throw new IllegalArgumentException("Object stored with key " + key + " is instanceof other class");
 			}
 		}
 	}

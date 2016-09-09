@@ -27,13 +27,13 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.playlist.PlaylistList;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.GeneralUtils;
 import com.leokomarov.jamstreamer.utils.TracklistUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 public class AudioPlayerService extends Service implements OnErrorListener, OnPreparedListener, OnCompletionListener {
     protected static MediaPlayer mediaPlayer;
@@ -41,7 +41,8 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     private static WifiLock wifiLock;
     private static ComplexPreferences trackPreferences;
     private static AudioPlayerService context;
-    private static ArrayList<HashMap<String, String>> tracklist;
+    protected static ArrayList<HashMap<String, String>> tracklist;
+    protected static int[] shuffleList;
 
     protected static AudioManager audioManager;
     private static int lastKnownAudioFocusState;
@@ -92,11 +93,21 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     }
 
     private static void updateTracklist(){
-        if (!shuffleBoolean) {
-            tracklist = TracklistUtils.restoreTracklist(trackPreferences);
-        } else {
-            PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
-            tracklist = shuffledTrackPreferencesObject.tracklist;
+        tracklist = TracklistUtils.restoreTracklist(trackPreferences);
+        updateShufflelist();
+    }
+
+    private static void updateShufflelist(){
+        Random random = new Random();
+        int min = 0;
+
+        int[] listOfInts = new int[tracklist.size()];
+        for (int i = 0; i < tracklist.size(); i++){
+            int j = random.nextInt((i - min) + 1) + min;
+            if (j != i){
+                listOfInts[i] = listOfInts[j];
+            }
+            listOfInts[j] = i;
         }
     }
 
@@ -507,8 +518,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         }
         else {
             //else get the shuffled/tracklist
-            ArrayList<HashMap<String, String>> tracklist = (shuffleBoolean ? TracklistUtils.restoreTracklist(trackPreferences) : trackPreferences.getObject("shuffledTracks", PlaylistList.class).tracklist);
-
             //and shuffled/indexPosition
             SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
             SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
@@ -516,11 +525,19 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             String nameOfIndexPosition = (shuffleBoolean ? "shuffledIndexPosition" : "indexPosition");
             int indexPosition = indexPositionPreference.getInt(nameOfIndexPosition, -1);
 
+            updateShufflelist();
+
             //if the next indexPosition is within the tracklist, play the next song
             if ((indexPosition + 1) <= (tracklist.size() - 1)){
                 indexPosition++;
                 indexPositionEditor.putInt(nameOfIndexPosition, indexPosition);
                 indexPositionEditor.apply();
+
+                //shuffledIndexPosition is the 2 in [5,2,4,1,3][2] = 4
+                if (AudioPlayerService.shuffleBoolean){
+                    indexPosition = shuffleList[indexPosition];
+                }
+
                 playSong(indexPosition);
             }
         }

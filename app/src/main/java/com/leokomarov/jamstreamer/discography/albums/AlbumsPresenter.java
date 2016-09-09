@@ -14,10 +14,9 @@ import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.common.TrackModel;
 import com.leokomarov.jamstreamer.discography.tracks.TracksActivity;
-import com.leokomarov.jamstreamer.playlist.PlaylistList;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
-import com.leokomarov.jamstreamer.utils.JSONParser;
 import com.leokomarov.jamstreamer.utils.GeneralUtils;
+import com.leokomarov.jamstreamer.utils.JSONParser;
 import com.leokomarov.jamstreamer.utils.TracklistUtils;
 
 import org.json.JSONArray;
@@ -240,11 +239,10 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
 
             if (onTrackRequestCompletedLoop == albumsToAddLoop){
                 ArrayList<HashMap<String, String>> newTrackList = new ArrayList<>();
-                if (trackPreferences.getObject("tracks", PlaylistList.class) != null){
-                    newTrackList.addAll(trackPreferences.getObject("tracks", PlaylistList.class).tracklist);
-                }
+                newTrackList.addAll(TracklistUtils.restoreTracklist(trackPreferences));
                 newTrackList.addAll(tracklist);
-                new TracklistUtils(activity).execute(trackPreferences, "saveAndShuffle", newTrackList);
+
+                new TracklistUtils().execute(trackPreferences, newTrackList);
 
                 activity.setPlaylistButtonClickable(true);
                 if (albumsToAddLoop == 1){

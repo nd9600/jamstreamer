@@ -17,11 +17,8 @@ import android.widget.TextView;
 
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
-import com.leokomarov.jamstreamer.playlist.PlaylistList;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
-import com.leokomarov.jamstreamer.utils.TracklistUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -223,23 +220,17 @@ public class AudioPlayer extends AppCompatActivity {
 
         //else set all the activity's views
         else {
-            ArrayList<HashMap<String, String>> tracklist;
             SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
-            int indexPosition;
+            String nameOfIndexPosition = (AudioPlayerService.shuffleBoolean ? "shuffledIndexPosition" : "indexPosition");
+            int indexPosition = indexPositionPreference.getInt(nameOfIndexPosition, -1);
 
             Log.v("audioPlayer", "setting all the views");
 
             if (AudioPlayerService.shuffleBoolean){
-                PlaylistList shuffledTrackPreferencesObject = trackPreferences.getObject("shuffledTracks", PlaylistList.class);
-                tracklist = shuffledTrackPreferencesObject.tracklist;
-                indexPosition = indexPositionPreference.getInt("shuffledIndexPosition", 0);
-            }
-            else {
-                tracklist = TracklistUtils.restoreTracklist(trackPreferences);
-                indexPosition = indexPositionPreference.getInt("indexPosition", 0);
+                indexPosition = AudioPlayerService.shuffleList[indexPosition];
             }
 
-            HashMap<String, String> trackMap = tracklist.get(indexPosition);
+            HashMap<String, String> trackMap = AudioPlayerService.tracklist.get(indexPosition);
 
             String trackName = trackMap.get("trackName");
             String artistName = trackMap.get("trackArtist");

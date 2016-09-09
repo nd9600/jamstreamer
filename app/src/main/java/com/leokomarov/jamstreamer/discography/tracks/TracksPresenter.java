@@ -177,9 +177,12 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
 
          int indexPosition = 0;
          int oldTrackListSize = 0;
-         if (trackPreferences.getObject("tracks", PlaylistList.class) != null && trackPreferences.getObject("tracks", PlaylistList.class).tracklist.size() != 0){
-             newTrackList.addAll(trackPreferences.getObject("tracks", PlaylistList.class).tracklist);
-             oldTrackListSize = trackPreferences.getObject("tracks", PlaylistList.class).tracklist.size();
+
+         ArrayList<HashMap<String, String>> oldTrackList = trackPreferences.getObject("tracks", PlaylistList.class).getTracklist();
+
+         if (trackPreferences.getObject("tracks", PlaylistList.class) != null && oldTrackList.size() != 0){
+             newTrackList.addAll(oldTrackList);
+             oldTrackListSize = oldTrackList.size();
          }
 
          switch (hierarchy) {
@@ -198,7 +201,8 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
          }
 
          GeneralUtils.putHierarchy(context, "tracks");
-         new TracklistUtils(activity).execute(trackPreferences, "saveAndShuffle", newTrackList);
+
+         new TracklistUtils().execute(trackPreferences, newTrackList);
 
          SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
          SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
@@ -256,17 +260,14 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
             }
         }
 
-        //Creates a new tracklist made up of
-        //the old tracklist
+        //Creates a new tracklist made up of the old tracklist
         ArrayList<HashMap<String, String>> newTrackList = new ArrayList<>();
-        if (trackPreferences.getObject("tracks", PlaylistList.class) != null){
-            newTrackList.addAll(trackPreferences.getObject("tracks", PlaylistList.class).tracklist);
-        }
+        newTrackList.addAll(TracklistUtils.restoreTracklist(trackPreferences));
 
         //and the selected tracks, then saves it to memory
         //and returns the size to the act
         newTrackList.addAll(tracksToAddList);
-        new TracklistUtils(activity).execute(trackPreferences, "saveAndShuffle", newTrackList);
+        new TracklistUtils().execute(trackPreferences, newTrackList);
 
         return tracksToAddList.size();
     }
