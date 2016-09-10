@@ -28,6 +28,7 @@ import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.GeneralUtils;
 import com.leokomarov.jamstreamer.utils.TracklistUtils;
 
@@ -79,9 +80,11 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         context = this;
         audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        ComplexPreferences trackPreferences = ComplexPreferences.getComplexPreferences(context,
+                context.getString(R.string.trackPreferences), Context.MODE_PRIVATE);
 
         Log.v("onCreate", " ");
-        //updateTracklistIfChanged();
+        TracklistUtils.updateTracklist(trackPreferences, sharedPreferences, null);
     }
 
     /*
@@ -470,20 +473,30 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     }
 
     public static void gotoPrevious(){
-        if(mediaPlayer.getCurrentPosition() >= 3000){
+        int indexPosition = sharedPreferences.getInt("indexPosition", 1);
+
+        if (mediaPlayer.getCurrentPosition() >= 3000){
             mediaPlayer.seekTo(0);
-        } else {
-            SharedPreferences.Editor indexPositionEditor = sharedPreferences.edit();
 
-            //start the previous song
-            int indexPosition = sharedPreferences.getInt("indexPosition", 1);
-            if (indexPosition != 0){
-                indexPosition--;
-                indexPositionEditor.putInt("indexPosition", indexPosition);
-                indexPositionEditor.apply();
+        //start the previous song
+        } else if (indexPosition != 0){
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            int shuffledIndexPosition = 1;
 
-                playSong(indexPosition);
+            //shuffledIndexPosition is the 4 = [5,2,4,1,3][2]
+            if (shuffleBoolean) {
+                shuffledIndexPosition = TracklistUtils.shufflelist[indexPosition];
+                for (int i : TracklistUtils.shufflelist) {
+                    Log.v("audioPlayerService", "i: " + i);
+                }
+                Log.v("audioPlayerService", "shuffledIndexPosition: " + shuffledIndexPosition);
             }
+
+            indexPosition--;
+            editor.putInt("indexPosition", indexPosition);
+            editor.apply();
+
+            playSong((shuffleBoolean ? shuffledIndexPosition : indexPosition));
         }
     }
 
@@ -491,42 +504,40 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
         Log.v("audioPlayerService", "gotoNext()");
 
+        int indexPosition = sharedPreferences.getInt("indexPosition", -1);
 
         //if on repeat, seek to the start
         if (repeatBoolean){
             mediaPlayer.seekTo(0);
         }
-        else {
-            //else get the shuffled/tracklist
-            //and shuffled/indexPosition
-            SharedPreferences.Editor indexPositionEditor = sharedPreferences.edit();
 
-            int indexPosition = sharedPreferences.getInt("indexPosition", -1);
+        //if the next indexPosition is within the tracklist, play the next song
+        else if ((indexPosition + 1) <= (TracklistUtils.tracklist.size() - 1)){
+            //get the tracklist and shuffled/indexPosition
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+
+            int shuffledIndexPosition = 0;
 
             Log.v("audioPlayerService", "indexPosition: " + indexPosition);
             Log.v("audioPlayerService", "tracklist.size(): " + TracklistUtils.tracklist.size());
             Log.v("audioPlayerService", "indexPosition + 1: " + (indexPosition + 1));
             Log.v("audioPlayerService", "tracklist.size() - 1: " + (TracklistUtils.tracklist.size() - 1));
 
-            //if the next indexPosition is within the tracklist, play the next song
-            if ((indexPosition + 1) <= (TracklistUtils.tracklist.size() - 1)){
-                indexPosition++;
-                indexPositionEditor.putInt("indexPosition", indexPosition);
-                indexPositionEditor.apply();
-
-                //shuffledIndexPosition is the 4 = [5,2,4,1,3][2]
-                if (shuffleBoolean){
-                    indexPosition = TracklistUtils.shufflelist[indexPosition];
-                    for (int i : TracklistUtils.shufflelist){
-                        Log.v("audioPlayerService", "i: " + i);
-                    }
-                    Log.v("audioPlayerService", "shuffledIndexPosition: " + indexPosition);
+            //shuffledIndexPosition is the 4 = [5,2,4,1,3][2]
+            if (shuffleBoolean) {
+                shuffledIndexPosition = TracklistUtils.shufflelist[indexPosition];
+                for (int i : TracklistUtils.shufflelist) {
+                    Log.v("audioPlayerService", "i: " + i);
                 }
-
-                playSong(indexPosition);
+                Log.v("audioPlayerService", "shuffledIndexPosition: " + shuffledIndexPosition);
             }
-        }
 
+            indexPosition++;
+            editor.putInt("indexPosition", indexPosition);
+            editor.apply();
+
+            playSong((shuffleBoolean ? shuffledIndexPosition : indexPosition));
+        }
     }
 
     protected static OnAudioFocusChangeListener onAudioFocusChangeListener = new AudioManager.OnAudioFocusChangeListener() {

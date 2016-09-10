@@ -72,9 +72,9 @@ public class PlaylistPresenter {
 
     //Starts the audio player
     public void startAudioPlayer(int indexPosition){
-        SharedPreferences.Editor indexPositionEditor = sharedPreferences.edit();
-        indexPositionEditor.putInt("indexPosition", indexPosition);
-        indexPositionEditor.apply();
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("indexPosition", indexPosition);
+        editor.apply();
 
         Log.v("startAudioPlayer", "clicked: " + indexPosition);
 

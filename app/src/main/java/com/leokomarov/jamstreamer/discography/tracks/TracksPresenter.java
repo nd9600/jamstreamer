@@ -206,9 +206,9 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
          TracklistUtils.updateTracklist(trackPreferences, sharedPreferences, newTrackList);
 
          SharedPreferences indexPositionPreference = PreferenceManager.getDefaultSharedPreferences(context);
-         SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
-         indexPositionEditor.putInt("indexPosition", indexPosition);
-         indexPositionEditor.apply();
+         SharedPreferences.Editor editor = indexPositionPreference.edit();
+         editor.putInt("indexPosition", indexPosition);
+         editor.apply();
 
          if (AudioPlayerService.shuffleBoolean){
              AudioPlayerService.shuffleBoolean = false;

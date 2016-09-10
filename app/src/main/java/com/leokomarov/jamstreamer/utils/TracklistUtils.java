@@ -30,6 +30,7 @@ public class TracklistUtils extends AsyncTask<Object, Integer, Void> {
         Random random = new Random();
         int min = 0;
 
+        //creates a shuffled list of integers from 0 to tracklist.size()
         shufflelist = new int[tracklist.size()];
         for (int i = 0; i < tracklist.size(); i++){
             int j = random.nextInt((i - min) + 1) + min;
@@ -39,8 +40,8 @@ public class TracklistUtils extends AsyncTask<Object, Integer, Void> {
             shufflelist[j] = i;
         }
 
+        //puts the current track at the front
         int indexPosition = sharedPreferences.getInt("indexPosition", 0);
-
         for (int i = 0; i < shufflelist.length; i++) {
             if (shufflelist[i] == indexPosition) {
                 shufflelist[i] = shufflelist[0];
@@ -49,7 +50,11 @@ public class TracklistUtils extends AsyncTask<Object, Integer, Void> {
             }
         }
 
-        Log.v("updateShufflelist", "indexPosition: " + indexPosition);
+        //resets the indexPosition to 0
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("indexPosition", 0);
+        editor.apply();
+
         Log.v("updateShufflelist", "tracklist.size(): " + tracklist.size());
         for (int i : shufflelist){
             Log.v("updateShufflelist", "i: " + i);
