@@ -50,11 +50,6 @@ public class TracklistUtils extends AsyncTask<Object, Integer, Void> {
             }
         }
 
-        //resets the indexPosition to 0
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putInt("indexPosition", 0);
-        editor.apply();
-
         Log.v("updateShufflelist", "tracklist.size(): " + tracklist.size());
         for (int i : shufflelist){
             Log.v("updateShufflelist", "i: " + i);

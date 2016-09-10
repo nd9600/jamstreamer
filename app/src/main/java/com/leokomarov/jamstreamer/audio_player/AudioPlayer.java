@@ -309,7 +309,12 @@ public class AudioPlayer extends AppCompatActivity {
 					AudioPlayerService.shuffleBoolean = true;
                     SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(AudioPlayer.this);
                     TracklistUtils.updateShufflelist(sharedPreferences);
-					button_shuffle.setImageResource(R.drawable.img_shuffle_focused);					
+					button_shuffle.setImageResource(R.drawable.img_shuffle_focused);
+
+                    //resets the shuffledIndexPosition to 0
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putInt("shuffledIndexPosition", 0);
+                    editor.apply();
                 }
             }
 		});

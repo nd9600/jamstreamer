@@ -481,22 +481,24 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         //start the previous song
         } else if (indexPosition != 0){
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            int shuffledIndexPosition = 1;
+            int shuffledIndexPosition = sharedPreferences.getInt("shuffledIndexPosition", 1);
 
             //shuffledIndexPosition is the 4 = [5,2,4,1,3][2]
             if (shuffleBoolean) {
-                shuffledIndexPosition = TracklistUtils.shufflelist[indexPosition];
+                indexPosition = TracklistUtils.shufflelist[shuffledIndexPosition];
                 for (int i : TracklistUtils.shufflelist) {
                     Log.v("audioPlayerService", "i: " + i);
                 }
+                shuffledIndexPosition--;
+                editor.putInt("shuffledIndexPosition", shuffledIndexPosition);
                 Log.v("audioPlayerService", "shuffledIndexPosition: " + shuffledIndexPosition);
+            } else {
+                indexPosition--;
+                editor.putInt("indexPosition", indexPosition);
             }
-
-            indexPosition--;
-            editor.putInt("indexPosition", indexPosition);
             editor.apply();
 
-            playSong((shuffleBoolean ? shuffledIndexPosition : indexPosition));
+            playSong(indexPosition);
         }
     }
 
@@ -516,27 +518,34 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             //get the tracklist and shuffled/indexPosition
             SharedPreferences.Editor editor = sharedPreferences.edit();
 
-            int shuffledIndexPosition = 0;
+            int shuffledIndexPosition = sharedPreferences.getInt("shuffledIndexPosition", -1);
 
-            Log.v("audioPlayerService", "indexPosition: " + indexPosition);
-            Log.v("audioPlayerService", "tracklist.size(): " + TracklistUtils.tracklist.size());
-            Log.v("audioPlayerService", "indexPosition + 1: " + (indexPosition + 1));
-            Log.v("audioPlayerService", "tracklist.size() - 1: " + (TracklistUtils.tracklist.size() - 1));
+            Log.v("gotoNext", "indexPosition: " + indexPosition);
+            Log.v("gotoNext", "tracklist.size(): " + TracklistUtils.tracklist.size());
+            Log.v("gotoNext", "indexPosition + 1: " + (indexPosition + 1));
+            Log.v("gotoNext", "tracklist.size() - 1: " + (TracklistUtils.tracklist.size() - 1));
 
+            //indexPosition is the actual index in the tracklist
             //shuffledIndexPosition is the 4 = [5,2,4,1,3][2]
             if (shuffleBoolean) {
-                shuffledIndexPosition = TracklistUtils.shufflelist[indexPosition];
-                for (int i : TracklistUtils.shufflelist) {
-                    Log.v("audioPlayerService", "i: " + i);
+                if (shuffledIndexPosition <= TracklistUtils.tracklist.size()) {
+                    indexPosition = TracklistUtils.shufflelist[shuffledIndexPosition];
+                    for (int i : TracklistUtils.shufflelist) {
+                        Log.v("gotoNext", "i: " + i);
+                    }
+                    shuffledIndexPosition++;
+                    editor.putInt("shuffledIndexPosition", shuffledIndexPosition);
+                    Log.v("gotoNext", "shuffledIndexPosition: " + shuffledIndexPosition);
+                } else {
+                    return;
                 }
-                Log.v("audioPlayerService", "shuffledIndexPosition: " + shuffledIndexPosition);
+            } else {
+                indexPosition++;
+                editor.putInt("indexPosition", indexPosition);
             }
-
-            indexPosition++;
-            editor.putInt("indexPosition", indexPosition);
             editor.apply();
 
-            playSong((shuffleBoolean ? shuffledIndexPosition : indexPosition));
+            playSong(indexPosition);
         }
     }
 
