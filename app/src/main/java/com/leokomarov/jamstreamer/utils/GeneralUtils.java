@@ -3,8 +3,7 @@ package com.leokomarov.jamstreamer.utils;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-
-import com.leokomarov.jamstreamer.R;
+import android.preference.PreferenceManager;
 
 public class GeneralUtils {
 
@@ -12,8 +11,8 @@ public class GeneralUtils {
 
     //Stores where you are going in the app hierarchy
     public static void putHierarchy(Context context, String hierarchy){
-        SharedPreferences hierarchyPreference = context.getSharedPreferences(context.getString(R.string.hierarchyPreferences), 0);
-        SharedPreferences.Editor hierarchyEditor = hierarchyPreference.edit();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor hierarchyEditor = sharedPreferences.edit();
         hierarchyEditor.putString("hierarchy", hierarchy);
         hierarchyEditor.apply();
     }

@@ -3,6 +3,7 @@ package com.leokomarov.jamstreamer.discography.albums;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,7 +12,6 @@ import android.widget.CheckBox;
 import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.audio_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.common.TrackModel;
 import com.leokomarov.jamstreamer.discography.tracks.TracksActivity;
@@ -34,6 +34,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
     private AlbumsActivity activity;
     private ListInteractor interactor;
     private ComplexPreferences trackPreferences;
+    private SharedPreferences sharedPreferences;
 
     private JSONArray results;
     private ArrayList<HashMap<String, String>> albumList = new ArrayList<>();
@@ -50,6 +51,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
         this.interactor = listInteractor;
         this.trackPreferences = ComplexPreferences.getComplexPreferences(context,
                 context.getString(R.string.trackPreferences), Context.MODE_PRIVATE);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public List<TrackModel> getListData(){
@@ -62,8 +64,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
     }
 
     public void populateList(Intent intent){
-        SharedPreferences hierarchyPreference = context.getSharedPreferences(context.getString(R.string.hierarchyPreferences), 0);
-        String hierarchy = hierarchyPreference.getString("hierarchy", "none");
+        String hierarchy = sharedPreferences.getString("hierarchy", "none");
         String searchTerm = "";
         String unformattedURL = "";
 
@@ -157,8 +158,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
     public void albumRequest(JSONObject json) {
         try {
             results = json.getJSONArray(context.getString(R.string.TAG_RESULTS));
-            SharedPreferences hierarchyPreference = context.getSharedPreferences(context.getString(R.string.hierarchyPreferences), 0);
-            String hierarchy = hierarchyPreference.getString("hierarchy", "none");
+            String hierarchy = sharedPreferences.getString("hierarchy", "none");
             switch (hierarchy) {
                 case "artists":
                 case "albumsFloatingMenuArtist":
@@ -243,8 +243,8 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
                 newTrackList.addAll(TracklistUtils.restoreTracklist(trackPreferences));
                 newTrackList.addAll(tracklist);
 
-                AudioPlayerService.tracklistHasChanged = true;
                 new TracklistUtils().execute(trackPreferences, newTrackList);
+                TracklistUtils.updateTracklist(trackPreferences, sharedPreferences, newTrackList);
 
                 activity.setPlaylistButtonClickable(true);
                 if (albumsToAddLoop == 1){

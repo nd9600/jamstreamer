@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
@@ -17,7 +18,7 @@ import android.widget.TextView;
 
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.playlist.PlaylistActivity;
-import com.leokomarov.jamstreamer.utils.ComplexPreferences;
+import com.leokomarov.jamstreamer.utils.TracklistUtils;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -38,8 +39,6 @@ public class AudioPlayer extends AppCompatActivity {
 	
 	private static Handler mHandler = new Handler();
 
-    private static ComplexPreferences trackPreferences;
-
     //called when the activity is re-launched while at the top of the activity stack instead of a new instance of the activity being started
     //since all intents creating it have the FLAG_ACTIVITY_SINGLE_TOP flag
     @Override
@@ -59,8 +58,6 @@ public class AudioPlayer extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        trackPreferences = ComplexPreferences.getComplexPreferences(this,
-                getString(R.string.trackPreferences), MODE_PRIVATE);
         afterCreation(getIntent());
     }
 
@@ -220,23 +217,23 @@ public class AudioPlayer extends AppCompatActivity {
 
         //else set all the activity's views
         else {
-            SharedPreferences indexPositionPreference = getSharedPreferences(getString(R.string.indexPositionPreferences), 0);
-            int indexPosition = indexPositionPreference.getInt("indexPosition", -1);
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            int indexPosition = sharedPreferences.getInt("indexPosition", -1);
 
             Log.v("audioPlayer", "setting all the views");
             Log.v("audioPlayerService", "indexPosition: " + indexPosition);
 
             if (AudioPlayerService.shuffleBoolean){
-                indexPosition = AudioPlayerService.shufflelist[indexPosition];
+                indexPosition = TracklistUtils.shufflelist[indexPosition];
                 //for (int i : AudioPlayerService.shufflelist){
                 //   Log.v("audioPlayer", "" + i);
                 //}
                 Log.v("audioPlayerService", "" + indexPosition);
             }
 
-            AudioPlayerService.updateTracklistIfChanged();
+            //AudioPlayerService.updateTracklistIfChanged();
 
-            HashMap<String, String> trackMap = AudioPlayerService.tracklist.get(indexPosition);
+            HashMap<String, String> trackMap = TracklistUtils.tracklist.get(indexPosition);
 
             String trackName = trackMap.get("trackName");
             String artistName = trackMap.get("trackArtist");
@@ -310,6 +307,8 @@ public class AudioPlayer extends AppCompatActivity {
                 }
                 else {
 					AudioPlayerService.shuffleBoolean = true;
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(AudioPlayer.this);
+                    TracklistUtils.updateShufflelist(sharedPreferences);
 					button_shuffle.setImageResource(R.drawable.img_shuffle_focused);					
                 }
             }

@@ -3,6 +3,7 @@ package com.leokomarov.jamstreamer.discography.tracks;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,11 +12,11 @@ import android.widget.CheckBox;
 import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.audio_player.AudioPlayer;
+import com.leokomarov.jamstreamer.audio_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.common.TrackModel;
 import com.leokomarov.jamstreamer.discography.albums.AlbumsActivity;
-import com.leokomarov.jamstreamer.audio_player.AudioPlayer;
-import com.leokomarov.jamstreamer.audio_player.AudioPlayerService;
 import com.leokomarov.jamstreamer.playlist.PlaylistList;
 import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.GeneralUtils;
@@ -35,6 +36,7 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
     private TracksActivity activity;
     private ListInteractor interactor;
     private ComplexPreferences trackPreferences;
+    private SharedPreferences sharedPreferences;
 
     private JSONArray results;
     private ArrayList<HashMap<String, String>> tracklist = new ArrayList<>();
@@ -46,6 +48,7 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
         this.interactor = listInteractor;
         this.trackPreferences = ComplexPreferences.getComplexPreferences(context,
                 context.getString(R.string.trackPreferences), Context.MODE_PRIVATE);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     //Sets the data used to generate the listview
@@ -58,8 +61,7 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
     }
 
     public void populateList(Intent intent){
-        SharedPreferences hierarchyPreference = context.getSharedPreferences(context.getString(R.string.hierarchyPreferences), 0);
-        String hierarchy = hierarchyPreference.getString("hierarchy", "none");
+        String hierarchy = sharedPreferences.getString("hierarchy", "none");
         String searchTerm = "";
         String unformattedURL = "";
 
@@ -93,8 +95,7 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
     public void onRequestCompleted(JSONObject json) {
         try {
             results = json.getJSONArray(context.getString(R.string.TAG_RESULTS));
-            SharedPreferences hierarchyPreference = context.getSharedPreferences(context.getString(R.string.hierarchyPreferences), 0);
-            String hierarchy = hierarchyPreference.getString("hierarchy", "none");
+            String hierarchy = sharedPreferences.getString("hierarchy", "none");
             switch (hierarchy) {
                 case "artists":
                 case "albums":
@@ -172,8 +173,7 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
 
      public void listviewOnClick(int position){
          ArrayList<HashMap<String, String>> newTrackList = new ArrayList<>();
-         SharedPreferences hierarchyPreference = context.getSharedPreferences(context.getString(R.string.hierarchyPreferences), 0);
-         String hierarchy = hierarchyPreference.getString("hierarchy", "none");
+         String hierarchy = sharedPreferences.getString("hierarchy", "none");
 
          int indexPosition = 0;
          int oldTrackListSize = 0;
@@ -202,10 +202,10 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
 
          GeneralUtils.putHierarchy(context, "tracks");
 
-         AudioPlayerService.tracklistHasChanged = true;
          new TracklistUtils().execute(trackPreferences, newTrackList);
+         TracklistUtils.updateTracklist(trackPreferences, sharedPreferences, newTrackList);
 
-         SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
+         SharedPreferences indexPositionPreference = PreferenceManager.getDefaultSharedPreferences(context);
          SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
          indexPositionEditor.putInt("indexPosition", indexPosition);
          indexPositionEditor.apply();
@@ -268,8 +268,8 @@ public class TracksPresenter implements JSONParser.CallbackInterface {
         //and the selected tracks, then saves it to memory
         //and returns the size to the act
         newTrackList.addAll(tracksToAddList);
-        AudioPlayerService.tracklistHasChanged = true;
         new TracklistUtils().execute(trackPreferences, newTrackList);
+        TracklistUtils.updateTracklist(trackPreferences, sharedPreferences, newTrackList);
 
         return tracksToAddList.size();
     }

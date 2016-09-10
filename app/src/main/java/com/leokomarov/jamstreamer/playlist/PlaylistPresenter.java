@@ -3,6 +3,7 @@ package com.leokomarov.jamstreamer.playlist;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +32,7 @@ public class PlaylistPresenter {
     private PlaylistActivity activity;
     private ListInteractor interactor;
     private ComplexPreferences trackPreferences;
+    private SharedPreferences sharedPreferences;
 
     public PlaylistPresenter(Context context, PlaylistActivity activity, ListInteractor listInteractor){
         this.context = context;
@@ -38,6 +40,7 @@ public class PlaylistPresenter {
         this.interactor = listInteractor;
         this.trackPreferences = ComplexPreferences.getComplexPreferences(context,
                 context.getString(R.string.trackPreferences), Context.MODE_PRIVATE);
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
     }
 
     public List<TrackModel> getListData(){
@@ -63,14 +66,13 @@ public class PlaylistPresenter {
     public void deletePlaylist(){
         clearListData();
 
-        AudioPlayerService.tracklistHasChanged = true;
+        TracklistUtils.updateTracklist(trackPreferences, sharedPreferences, new ArrayList<HashMap<String, String>>());
         new TracklistUtils().execute(trackPreferences, new ArrayList<HashMap<String, String>>());
     }
 
     //Starts the audio player
     public void startAudioPlayer(int indexPosition){
-        SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
-        SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
+        SharedPreferences.Editor indexPositionEditor = sharedPreferences.edit();
         indexPositionEditor.putInt("indexPosition", indexPosition);
         indexPositionEditor.apply();
 
@@ -157,8 +159,8 @@ public class PlaylistPresenter {
 
         setListData(false, tracklist);
 
-        AudioPlayerService.tracklistHasChanged = true;
         new TracklistUtils().execute(trackPreferences, tracklist);
+        TracklistUtils.updateTracklist(trackPreferences, sharedPreferences, tracklist);
 
         activity.listAdapter.clearCheckboxes();
         return tracksToDelete.size();

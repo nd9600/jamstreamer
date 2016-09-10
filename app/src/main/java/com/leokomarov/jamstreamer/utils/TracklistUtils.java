@@ -1,5 +1,6 @@
 package com.leokomarov.jamstreamer.utils;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -7,8 +8,53 @@ import com.leokomarov.jamstreamer.playlist.PlaylistList;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 public class TracklistUtils extends AsyncTask<Object, Integer, Void> {
+
+    public static ArrayList<HashMap<String, String>> tracklist;
+    public static int[] shufflelist;
+
+    //set tracklist with parameter, or restore from memory if parameter is null
+    public static void updateTracklist(ComplexPreferences trackPreferences, SharedPreferences sharedPreferences, ArrayList<HashMap<String, String>> tracklist) {
+        if (tracklist == null){
+            TracklistUtils.tracklist = restoreTracklist(trackPreferences);
+        } else {
+            TracklistUtils.tracklist = tracklist;
+        }
+
+        updateShufflelist(sharedPreferences);
+    }
+
+    public static void updateShufflelist(SharedPreferences sharedPreferences) {
+        Random random = new Random();
+        int min = 0;
+
+        shufflelist = new int[tracklist.size()];
+        for (int i = 0; i < tracklist.size(); i++){
+            int j = random.nextInt((i - min) + 1) + min;
+            if (j != i){
+                shufflelist[i] = shufflelist[j];
+            }
+            shufflelist[j] = i;
+        }
+
+        int indexPosition = sharedPreferences.getInt("indexPosition", 0);
+
+        for (int i = 0; i < shufflelist.length; i++) {
+            if (shufflelist[i] == indexPosition) {
+                shufflelist[i] = shufflelist[0];
+                shufflelist[0] = indexPosition;
+                break;
+            }
+        }
+
+        Log.v("updateShufflelist", "indexPosition: " + indexPosition);
+        Log.v("updateShufflelist", "tracklist.size(): " + tracklist.size());
+        for (int i : shufflelist){
+            Log.v("updateShufflelist", "i: " + i);
+        }
+    }
 
     //Restores the playlist from memory
     //See ComplexPreferences docs on Github

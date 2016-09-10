@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,13 +35,14 @@ public class MainMenu extends AppCompatActivity {
         getSupportActionBar();
 
         //if the app hasn't been ran before, show the toasts
-        // ie FIRSTRUN_PREFERENCE doesn't contain "firstrun" or "firstrun" == true
-        if (! getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE).contains("firstrun")
-                || getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE).getBoolean("firstrun", true)) {
+        //ie if sharedPreferences doesn't contain "firstrun" or "firstrun" == true
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if (! sharedPreferences.contains("firstrun")
+                || sharedPreferences.getBoolean("firstrun", true)) {
             Toast.makeText(getApplicationContext(),"Long-press on an album or track for options", Toast.LENGTH_LONG).show();
             Toast.makeText(getApplicationContext(),"I'd appreciate it if you rate this app. Thanks!", Toast.LENGTH_LONG).show();
-            SharedPreferences firstrunPreference = getSharedPreferences("FIRSTRUN_PREFERENCE", MODE_PRIVATE);
-            SharedPreferences.Editor firstrunEditor = firstrunPreference.edit();
+            SharedPreferences.Editor firstrunEditor = sharedPreferences.edit();
             firstrunEditor.putBoolean("firstrun", false);
             firstrunEditor.apply();
         }

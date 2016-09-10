@@ -21,40 +21,33 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.RemoteException;
+import android.preference.PreferenceManager;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.utils.ComplexPreferences;
 import com.leokomarov.jamstreamer.utils.GeneralUtils;
 import com.leokomarov.jamstreamer.utils.TracklistUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
 
 public class AudioPlayerService extends Service implements OnErrorListener, OnPreparedListener, OnCompletionListener {
     protected static MediaPlayer mediaPlayer;
     protected static boolean prepared;
-    private static WifiLock wifiLock;
-    private static ComplexPreferences trackPreferences;
     private static AudioPlayerService context;
-    protected static ArrayList<HashMap<String, String>> tracklist;
-    protected static int[] shufflelist;
+    private static SharedPreferences sharedPreferences;
 
     protected static AudioManager audioManager;
     private static int lastKnownAudioFocusState;
     private static boolean wasPlayingWhenTransientLoss;
     private static int originalVolume;
+    private static WifiLock wifiLock;
 
     private static String currentTrackName = "Track name";
     private static String previousArtistAndAlbum = "";
     private static String currentArtistAndAlbum = "Artist - album";
     private static String currentTrackInfoURL = "";
 
-    public static boolean tracklistHasChanged;
     public static boolean shuffleBoolean;
     protected static boolean repeatBoolean;
 
@@ -83,15 +76,15 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     public void onCreate(){
         super.onCreate();
 
-        audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
-        trackPreferences = ComplexPreferences.getComplexPreferences(this,
-                getString(R.string.trackPreferences), MODE_PRIVATE);
         context = this;
+        audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         Log.v("onCreate", " ");
-        updateTracklistIfChanged();
+        //updateTracklistIfChanged();
     }
 
+    /*
     protected static void updateTracklistIfChanged(){
         Log.v("service-updateTracklist", "tracklistHasChanged: " + tracklistHasChanged);
         if (tracklistHasChanged) {
@@ -99,42 +92,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             tracklistHasChanged = false;
         }
     }
-
-    private static void updateTracklist(){
-        tracklist = TracklistUtils.restoreTracklist(trackPreferences);
-        updateShufflelist();
-    }
-
-    private static void updateShufflelist(){
-        Random random = new Random();
-        int min = 0;
-
-        shufflelist = new int[tracklist.size()];
-        for (int i = 0; i < tracklist.size(); i++){
-            int j = random.nextInt((i - min) + 1) + min;
-            if (j != i){
-                shufflelist[i] = shufflelist[j];
-            }
-            shufflelist[j] = i;
-        }
-
-        SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
-        int indexPosition = indexPositionPreference.getInt("indexPosition", 0);
-
-        for (int i = 0; i < shufflelist.length; i++) {
-            if (shufflelist[i] == indexPosition) {
-                shufflelist[i] = shufflelist[0];
-                shufflelist[0] = indexPosition;
-                break;
-            }
-        }
-
-        Log.v("updateShufflelist", "indexPosition: " + indexPosition);
-        Log.v("updateShufflelist", "tracklist.size(): " + tracklist.size());
-        for (int i : shufflelist){
-            Log.v("updateShufflelist", "i: " + i);
-        }
-    }
+    */
 
     private static void updateAlbumArt(){
         //if there isn't any album art, or the ArtistAndAlbum has changed
@@ -325,7 +283,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         }
 
         Log.v("onStartCommand", " ");
-        updateTracklistIfChanged();
+        //updateTracklistIfChanged();
 
         handleIntent(audioPlayerServiceIntent);
 
@@ -337,8 +295,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         if (playFirstSong) {
             playFirstSong = false;
 
-            SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
-            int indexPosition = indexPositionPreference.getInt("indexPosition", 0);
+            int indexPosition = sharedPreferences.getInt("indexPosition", 0);
 
             playSong(indexPosition);
         }
@@ -348,12 +305,11 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     protected static void playSong(int indexPosition) {
 
         Log.v("playSong", " ");
-        updateTracklistIfChanged();
+        //updateTracklistIfChanged();
 
         //gets the trackIDs
-        SharedPreferences currentTrackPreference = context.getSharedPreferences(context.getString(R.string.currentTrackPreferences), 0);
-        int previousTrackID = currentTrackPreference.getInt("currentTrack", 0);
-        int newTrackID = Integer.parseInt(tracklist.get(indexPosition).get("trackID"));
+        int previousTrackID = sharedPreferences.getInt("currentTrack", 0);
+        int newTrackID = Integer.parseInt(TracklistUtils.tracklist.get(indexPosition).get("trackID"));
 
         //if the player doesn't exist, or the tracks that was playing is
         //different from the new one, play the new track
@@ -363,10 +319,10 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
             Log.v("service-playSong", "setting player view");
 
-            String trackName = tracklist.get(indexPosition).get("trackName");
-            String trackDuration = tracklist.get(indexPosition).get("trackDuration");
-            String artistName = tracklist.get(indexPosition).get("trackArtist");
-            String albumName = tracklist.get(indexPosition).get("trackAlbum");
+            String trackName = TracklistUtils.tracklist.get(indexPosition).get("trackName");
+            String trackDuration = TracklistUtils.tracklist.get(indexPosition).get("trackDuration");
+            String artistName = TracklistUtils.tracklist.get(indexPosition).get("trackArtist");
+            String albumName = TracklistUtils.tracklist.get(indexPosition).get("trackAlbum");
             String trackAndArtist = String.format("%s - %s", trackName, artistName);
             AudioPlayer.setMetadataAndAlbumArt(trackAndArtist, albumName, trackDuration);
             buildNotification(false, generateAction(android.R.drawable.ic_media_pause, "Pause", ACTION_PAUSE));
@@ -376,7 +332,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
         Log.v("service-playSong", "Playing new song");
 
-        if (tracklist.size() != 0) {
+        if (TracklistUtils.tracklist.size() != 0) {
 
             //create the player if it doesn't exist
             //if it does, reset it
@@ -387,7 +343,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             }
 
             //saves the current trackID in memory
-            SharedPreferences.Editor currentTrackEditor = currentTrackPreference.edit();
+            SharedPreferences.Editor currentTrackEditor = sharedPreferences.edit();
             currentTrackEditor.putInt("currentTrack", newTrackID);
             currentTrackEditor.apply();
 
@@ -400,10 +356,10 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             currentTrackInfoURL = String.format(unformattedTrackInfoURL, newTrackID).replace("&amp;", "&");
 
             //gets the track info from the tracklist
-            String trackName = tracklist.get(indexPosition).get("trackName");
-            String artistName = tracklist.get(indexPosition).get("trackArtist");
-            String trackDuration = tracklist.get(indexPosition).get("trackDuration");
-            String albumName = tracklist.get(indexPosition).get("trackAlbum");
+            String trackName = TracklistUtils.tracklist.get(indexPosition).get("trackName");
+            String artistName = TracklistUtils.tracklist.get(indexPosition).get("trackArtist");
+            String trackDuration = TracklistUtils.tracklist.get(indexPosition).get("trackDuration");
+            String albumName = TracklistUtils.tracklist.get(indexPosition).get("trackAlbum");
             String artistAndAlbum = String.format("%s - %s", artistName, albumName);
             String trackAndArtist = String.format("%s - %s", trackName, artistName);
 
@@ -517,11 +473,10 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         if(mediaPlayer.getCurrentPosition() >= 3000){
             mediaPlayer.seekTo(0);
         } else {
-            SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
-            SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
+            SharedPreferences.Editor indexPositionEditor = sharedPreferences.edit();
 
             //start the previous song
-            int indexPosition = indexPositionPreference.getInt("indexPosition", 1);
+            int indexPosition = sharedPreferences.getInt("indexPosition", 1);
             if (indexPosition != 0){
                 indexPosition--;
                 indexPositionEditor.putInt("indexPosition", indexPosition);
@@ -544,26 +499,25 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         else {
             //else get the shuffled/tracklist
             //and shuffled/indexPosition
-            SharedPreferences indexPositionPreference = context.getSharedPreferences(context.getString(R.string.indexPositionPreferences), 0);
-            SharedPreferences.Editor indexPositionEditor = indexPositionPreference.edit();
+            SharedPreferences.Editor indexPositionEditor = sharedPreferences.edit();
 
-            int indexPosition = indexPositionPreference.getInt("indexPosition", -1);
+            int indexPosition = sharedPreferences.getInt("indexPosition", -1);
 
             Log.v("audioPlayerService", "indexPosition: " + indexPosition);
-            Log.v("audioPlayerService", "tracklist.size(): " + tracklist.size());
+            Log.v("audioPlayerService", "tracklist.size(): " + TracklistUtils.tracklist.size());
             Log.v("audioPlayerService", "indexPosition + 1: " + (indexPosition + 1));
-            Log.v("audioPlayerService", "tracklist.size() - 1: " + (tracklist.size() - 1));
+            Log.v("audioPlayerService", "tracklist.size() - 1: " + (TracklistUtils.tracklist.size() - 1));
 
             //if the next indexPosition is within the tracklist, play the next song
-            if ((indexPosition + 1) <= (tracklist.size() - 1)){
+            if ((indexPosition + 1) <= (TracklistUtils.tracklist.size() - 1)){
                 indexPosition++;
                 indexPositionEditor.putInt("indexPosition", indexPosition);
                 indexPositionEditor.apply();
 
                 //shuffledIndexPosition is the 4 = [5,2,4,1,3][2]
                 if (shuffleBoolean){
-                    indexPosition = shufflelist[indexPosition];
-                    for (int i : shufflelist){
+                    indexPosition = TracklistUtils.shufflelist[indexPosition];
+                    for (int i : TracklistUtils.shufflelist){
                         Log.v("audioPlayerService", "i: " + i);
                     }
                     Log.v("audioPlayerService", "shuffledIndexPosition: " + indexPosition);
