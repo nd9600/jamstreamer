@@ -49,11 +49,6 @@ public class TracklistUtils extends AsyncTask<Object, Integer, Void> {
                 break;
             }
         }
-
-        Log.v("updateShufflelist", "tracklist.size(): " + tracklist.size());
-        for (int i : shufflelist){
-            Log.v("updateShufflelist", "i: " + i);
-        }
     }
 
     //Restores the playlist from memory

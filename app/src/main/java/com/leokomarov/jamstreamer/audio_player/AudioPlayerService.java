@@ -54,7 +54,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
     //used to stop playback when you detach headphones
     private static IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-    private static HeadsetIntentReceiver headsetReceiver = new HeadsetIntentReceiver();
+    private static HeadsetIntentReceiver headsetReceiver;
 
     //used with notification and lockscreen controls
     private static MediaSessionCompat mSession;
@@ -87,23 +87,11 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         TracklistUtils.updateTracklist(trackPreferences, sharedPreferences, null);
     }
 
-    /*
-    protected static void updateTracklistIfChanged(){
-        Log.v("service-updateTracklist", "tracklistHasChanged: " + tracklistHasChanged);
-        if (tracklistHasChanged) {
-            updateTracklist();
-            tracklistHasChanged = false;
-        }
-    }
-    */
-
     private static void updateAlbumArt(){
         //if there isn't any album art, or the ArtistAndAlbum has changed
         //update the album art and previousArtistAndAlbum
         if ((! previousArtistAndAlbum.equals(currentArtistAndAlbum)) || albumImage == null) {
             Log.v("updateAlbumArt", "getting new album art");
-            Log.v("updateAlbumArt", "text different: " + (!previousArtistAndAlbum.equals(currentArtistAndAlbum)));
-            Log.v("updateAlbumArt", "imageStore null: " + (albumImage == null));
 
             AudioParser audioParser = new AudioParser();
             audioParser.execute(currentTrackInfoURL, currentArtistAndAlbum);
@@ -166,8 +154,8 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
                 audioManager.abandonAudioFocus(onAudioFocusChangeListener);
                 unregisterReceiver(headsetReceiver);
                 mSession.release();
-                mediaPlayer.release();
                 mediaPlayer.reset();
+                mediaPlayer.release();
                 if (wifiLock.isHeld()) {
                     wifiLock.release();
                 }
@@ -181,7 +169,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     }
 
     protected void handleIntent(Intent intent) {
-        if (intent.getAction() == null) {
+        if (intent == null || intent.getAction() == null) {
             return;
         }
 
@@ -286,7 +274,6 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
         }
 
         Log.v("onStartCommand", " ");
-        //updateTracklistIfChanged();
 
         handleIntent(audioPlayerServiceIntent);
 
@@ -373,6 +360,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
             try {
                 //sets the initial text in the player;
                 AudioPlayer.setMetadataAndAlbumArt(trackAndArtist, albumName, trackDuration);
+                AudioPlayer.setPlayButtonImage(false);
 
                 //set wake and wifilocks and the player data source
                 Log.v("service-playSong", "Preparing");
@@ -416,6 +404,7 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
             try {
                 Log.v("service-onPrepared", "mp started");
+                headsetReceiver = new HeadsetIntentReceiver();
                 registerReceiver(headsetReceiver, intentFilter);
                 mSession.setActive(true);
                 mp.start();
@@ -473,32 +462,32 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     }
 
     public static void gotoPrevious(){
-        int indexPosition = sharedPreferences.getInt("indexPosition", 1);
-
-        if (mediaPlayer.getCurrentPosition() >= 3000){
+        if (mediaPlayer.getCurrentPosition() >= 3000) {
             mediaPlayer.seekTo(0);
 
-        //start the previous song
-        } else if (indexPosition != 0){
+        } else {
+            int indexPosition = sharedPreferences.getInt("indexPosition", 1);
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            int shuffledIndexPosition = sharedPreferences.getInt("shuffledIndexPosition", 1);
+            if (shuffleBoolean){
+                int shuffledIndexPosition = sharedPreferences.getInt("shuffledIndexPosition", 1);
+                if ((shuffledIndexPosition - 1) >= 0) {
 
-            //shuffledIndexPosition is the 4 = [5,2,4,1,3][2]
-            if (shuffleBoolean) {
-                indexPosition = TracklistUtils.shufflelist[shuffledIndexPosition];
-                for (int i : TracklistUtils.shufflelist) {
-                    Log.v("audioPlayerService", "i: " + i);
+                    shuffledIndexPosition--;
+                    int actuallyPlayingIndex = TracklistUtils.shufflelist[shuffledIndexPosition];
+
+                    editor.putInt("indexPosition", actuallyPlayingIndex);
+                    editor.putInt("shuffledIndexPosition", shuffledIndexPosition);
+                    editor.apply();
+
+                    playSong(actuallyPlayingIndex);
                 }
-                shuffledIndexPosition--;
-                editor.putInt("shuffledIndexPosition", shuffledIndexPosition);
-                Log.v("audioPlayerService", "shuffledIndexPosition: " + shuffledIndexPosition);
-            } else {
+            } else if ((indexPosition - 1) >= 0){
                 indexPosition--;
                 editor.putInt("indexPosition", indexPosition);
-            }
-            editor.apply();
+                editor.apply();
 
-            playSong(indexPosition);
+                playSong(indexPosition);
+            }
         }
     }
 
@@ -506,46 +495,39 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
 
         Log.v("audioPlayerService", "gotoNext()");
 
-        int indexPosition = sharedPreferences.getInt("indexPosition", -1);
-
         //if on repeat, seek to the start
         if (repeatBoolean){
             mediaPlayer.seekTo(0);
-        }
+
 
         //if the next indexPosition is within the tracklist, play the next song
-        else if ((indexPosition + 1) <= (TracklistUtils.tracklist.size() - 1)){
+        //indexPosition is the actual index in the tracklist
+        //shuffledIndexPosition is the [2] in [5,2,4,1,3][2],
+        //and gives you the indexPosition
+        } else {
+            int indexPosition = sharedPreferences.getInt("indexPosition", -1);
             //get the tracklist and shuffled/indexPosition
             SharedPreferences.Editor editor = sharedPreferences.edit();
+            if (shuffleBoolean){
+                int shuffledIndexPosition = sharedPreferences.getInt("shuffledIndexPosition", -1);
+                if ((shuffledIndexPosition + 1) <= (TracklistUtils.tracklist.size() - 1)) {
 
-            int shuffledIndexPosition = sharedPreferences.getInt("shuffledIndexPosition", -1);
-
-            Log.v("gotoNext", "indexPosition: " + indexPosition);
-            Log.v("gotoNext", "tracklist.size(): " + TracklistUtils.tracklist.size());
-            Log.v("gotoNext", "indexPosition + 1: " + (indexPosition + 1));
-            Log.v("gotoNext", "tracklist.size() - 1: " + (TracklistUtils.tracklist.size() - 1));
-
-            //indexPosition is the actual index in the tracklist
-            //shuffledIndexPosition is the 4 = [5,2,4,1,3][2]
-            if (shuffleBoolean) {
-                if (shuffledIndexPosition <= TracklistUtils.tracklist.size()) {
-                    indexPosition = TracklistUtils.shufflelist[shuffledIndexPosition];
-                    for (int i : TracklistUtils.shufflelist) {
-                        Log.v("gotoNext", "i: " + i);
-                    }
                     shuffledIndexPosition++;
+                    int actuallyPlayingIndex = TracklistUtils.shufflelist[shuffledIndexPosition];
+
+                    editor.putInt("indexPosition", actuallyPlayingIndex);
                     editor.putInt("shuffledIndexPosition", shuffledIndexPosition);
-                    Log.v("gotoNext", "shuffledIndexPosition: " + shuffledIndexPosition);
-                } else {
-                    return;
+                    editor.apply();
+
+                    playSong(actuallyPlayingIndex);
                 }
-            } else {
+            } else if ((indexPosition + 1) <= (TracklistUtils.tracklist.size() - 1)){
                 indexPosition++;
                 editor.putInt("indexPosition", indexPosition);
-            }
-            editor.apply();
+                editor.apply();
 
-            playSong(indexPosition);
+                playSong(indexPosition);
+            }
         }
     }
 
@@ -608,10 +590,8 @@ public class AudioPlayerService extends Service implements OnErrorListener, OnPr
     public void onDestroy() {
         super.onDestroy();
         if (mediaPlayer != null) {
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.stop();
-                GeneralUtils.closeNotification(this);
-            }
+            mediaPlayer.release();
+            GeneralUtils.closeNotification(this);
             mediaPlayer = null;
         }
         if (wifiLock.isHeld()) {
