@@ -10,7 +10,6 @@ import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.controllers.ArtistsController;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -21,9 +20,9 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ViewHold
     private final LayoutInflater inflater;
     private final ArtistsController artistsController;
 
-    private final ArrayList<HashMap<String, String>> artistList;
+    private final  ArrayList<String[]> artistList;
 
-    public ArtistsAdapter(ArtistsController artistsController, LayoutInflater inflater, ArrayList<HashMap<String, String>> artistList) {
+    public ArtistsAdapter(ArtistsController artistsController, LayoutInflater inflater, ArrayList<String[]> artistList) {
         this.artistsController = artistsController;
         this.inflater = inflater;
         this.artistList = artistList;
@@ -36,8 +35,9 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(ArtistsAdapter.ViewHolder holder, int position) {
-        String artistName = artistList.get(position).get(artistsController.getApplicationContext().getString(R.string.TAG_ARTIST_NAME));
-        String artistID = artistList.get(position).get(artistsController.getApplicationContext().getString(R.string.TAG_ARTIST_ID));
+        String[] artistArray = artistList.get(position);
+        String artistID = artistArray[0];
+        String artistName = artistArray[1];
         holder.bind(artistName, artistID);
     }
 
@@ -51,9 +51,6 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ViewHold
         @BindView(R.id.artists_list_artists_names)
         TextView textView1;
 
-        @BindView(R.id.artists_list_artists_ids)
-        TextView textView2;
-
         private String artistID;
 
         public ViewHolder(View itemView) {
@@ -63,7 +60,6 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ViewHold
 
         void bind(String artistName, String artistID) {
             textView1.setText(artistName);
-            textView2.setVisibility(View.INVISIBLE);
             this.artistID = artistID;
         }
 

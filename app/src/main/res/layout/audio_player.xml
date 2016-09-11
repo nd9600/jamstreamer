@@ -7,7 +7,7 @@
         android:id="@+id/songDetailsHeader"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#702f6f"
+        android:background="@color/myPurple"
         android:paddingLeft="5dp">
                
         <TextView
@@ -35,7 +35,7 @@
         android:id="@+id/albumDetailsHeader"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#702f6f"
+        android:background="@color/myPurple"
         android:layout_below="@id/songDetailsHeader"
         android:paddingLeft="5dp">    
         

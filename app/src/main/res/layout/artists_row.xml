@@ -14,12 +14,9 @@
         android:textSize="18sp"
         android:paddingTop="5dp"
         android:paddingLeft="5dp"
-        android:paddingBottom="5dp" />
-
-    <TextView
-        android:id="@+id/artists_list_artists_ids"
-        android:layout_width="0dp"
-        android:layout_height="0dp" />
+        android:paddingBottom="5dp"
+        style="@style/Base.TextAppearance.AppCompat.Large"
+        />
 
     <View
         android:layout_width="fill_parent"

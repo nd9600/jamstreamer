@@ -20,9 +20,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 
 public class ArtistsController extends ActionBarListActivity implements JSONParser.CallbackInterface {
 
@@ -30,7 +30,7 @@ public class ArtistsController extends ActionBarListActivity implements JSONPars
     JSONArray results = null;
 
     RecyclerView.Adapter adapter;
-    ArrayList<HashMap<String, String>> artistList;
+    ArrayList<String[]> artistList;
 
     @BindView(R.id.main_recycler_view)
     RecyclerView recyclerView;
@@ -68,17 +68,17 @@ public class ArtistsController extends ActionBarListActivity implements JSONPars
         jParser.execute(url);
     }
 
-    /*
-    @OnClick(R.id.artists1_btnPlaylist) void playlistButtonClicked(){
+    @OnClick(R.id.artists_btn_playlist) void playlistButtonClicked(){
         //Intent button_playlistIntent = new Intent(getApplicationContext(), PlaylistActivity.class);
         //startActivityForResult(button_playlistIntent, 1);
     }
-    */
 
     @Override
     public void onRequestCompleted(JSONObject json) {
         try {
             results = json.getJSONArray(getApplicationContext().getString(R.string.TAG_RESULTS));
+
+            ArrayList<String[]> artistsList = new ArrayList<>();
 
             for(int i = 0; i < results.length(); i++) {
                 JSONObject result = results.getJSONObject(i);
@@ -86,12 +86,9 @@ public class ArtistsController extends ActionBarListActivity implements JSONPars
                 String id = result.getString(getApplicationContext().getString(R.string.TAG_ARTIST_ID));
                 String name = result.getString(getApplicationContext().getString(R.string.TAG_ARTIST_NAME));
 
-                HashMap<String, String> map = new HashMap<>();
+                String[] artistArray = {id, name};
 
-                map.put(getApplicationContext().getString(R.string.TAG_ARTIST_ID), id);
-                map.put(getApplicationContext().getString(R.string.TAG_ARTIST_NAME), name);
-
-                artistList.add(map);
+                artistList.add(artistArray);
             }
         } catch (Exception e) {
             Log.e("ArtistsController", "Exception: " +  e);
@@ -104,11 +101,6 @@ public class ArtistsController extends ActionBarListActivity implements JSONPars
             Toast.makeText(getApplicationContext(), "There are no artists matching this search", Toast.LENGTH_SHORT).show();
         }
         else {
-
-
-            //String[] stringArray = {getApplicationContext().getString(R.string.TAG_ARTIST_NAME), getApplicationContext().getString(R.string.TAG_ARTIST_ID)};
-            //int[] intArray = {R.id.artists_list_artists_names, R.id.artists_list_artists_ids};
-
             adapter.notifyDataSetChanged();
         }
     }

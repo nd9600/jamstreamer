@@ -8,7 +8,7 @@
         android:id="@+id/albums_Header"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="#702f6f"
+        android:background="@color/myPurple"
         android:paddingBottom="5dp"
         android:paddingTop="5dp"
         android:paddingLeft="5dp"
