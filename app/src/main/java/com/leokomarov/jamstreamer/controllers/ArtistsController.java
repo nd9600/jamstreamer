@@ -2,22 +2,18 @@ package com.leokomarov.jamstreamer.controllers;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.adapters.ArtistsAdapter;
 import com.leokomarov.jamstreamer.common.ActionBarListActivity;
 import com.leokomarov.jamstreamer.util.BundleBuilder;
-import com.leokomarov.jamstreamer.util.GeneralUtils;
 import com.leokomarov.jamstreamer.util.JSONParser;
 
 import org.json.JSONArray;
@@ -33,8 +29,11 @@ public class ArtistsController extends ActionBarListActivity implements JSONPars
     String artistName;
     JSONArray results = null;
 
-    @BindView(R.id.artists1_btnPlaylist)
-    ImageView playlistButton;
+    RecyclerView.Adapter adapter;
+    ArrayList<HashMap<String, String>> artistList;
+
+    @BindView(R.id.main_recycler_view)
+    RecyclerView recyclerView;
 
     public ArtistsController(Bundle args) {
         super(args);
@@ -49,12 +48,18 @@ public class ArtistsController extends ActionBarListActivity implements JSONPars
 
     @Override
     protected View inflateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
-        return inflater.inflate(R.layout.original_empty_list, container, false);
+        return inflater.inflate(R.layout.controller_artists, container, false);
     }
 
     @Override
     protected void onViewBound(@NonNull View view) {
         super.onViewBound(view);
+
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        artistList = new ArrayList<>();
+        adapter = new ArtistsAdapter(this, LayoutInflater.from(view.getContext()), artistList);
+        recyclerView.setAdapter(adapter);
 
         String unformattedURL = getResources().getString(R.string.artistsByNameJSONURL);
         String url = String.format(unformattedURL, artistName).replace("&amp;", "&").replace(" ", "+");
@@ -72,15 +77,14 @@ public class ArtistsController extends ActionBarListActivity implements JSONPars
 
     @Override
     public void onRequestCompleted(JSONObject json) {
-        ArrayList<HashMap<String, String>> artistList = new ArrayList<>();
         try {
             results = json.getJSONArray(getApplicationContext().getString(R.string.TAG_RESULTS));
 
             for(int i = 0; i < results.length(); i++) {
-                JSONObject r = results.getJSONObject(i);
+                JSONObject result = results.getJSONObject(i);
 
-                String id = r.getString(getApplicationContext().getString(R.string.TAG_ARTIST_ID));
-                String name = r.getString(getApplicationContext().getString(R.string.TAG_ARTIST_NAME));
+                String id = result.getString(getApplicationContext().getString(R.string.TAG_ARTIST_ID));
+                String name = result.getString(getApplicationContext().getString(R.string.TAG_ARTIST_NAME));
 
                 HashMap<String, String> map = new HashMap<>();
 
@@ -100,30 +104,21 @@ public class ArtistsController extends ActionBarListActivity implements JSONPars
             Toast.makeText(getApplicationContext(), "There are no artists matching this search", Toast.LENGTH_SHORT).show();
         }
         else {
-            ListView lv = getListView();
-            LayoutInflater inflater = getActivity().getLayoutInflater();
 
-            ViewGroup header = (ViewGroup)inflater.inflate(R.layout.artists_list_header, lv, false);
-            lv.addHeaderView(header, null, false);
 
-            String[] stringArray = {getApplicationContext().getString(R.string.TAG_ARTIST_NAME), getApplicationContext().getString(R.string.TAG_ARTIST_ID)};
-            int[] intArray = {R.id.artists_list_artists_names, R.id.artists_list_artists_ids};
+            //String[] stringArray = {getApplicationContext().getString(R.string.TAG_ARTIST_NAME), getApplicationContext().getString(R.string.TAG_ARTIST_ID)};
+            //int[] intArray = {R.id.artists_list_artists_names, R.id.artists_list_artists_ids};
 
-            ListAdapter adapter = new SimpleAdapter(getApplicationContext(), artistList, R.layout.artists_list, stringArray , intArray);
-            setListAdapter(adapter);
-
-            lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    GeneralUtils.putHierarchy(getApplicationContext(), "artists");
-                    String artistID = ((TextView) view.findViewById(R.id.artists_list_artists_ids)).getText().toString();
-
-                    //Intent in = new Intent(getApplicationContext(), AlbumsActivity.class);
-                    //in.putExtra(getApplicationContext().getString(R.string.TAG_ARTIST_ID), artistID);
-                    //startActivityForResult(in, 2);
-                }
-            });
-
+            adapter.notifyDataSetChanged();
         }
+    }
+
+    public void onRowClick(String artistID) {
+        Log.v("onRowClick", "clicked: " + artistID);
+        //GeneralUtils.putHierarchy(getApplicationContext(), "artists");
+
+        //Intent in = new Intent(getApplicationContext(), AlbumsActivity.class);
+        //in.putExtra(getApplicationContext().getString(R.string.TAG_ARTIST_ID), artistID);
+        //startActivityForResult(in, 2);
     }
 }
