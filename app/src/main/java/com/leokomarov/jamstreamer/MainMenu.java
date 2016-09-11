@@ -21,117 +21,115 @@ import com.leokomarov.jamstreamer.searches.ArtistsSearch;
 import com.leokomarov.jamstreamer.searches.TracksSearch;
 import com.leokomarov.jamstreamer.utils.GeneralUtils;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class MainMenu extends AppCompatActivity {
-	private ImageButton button_playlist;
-	private TextView textView_artists;
-	private TextView textView_albums;
-	private TextView textView_tracks;
-	private TextView textView_topTracksThisWeek;
-	
-	@Override
+    @BindView(R.id.mainMenu_artists) TextView textView_artists;
+    @BindView(R.id.mainMenu_albums) TextView textView_albums;
+    @BindView(R.id.mainMenu_tracks) TextView textView_tracks;
+    @BindView(R.id.mainMenu_topTracksThisWeek) TextView textView_topTracksThisWeek;
+    @BindView(R.id.mainMenu_btnPlaylist) ImageButton button_playlist;
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_menu);       
+        setContentView(R.layout.main_menu);
+        ButterKnife.bind(this);
         getSupportActionBar();
 
         //if the app hasn't been ran before, show the toasts
         //ie if sharedPreferences doesn't contain "firstrun" or "firstrun" == true
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
-        if (! sharedPreferences.contains("firstrun")
+        if (!sharedPreferences.contains("firstrun")
                 || sharedPreferences.getBoolean("firstrun", true)) {
-            Toast.makeText(getApplicationContext(),"Long-press on an album or track for options", Toast.LENGTH_LONG).show();
-            Toast.makeText(getApplicationContext(),"I'd appreciate it if you rate this app. Thanks!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Long-press on an album or track for options", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "I'd appreciate it if you rate this app. Thanks!", Toast.LENGTH_LONG).show();
             SharedPreferences.Editor firstrunEditor = sharedPreferences.edit();
             firstrunEditor.putBoolean("firstrun", false);
             firstrunEditor.apply();
         }
 
-        button_playlist = (ImageButton) findViewById(R.id.mainMenu_btnPlaylist);
-        textView_artists = (TextView) findViewById(R.id.mainMenu_artists);
-        textView_albums = (TextView) findViewById(R.id.mainMenu_albums);
-        textView_tracks = (TextView) findViewById(R.id.mainMenu_tracks);
-        textView_topTracksThisWeek = (TextView) findViewById(R.id.mainMenu_topTracksThisWeek);
-
         button_playlist.setOnClickListener(new View.OnClickListener() {
-    		@Override
+            @Override
             public void onClick(View v) {
                 Intent playlistIntent = new Intent(getApplicationContext(), PlaylistActivity.class);
                 startActivityForResult(playlistIntent, 1);
             }
-    	});
+        });
 
         //If the artists &c button is clicked
         //put the appropriate string in the hierarchy, and start the activity
-    	textView_artists.setOnClickListener(new View.OnClickListener() {
-    		@Override
+        textView_artists.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
-    			GeneralUtils.putHierarchy(MainMenu.this, "artists");
-    			Intent artistIntent = new Intent(getApplicationContext(), ArtistsSearch.class);
-    			startActivity(artistIntent);
-    		}
-    	});
+                GeneralUtils.putHierarchy(MainMenu.this, "artists");
+                Intent artistIntent = new Intent(getApplicationContext(), ArtistsSearch.class);
+                startActivity(artistIntent);
+            }
+        });
 
-    	textView_albums.setOnClickListener(new View.OnClickListener() {
-    		@Override
+        textView_albums.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 GeneralUtils.putHierarchy(MainMenu.this, "albums");
-    			Intent albumIntent = new Intent(getApplicationContext(), AlbumsSearch.class);
-    			startActivity(albumIntent);	
-    		}
-    	});
-    	
-    	textView_tracks.setOnClickListener(new View.OnClickListener() {
-    		@Override
+                Intent albumIntent = new Intent(getApplicationContext(), AlbumsSearch.class);
+                startActivity(albumIntent);
+            }
+        });
+
+        textView_tracks.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 GeneralUtils.putHierarchy(MainMenu.this, "tracks");
-    			Intent trackIntent = new Intent(getApplicationContext(), TracksSearch.class);
-    			startActivity(trackIntent);	
-    		}
-    	});
-    	
-    	textView_topTracksThisWeek.setOnClickListener(new View.OnClickListener() {
-    		@Override
+                Intent trackIntent = new Intent(getApplicationContext(), TracksSearch.class);
+                startActivity(trackIntent);
+            }
+        });
+
+        textView_topTracksThisWeek.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(View v) {
                 GeneralUtils.putHierarchy(MainMenu.this, "topTracksPerWeek");
-    			Intent topTracksWeekIntent = new Intent(getApplicationContext(), TracksActivity.class);
-    			startActivityForResult(topTracksWeekIntent, 2);	
-    		}
-    	});
-	}
+                Intent topTracksWeekIntent = new Intent(getApplicationContext(), TracksActivity.class);
+                startActivityForResult(topTracksWeekIntent, 2);
+            }
+        });
+    }
 
     //Resets the checkboxes once you've left the playlist or top tracks activities
     @Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //Todo: possibly remove this
         //GeneralUtils.clearCheckboxes(null);
-	}
+    }
 
     //Brings up the exit dialog when you press the back button
     @Override
     public void onBackPressed() {
         new AlertDialog.Builder(this)
-        	.setMessage("Are you sure you want to exit?")
-        	.setCancelable(false)
-        	.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-        		public void onClick(DialogInterface dialog, int id) {
-        			stopService(new Intent(MainMenu.this, AudioPlayerService.class));
-        			MainMenu.this.finish();
-                    GeneralUtils.closeNotification(MainMenu.this);
-                }
-        })
-        .setNegativeButton("No", null)
-        .show();
+                .setMessage("Are you sure you want to exit?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        stopService(new Intent(MainMenu.this, AudioPlayerService.class));
+                        MainMenu.this.finish();
+                        GeneralUtils.closeNotification(MainMenu.this);
+                    }
+                })
+                .setNegativeButton("No", null)
+                .show();
     }
 
     //When you press the app home button, bring up the exit dialog
     public boolean onOptionsItemSelected(MenuItem item) {
-	        int itemId = item.getItemId();
-			if (itemId == android.R.id.home) {
-				onBackPressed();
-				return true;
-			}
-	    return super.onOptionsItemSelected(item);
-	}
-	
+        int itemId = item.getItemId();
+        if (itemId == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
 }

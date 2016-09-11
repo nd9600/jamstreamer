@@ -1,7 +1,10 @@
 + Pause audio when you remove headphones
 + Add notification controls (including stop, which closes notification)
++ Change the shuffling to make a list of ints, rather than shuffling the whole tracklist
+
 - Change notification icon to be transparent rather than white
 - Be able to quit from anywhere
 
+- Move to Conductor/Mosby
 - Make proper search options - sorting, filters, &c
-- Change the shuffling to make a list of ints, not shuffle the whole tracklist
+
