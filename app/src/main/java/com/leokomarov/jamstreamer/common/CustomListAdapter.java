@@ -1,5 +1,7 @@
 package com.leokomarov.jamstreamer.common;
 
+import android.app.Activity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,8 +22,10 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
     //mCallback is the instance of the interface with the callActionBar() method
     private CallbackInterface mCallback;
 
+
+    //TODO: Fix all listActivity references
     //listActivity is the activity that contains the LV
-    private final ActionBarListActivity listActivity;
+    private final AppCompatActivity listActivity;
 
     //listLayoutID is the ID of the layout used for the LV
     private final int listLayoutID;
@@ -47,16 +51,15 @@ public abstract class CustomListAdapter extends ArrayAdapter<TrackModel> {
     protected HashMap<Integer, Integer> hashcodeToPosition = new HashMap<>();
 
     protected CustomListAdapter(CallbackInterface callback, ActionBarListActivity listActivity, List<TrackModel> trackData, int listLayoutID, int checkboxID, int textView1ID, int textView2ID) {
-        super(listActivity, listLayoutID, trackData);
+        super(new Activity(), listLayoutID, trackData);
         this.mCallback = callback;
-        this.listActivity = listActivity;
+        this.listActivity = new AppCompatActivity();
         this.trackData = trackData;
         this.listLayoutID = listLayoutID;
         this.checkboxID = checkboxID;
         this.textView1ID = textView1ID;
         this.textView2ID = textView2ID;
         updateHashcodeMap();
-
     }
 
     //returns the number of rows to display

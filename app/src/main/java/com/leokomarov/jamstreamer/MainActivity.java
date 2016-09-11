@@ -16,7 +16,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Router router;
 
-    @BindView(R.id.controller_container) ViewGroup container;
+    @BindView(R.id.controller_container)
+    ViewGroup container;
 
     @Override
     public void onCreate(Bundle savedInstanceState){

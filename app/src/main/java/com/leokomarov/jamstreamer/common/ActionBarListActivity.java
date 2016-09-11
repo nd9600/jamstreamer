@@ -1,17 +1,26 @@
 package com.leokomarov.jamstreamer.common;
 
-import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.widget.HeaderViewListAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
-public abstract class ActionBarListActivity extends AppCompatActivity {
+import com.leokomarov.jamstreamer.controllers.base.ButterKnifeController;
+
+public abstract class ActionBarListActivity extends ButterKnifeController {
 
     private ListView mListView;
 
+    public ActionBarListActivity(){
+    }
+
+    public ActionBarListActivity(Bundle args){
+        super(args);
+    }
+
     protected ListView getListView() {
         if (mListView == null) {
-            mListView = (ListView) findViewById(android.R.id.list);
+            mListView = (ListView) getActivity().findViewById(android.R.id.list);
         }
         return mListView;
     }

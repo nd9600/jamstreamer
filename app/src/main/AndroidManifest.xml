@@ -15,7 +15,7 @@
         android:allowBackup="true" 
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity
-            android:name="com.leokomarov.jamstreamer.MainMenu"
+            android:name="com.leokomarov.jamstreamer.MainActivity"
             android:label="@string/appName" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
@@ -25,49 +25,49 @@
         
         <activity
             android:label="JamStreamer - Artist search"
-            android:name="com.leokomarov.jamstreamer.searches.ArtistsSearch" >
+            android:name=".ignored.searches.ArtistsSearch" >
         </activity>
         
         <activity
             android:label="JamStreamer - Artists"
-            android:name="com.leokomarov.jamstreamer.searches.ArtistsParser" >
+            android:name=".ignored.searches.ArtistsParser" >
         </activity>
         
         <activity
             android:label="JamStreamer - Album search"
-            android:name="com.leokomarov.jamstreamer.searches.AlbumsSearch" >
+            android:name=".ignored.searches.AlbumsSearch" >
         </activity>
         
         <activity
             android:label="JamStreamer - Track search"
-            android:name="com.leokomarov.jamstreamer.searches.TracksSearch" >
+            android:name=".ignored.searches.TracksSearch" >
         </activity>
 
         <activity
             android:label="JamStreamer - Albums"
-            android:name=".discography.albums.AlbumsActivity" >
+            android:name=".ignored.discography.albums.AlbumsActivity" >
         </activity>
         
         <activity
             android:label="JamStreamer - Tracks"
-            android:name=".discography.tracks.TracksActivity" >
+            android:name=".ignored.discography.tracks.TracksActivity" >
         </activity>
         
         <activity
             android:label="JamStreamer - Audio player"
-            android:name="com.leokomarov.jamstreamer.audio_player.AudioPlayer" >
+            android:name=".ignored.audio_player.AudioPlayer" >
         </activity>
         
         <service
             android:enabled="true"
             android:label="JamStreamer - Audio player"
-            android:name="com.leokomarov.jamstreamer.audio_player.AudioPlayerService"
+            android:name=".ignored.audio_player.AudioPlayerService"
             android:exported="false" >
         </service>
 
         <activity
             android:label="JamStreamer - Playlist"
-            android:name="com.leokomarov.jamstreamer.playlist.PlaylistActivity" >
+            android:name=".ignored.playlist.PlaylistActivity" >
         </activity>
       
     </application>
