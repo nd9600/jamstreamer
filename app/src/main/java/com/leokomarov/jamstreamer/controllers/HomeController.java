@@ -12,6 +12,7 @@ import com.bluelinelabs.conductor.RouterTransaction;
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.controllers.base.ButterKnifeController;
+import com.leokomarov.jamstreamer.playlist.PlaylistController;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -21,6 +22,11 @@ public class HomeController extends ButterKnifeController {
 
     @BindView(R.id.main_recycler_view)
     RecyclerView recyclerView;
+
+    @OnClick(R.id.home_list_playlist_button)
+    void playlistButtonClicked(){
+        getRouter().pushController(RouterTransaction.with(new PlaylistController()));
+    }
 
     @NonNull
     @Override

@@ -1,23 +1,32 @@
 package com.leokomarov.jamstreamer.util;
 
-public class TracklistUtils {// extends AsyncTask<Object, Integer, Void> {
+import android.os.AsyncTask;
+import android.util.Log;
 
-    /*
+import com.leokomarov.jamstreamer.MainActivity;
+import com.leokomarov.jamstreamer.playlist.PlaylistList;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+
+public class TracklistUtils extends AsyncTask<Object, Integer, Void> {
+
     public static ArrayList<HashMap<String, String>> tracklist;
     public static int[] shufflelist;
 
     //set tracklist with parameter, or restore from memory if parameter is null
-    public static void updateTracklist(ComplexPreferences trackPreferences, SharedPreferences sharedPreferences, ArrayList<HashMap<String, String>> tracklist) {
+    public static void updateTracklist(ArrayList<HashMap<String, String>> tracklist) {
         if (tracklist == null){
-            TracklistUtils.tracklist = restoreTracklist(trackPreferences);
+            TracklistUtils.tracklist = restoreTracklist();
         } else {
             TracklistUtils.tracklist = tracklist;
         }
 
-        updateShufflelist(sharedPreferences);
+        updateShufflelist();
     }
 
-    public static void updateShufflelist(SharedPreferences sharedPreferences) {
+    public static void updateShufflelist() {
         Random random = new Random();
         int min = 0;
 
@@ -32,7 +41,7 @@ public class TracklistUtils {// extends AsyncTask<Object, Integer, Void> {
         }
 
         //puts the current track at the front
-        int indexPosition = sharedPreferences.getInt("indexPosition", 0);
+        int indexPosition = MainActivity.sharedPreferences.getInt("indexPosition", 0);
         for (int i = 0; i < shufflelist.length; i++) {
             if (shufflelist[i] == indexPosition) {
                 shufflelist[i] = shufflelist[0];
@@ -45,10 +54,10 @@ public class TracklistUtils {// extends AsyncTask<Object, Integer, Void> {
     //Restores the playlist from memory
     //See ComplexPreferences docs on Github
     @SuppressWarnings("unchecked")
-    public static ArrayList<HashMap<String, String>> restoreTracklist(ComplexPreferences trackPreferences){
+    public static ArrayList<HashMap<String, String>> restoreTracklist(){
         Log.v("TracklistUtils", "restoreTracklist");
         ArrayList<HashMap<String, String>> tracklist = new ArrayList<>();
-        PlaylistList playlistList = trackPreferences.getObject("tracks", PlaylistList.class);
+        PlaylistList playlistList = MainActivity.trackPreferences.getObject("tracks", PlaylistList.class);
         if (playlistList != null){
             tracklist = playlistList.getTracklist();
         }
@@ -60,17 +69,16 @@ public class TracklistUtils {// extends AsyncTask<Object, Integer, Void> {
     @SuppressWarnings("unchecked")
     @Override
     protected Void doInBackground(Object... objects) {
-        ComplexPreferences trackPreferences = (ComplexPreferences) objects[0];
-        ArrayList<HashMap<String, String>> tracklist = (ArrayList<HashMap<String, String>>) objects[1];
+        ArrayList<HashMap<String, String>> tracklist = (ArrayList<HashMap<String, String>>) objects[0];
 
         Log.v("TracklistUtils", "saveTracklist");
-        PlaylistList playlistList = trackPreferences.getObject("tracks", PlaylistList.class);
+        PlaylistList playlistList = MainActivity.trackPreferences.getObject("tracks", PlaylistList.class);
         if (playlistList == null) {
             playlistList = new PlaylistList();
         }
         playlistList.setTrackList(tracklist);
-        trackPreferences.putObject("tracks", playlistList);
-        trackPreferences.commit();
+        MainActivity.trackPreferences.putObject("tracks", playlistList);
+        MainActivity.trackPreferences.commit();
 
         return null;
     }
@@ -78,7 +86,5 @@ public class TracklistUtils {// extends AsyncTask<Object, Integer, Void> {
     @Override
     protected void onPostExecute(Void nothing) {
     }
-
-    */
 
 }

@@ -2,6 +2,7 @@ package com.leokomarov.jamstreamer.albums;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,9 +17,10 @@ import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.bluelinelabs.conductor.RouterTransaction;
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.controllers.base.ListController;
+import com.leokomarov.jamstreamer.playlist.PlaylistController;
 import com.leokomarov.jamstreamer.util.BundleBuilder;
 import com.leokomarov.jamstreamer.util.GeneralUtils;
 
@@ -40,12 +42,10 @@ public class AlbumsController extends ListController {
 
     @OnClick(R.id.results_list_header_btn_playlist)
     void playlistButtonClicked(){
-        Log.v("playlistButtonClicked", "playlistButtonClicked");
-        //Intent button_playlistIntent = new Intent(getApplicationContext(), PlaylistActivity.class);
-        //startActivityForResult(button_playlistIntent, 1);
+        getRouter().pushController(RouterTransaction.with(new PlaylistController()));
     }
 
-    protected AlbumsPresenter presenter;
+    protected static AlbumsPresenter presenter;
     protected static ActionMode mActionMode;
 
     public AlbumsController(Bundle args) {
@@ -69,7 +69,7 @@ public class AlbumsController extends ListController {
         super.onViewBound(view);
 
         results_list_header_textview.setText(getApplicationContext().getString(R.string.mainAlbums));
-        presenter = new AlbumsPresenter(view.getContext(), this, new ListInteractor(), LayoutInflater.from(view.getContext()));
+        presenter = new AlbumsPresenter(view.getContext(), this, LayoutInflater.from(view.getContext()));
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
@@ -101,8 +101,8 @@ public class AlbumsController extends ListController {
             return;
         }
 
-        if (getSupportActionBar() == null) {
-            mActionMode = startSupportActionMode(mActionModeCallback);
+        if (getActionBar() == null) {
+            mActionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(mActionModeCallback);
         } else {
             mActionMode.invalidate();
         }
@@ -112,7 +112,7 @@ public class AlbumsController extends ListController {
     private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            MenuInflater inflater = getMenuInflater();
+            MenuInflater inflater = getActivity().getMenuInflater();
             inflater.inflate(R.menu.albums_contextual_menu, menu);
             return true;
         }
@@ -133,7 +133,7 @@ public class AlbumsController extends ListController {
             int numberOfAlbums = presenter.listAdapter.getItemCount();
 
             if (itemId == R.id.albums_context_menu_SelectAllTracks) {
-                for (int i = 1; i < numberOfAlbums; i++) {
+                for (int i = 0; i < numberOfAlbums; i++) {
                     View view = recyclerView.getChildAt(i);
 
                     int indexPosition = i - 1;

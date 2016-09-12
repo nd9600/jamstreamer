@@ -15,6 +15,7 @@ import com.bluelinelabs.conductor.RouterTransaction;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.albums.AlbumsController;
 import com.leokomarov.jamstreamer.controllers.base.ButterKnifeController;
+import com.leokomarov.jamstreamer.playlist.PlaylistController;
 import com.leokomarov.jamstreamer.util.BundleBuilder;
 import com.leokomarov.jamstreamer.util.GeneralUtils;
 import com.leokomarov.jamstreamer.util.JSONParser;
@@ -42,9 +43,7 @@ public class ArtistsController extends ButterKnifeController implements JSONPars
 
     @OnClick(R.id.results_list_header_btn_playlist)
     void playlistButtonClicked(){
-        Log.v("playlistButtonClicked", "playlistButtonClicked");
-        //Intent button_playlistIntent = new Intent(getApplicationContext(), PlaylistActivity.class);
-        //startActivityForResult(button_playlistIntent, 1);
+        getRouter().pushController(RouterTransaction.with(new PlaylistController()));
     }
 
     public ArtistsController(Bundle args) {

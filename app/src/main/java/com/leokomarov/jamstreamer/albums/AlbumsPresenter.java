@@ -1,17 +1,16 @@
 package com.leokomarov.jamstreamer.albums;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.widget.Toast;
 
+import com.leokomarov.jamstreamer.MainActivity;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.common.TrackModel;
-import com.leokomarov.jamstreamer.util.ComplexPreferences;
 import com.leokomarov.jamstreamer.util.JSONParser;
+import com.leokomarov.jamstreamer.util.TracklistUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -24,29 +23,26 @@ import java.util.Locale;
 public class AlbumsPresenter implements JSONParser.CallbackInterface {
 
     private Context context;
-    private AlbumsController listController;
     private ListInteractor interactor;
-    private ComplexPreferences trackPreferences;
-    private SharedPreferences sharedPreferences;
 
+    private AlbumsController listController;
     public AlbumsAdapter listAdapter;
 
     protected ArrayList<HashMap<String, String>> albumList = new ArrayList<>();
-    private ArrayList<HashMap<String, String>> tracklist = new ArrayList<>();
 
     private int albumsToAddLoop = 0;
     private int onTrackRequestCompletedLoop = 0;
 
     private String requestType;
 
-    public AlbumsPresenter(Context context, AlbumsController listController, ListInteractor listInteractor, LayoutInflater inflater){
+    public AlbumsPresenter(Context context, AlbumsController listController, LayoutInflater inflater){
         this.context = context;
         this.listController = listController;
-        this.interactor = listInteractor;
-        this.trackPreferences = ComplexPreferences.getComplexPreferences(context,
-                context.getString(R.string.trackPreferences), Context.MODE_PRIVATE);
-        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        this.interactor = new ListInteractor();
         this.listAdapter = new AlbumsAdapter(listController, getListData(), inflater);
+        this.listAdapter.selectAllPressed = false;
+        this.listAdapter.selectAll = true;
+        this.listAdapter.clearCheckboxes();
     }
 
     public List<TrackModel> getListData(){
@@ -59,7 +55,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
     }
 
     public void populateList(String searchTerm){
-        String hierarchy = sharedPreferences.getString("hierarchy", "none");
+        String hierarchy =  MainActivity.sharedPreferences.getString("hierarchy", "none");
         String unformattedURL = "";
 
         switch (hierarchy) {
@@ -95,7 +91,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
     public void albumRequest(JSONObject json) {
         try {
             JSONArray results = json.getJSONArray(context.getString(R.string.TAG_RESULTS));
-            String hierarchy = sharedPreferences.getString("hierarchy", "none");
+            String hierarchy = MainActivity.sharedPreferences.getString("hierarchy", "none");
             switch (hierarchy) {
                 case "artists":
                 case "albumsFloatingMenuArtist":
@@ -149,6 +145,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
     }
 
     public void trackRequest(JSONObject json) {
+        ArrayList<HashMap<String, String>> tracklist = new ArrayList<>();
         try {
             JSONArray results = json.getJSONArray(context.getString(R.string.TAG_RESULTS));
             onTrackRequestCompletedLoop++;
@@ -176,16 +173,14 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
             }
 
             if (onTrackRequestCompletedLoop == albumsToAddLoop){
-                /*
                 ArrayList<HashMap<String, String>> newTrackList = new ArrayList<>();
-                newTrackList.addAll(TracklistUtils.restoreTracklist(trackPreferences));
+                newTrackList.addAll(TracklistUtils.restoreTracklist());
                 newTrackList.addAll(tracklist);
 
-                new TracklistUtils().execute(trackPreferences, newTrackList);
-                TracklistUtils.updateTracklist(trackPreferences, sharedPreferences, newTrackList);
+                new TracklistUtils().execute(newTrackList);
+                TracklistUtils.updateTracklist(newTrackList);
 
                 listController.setPlaylistButtonClickable(true);
-                */
                 if (albumsToAddLoop == 1){
                     Toast.makeText(context,"1 album added to the playlist", Toast.LENGTH_LONG).show();
                 } else if(albumsToAddLoop >= 2){

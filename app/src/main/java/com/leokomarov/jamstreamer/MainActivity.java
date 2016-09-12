@@ -1,6 +1,9 @@
 package com.leokomarov.jamstreamer;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.ViewGroup;
 
@@ -8,16 +11,20 @@ import com.bluelinelabs.conductor.Conductor;
 import com.bluelinelabs.conductor.Router;
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.leokomarov.jamstreamer.controllers.HomeController;
+import com.leokomarov.jamstreamer.util.ComplexPreferences;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ActionBarProvider {
 
     private Router router;
 
     @BindView(R.id.controller_container)
     ViewGroup container;
+
+    public static ComplexPreferences trackPreferences;
+    public static SharedPreferences sharedPreferences;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -25,6 +32,10 @@ public class MainActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        this.trackPreferences = ComplexPreferences.getComplexPreferences(this,
+                getString(R.string.trackPreferences), Context.MODE_PRIVATE);
+        this.sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
         //attaches a router to this activity
         //router's controllers are hosted in the container
