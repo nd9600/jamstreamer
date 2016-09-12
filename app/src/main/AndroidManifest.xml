@@ -22,53 +22,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-        <activity
-            android:label="JamStreamer - Artist search"
-            android:name=".ignored.searches.ArtistsSearch" >
-        </activity>
-        
-        <activity
-            android:label="JamStreamer - Artists"
-            android:name=".ignored.searches.ArtistsParser" >
-        </activity>
-        
-        <activity
-            android:label="JamStreamer - Album search"
-            android:name=".ignored.searches.AlbumsSearch" >
-        </activity>
-        
-        <activity
-            android:label="JamStreamer - Track search"
-            android:name=".ignored.searches.TracksSearch" >
-        </activity>
-
-        <activity
-            android:label="JamStreamer - Albums"
-            android:name=".ignored.discography.albums.AlbumsActivity" >
-        </activity>
-        
-        <activity
-            android:label="JamStreamer - Tracks"
-            android:name=".ignored.discography.tracks.TracksActivity" >
-        </activity>
-        
-        <activity
-            android:label="JamStreamer - Audio player"
-            android:name=".ignored.audio_player.AudioPlayer" >
-        </activity>
-        
-        <service
-            android:enabled="true"
-            android:label="JamStreamer - Audio player"
-            android:name=".ignored.audio_player.AudioPlayerService"
-            android:exported="false" >
-        </service>
-
-        <activity
-            android:label="JamStreamer - Playlist"
-            android:name=".ignored.playlist.PlaylistActivity" >
-        </activity>
       
     </application>
 

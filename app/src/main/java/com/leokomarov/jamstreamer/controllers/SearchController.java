@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.artists.ArtistsController;
 import com.leokomarov.jamstreamer.controllers.base.ButterKnifeController;
 
 import butterknife.BindView;

@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.adapters;
+package com.leokomarov.jamstreamer.artists;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.controllers.ArtistsController;
 
 import java.util.ArrayList;
 

@@ -5,13 +5,14 @@
     android:orientation="vertical">
 
     <RelativeLayout
-        android:id="@+id/artists_list_header"
+        android:id="@+id/results_list_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_alignParentTop="true">
 
     <TextView
+        android:id="@+id/results_list_header_text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@color/myPurple"
@@ -19,13 +20,12 @@
         android:paddingTop="5dp"
         android:paddingLeft="5dp"
         android:paddingStart="5dp"
-        android:text="@string/mainArtists"
         android:textColor="#ffffff"
         android:textSize="32sp"
         android:textStyle="bold" />
 
     <ImageButton
-        android:id="@+id/artists_btn_playlist"
+        android:id="@+id/results_list_header_btn_playlist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
@@ -42,7 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
-        android:layout_below="@id/artists_list_header"
+        android:layout_below="@id/results_list_header"
         />
 
 </RelativeLayout>

@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.controllers;
+package com.leokomarov.jamstreamer.artists;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,12 +8,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bluelinelabs.conductor.RouterTransaction;
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.adapters.ArtistsAdapter;
+import com.leokomarov.jamstreamer.albums.AlbumsController;
 import com.leokomarov.jamstreamer.common.ActionBarListActivity;
 import com.leokomarov.jamstreamer.util.BundleBuilder;
+import com.leokomarov.jamstreamer.util.GeneralUtils;
 import com.leokomarov.jamstreamer.util.JSONParser;
 
 import org.json.JSONArray;
@@ -26,14 +29,23 @@ import butterknife.OnClick;
 
 public class ArtistsController extends ActionBarListActivity implements JSONParser.CallbackInterface {
 
-    String artistName;
-    JSONArray results = null;
+    private String artistName;
 
-    RecyclerView.Adapter adapter;
-    ArrayList<String[]> artistList;
+    private RecyclerView.Adapter listAdapter;
+    private ArrayList<String[]> artistList;
+
+    @BindView(R.id.results_list_header_text)
+    TextView results_list_header_textview;
 
     @BindView(R.id.main_recycler_view)
     RecyclerView recyclerView;
+
+    @OnClick(R.id.results_list_header_btn_playlist)
+    void playlistButtonClicked(){
+        Log.v("playlistButtonClicked", "playlistButtonClicked");
+        //Intent button_playlistIntent = new Intent(getApplicationContext(), PlaylistActivity.class);
+        //startActivityForResult(button_playlistIntent, 1);
+    }
 
     public ArtistsController(Bundle args) {
         super(args);
@@ -41,25 +53,27 @@ public class ArtistsController extends ActionBarListActivity implements JSONPars
 
     public ArtistsController(String artistName){
         this(new BundleBuilder(new Bundle())
-                .putString("artist_name", artistName)
+                .putString("artistName", artistName)
                 .build());
         this.artistName = artistName;
     }
 
     @Override
     protected View inflateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
-        return inflater.inflate(R.layout.controller_artists, container, false);
+        return inflater.inflate(R.layout.controller_list, container, false);
     }
 
     @Override
     protected void onViewBound(@NonNull View view) {
         super.onViewBound(view);
 
+        results_list_header_textview.setText(getApplicationContext().getString(R.string.mainArtists));
+
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         artistList = new ArrayList<>();
-        adapter = new ArtistsAdapter(this, LayoutInflater.from(view.getContext()), artistList);
-        recyclerView.setAdapter(adapter);
+        listAdapter = new ArtistsAdapter(this, LayoutInflater.from(view.getContext()), artistList);
+        recyclerView.setAdapter(listAdapter);
 
         String unformattedURL = getResources().getString(R.string.artistsByNameJSONURL);
         String url = String.format(unformattedURL, artistName).replace("&amp;", "&").replace(" ", "+");
@@ -68,17 +82,10 @@ public class ArtistsController extends ActionBarListActivity implements JSONPars
         jParser.execute(url);
     }
 
-    @OnClick(R.id.artists_btn_playlist) void playlistButtonClicked(){
-        //Intent button_playlistIntent = new Intent(getApplicationContext(), PlaylistActivity.class);
-        //startActivityForResult(button_playlistIntent, 1);
-    }
-
     @Override
     public void onRequestCompleted(JSONObject json) {
         try {
-            results = json.getJSONArray(getApplicationContext().getString(R.string.TAG_RESULTS));
-
-            ArrayList<String[]> artistsList = new ArrayList<>();
+            JSONArray results = json.getJSONArray(getApplicationContext().getString(R.string.TAG_RESULTS));
 
             for(int i = 0; i < results.length(); i++) {
                 JSONObject result = results.getJSONObject(i);
@@ -101,16 +108,13 @@ public class ArtistsController extends ActionBarListActivity implements JSONPars
             Toast.makeText(getApplicationContext(), "There are no artists matching this search", Toast.LENGTH_SHORT).show();
         }
         else {
-            adapter.notifyDataSetChanged();
+            listAdapter.notifyDataSetChanged();
         }
     }
 
     public void onRowClick(String artistID) {
         Log.v("onRowClick", "clicked: " + artistID);
-        //GeneralUtils.putHierarchy(getApplicationContext(), "artists");
-
-        //Intent in = new Intent(getApplicationContext(), AlbumsActivity.class);
-        //in.putExtra(getApplicationContext().getString(R.string.TAG_ARTIST_ID), artistID);
-        //startActivityForResult(in, 2);
+        GeneralUtils.putHierarchy(getApplicationContext(), "artists");
+        getRouter().pushController(RouterTransaction.with(new AlbumsController(artistID)));
     }
 }
