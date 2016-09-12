@@ -149,10 +149,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
         }
         else {
             setListData();
-            for (int i = 0; i < albumList.size(); i++){
-                Log.v("albumRequest", String.format("%s: %s", i, albumList.get(i)));
-            }
-            listAdapter.updateListData(getListData());
+            listAdapter.notifyDataSetChanged();
         }
     }
 

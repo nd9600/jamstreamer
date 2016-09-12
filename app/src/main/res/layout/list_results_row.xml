@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="fill_parent"
-                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:id="@+id/row_root">
 
     <CheckBox
@@ -18,7 +18,7 @@
 
     <TextView
         android:id="@id/row_textview_1"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_toRightOf="@id/row_checkbox"
@@ -30,7 +30,7 @@
 
     <TextView
         android:id="@+id/row_textview_2"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/row_textview_1"
         android:layout_alignLeft="@id/row_textview_1"
@@ -41,7 +41,7 @@
         android:textColor="@drawable/text_highlighter" />
 
     <View
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:layout_below="@id/row_textview_2"
         android:visibility="visible"

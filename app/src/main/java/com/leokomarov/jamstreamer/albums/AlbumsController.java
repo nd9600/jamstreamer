@@ -6,9 +6,14 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -82,12 +87,100 @@ public class AlbumsController extends ListController {
         //getRouter().pushController(RouterTransaction.with(new AlbumsController(artistID)));
     }
 
-    @Override
-    public void callActionBar(int tickedCheckboxCounter) {
-        Log.v("callActionBar", "tickedCheckboxCounter: " + tickedCheckboxCounter);
-    }
-
     public void setPlaylistButtonClickable(boolean clickable) {
         button_playlist.setClickable(clickable);
     }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, view, menuInfo);
+        getMenuInflater().inflate(R.menu.albums_floating_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(android.view.MenuItem item) {
+        return presenter.onContextItemSelected(item);
+    }
+
+    //Creates the contextual action bar
+    public void callActionBar(int tickedCheckboxCounter) {
+        if (tickedCheckboxCounter == 0) {
+            if (mActionMode != null) {
+                mActionMode.finish();
+            }
+
+            return;
+        }
+
+        if (getSupportActionBar() == null) {
+            mActionMode = startSupportActionMode(mActionModeCallback);
+        } else {
+            mActionMode.invalidate();
+        }
+        mActionMode.setTitle(tickedCheckboxCounter + " selected");
+    }
+
+    private ActionMode.Callback mActionModeCallback = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.albums_contextual_menu, menu);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            String selectAllTitle = "Select all";
+            if (!listAdapter.selectAll) { //if selectAll is false, we want the button to say "Select none"
+                selectAllTitle = "Select none";
+            }
+            menu.findItem(R.id.albums_context_menu_SelectAllTracks).setTitle(selectAllTitle);
+            return true;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            int itemId = item.getItemId();
+            int numberOfAlbums = albumsLV.getCount();
+
+            if (itemId == R.id.albums_context_menu_SelectAllTracks) {
+                for (int i = 1; i < numberOfAlbums; i++) {
+                    View view = albumsLV.getChildAt(i);
+                    int indexPosition = i - 1;
+                    listAdapter.tickCheckbox(indexPosition, listAdapter.selectAll);
+
+                    if (view != null) {
+                        CheckBox checkbox = (CheckBox) view.findViewById(R.id.albums_checkbox);
+
+                        //if the checkbox isn't ticked, tick it
+                        //or vice versa
+                        if (checkbox.isChecked() == (!listAdapter.selectAll)) {
+                            checkbox.setChecked(listAdapter.selectAll);
+                        }
+                    }
+
+                }
+                listAdapter.selectAllPressed = true;
+                listAdapter.selectAll = !listAdapter.selectAll;
+                callActionBar(listAdapter.tickedCheckboxCounter);
+                return true;
+            } else if (itemId == R.id.albums_context_menu_addAlbumToPlaylist) {
+                setPlaylistButtonClickable(false);
+                presenter.addAlbumToPlaylist(numberOfAlbums);
+
+                mActionMode.finish();
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            if (mActionMode != null) {
+                mActionMode = null;
+                //mode = null;
+            }
+        }
+    };
 }

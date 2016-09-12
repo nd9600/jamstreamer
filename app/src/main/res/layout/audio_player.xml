@@ -5,7 +5,7 @@
  
     <LinearLayout
         android:id="@+id/songDetailsHeader"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/myPurple"
         android:paddingLeft="5dp">
@@ -23,7 +23,7 @@
         <ImageButton
             android:id="@+id/btnPlaylist"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
+            android:layout_height="match_parent"
             android:paddingTop="5dp"
             android:background="@null"
             android:contentDescription="@string/playlistButton"
@@ -33,7 +33,7 @@
         
     <LinearLayout
         android:id="@+id/albumDetailsHeader"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/myPurple"
         android:layout_below="@id/songDetailsHeader"
@@ -68,7 +68,7 @@
     
     <SeekBar
     	android:id="@id/songProgressBar"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/timerDisplay"
         android:layout_marginTop="10dp"
@@ -80,7 +80,7 @@
     <LinearLayout
         android:id="@id/timerDisplay"
         android:layout_above="@+id/player_footer_bg"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
@@ -88,7 +88,7 @@
         
         <TextView
             android:id="@+id/songCurrentDurationLabel"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="left"
@@ -97,7 +97,7 @@
         
         <TextView
             android:id="@+id/songTotalDurationLabel"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="right"
@@ -107,7 +107,7 @@
     
     <LinearLayout
         android:id="@id/player_footer_bg"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:background="#ffffff"

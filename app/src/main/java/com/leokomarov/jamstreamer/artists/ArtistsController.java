@@ -14,7 +14,7 @@ import android.widget.Toast;
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.albums.AlbumsController;
-import com.leokomarov.jamstreamer.common.ActionBarListActivity;
+import com.leokomarov.jamstreamer.controllers.base.ButterKnifeController;
 import com.leokomarov.jamstreamer.util.BundleBuilder;
 import com.leokomarov.jamstreamer.util.GeneralUtils;
 import com.leokomarov.jamstreamer.util.JSONParser;
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.OnClick;
 
-public class ArtistsController extends ActionBarListActivity implements JSONParser.CallbackInterface {
+public class ArtistsController extends ButterKnifeController implements JSONParser.CallbackInterface {
 
     private String artistName;
 

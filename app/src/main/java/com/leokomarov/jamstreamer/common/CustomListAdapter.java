@@ -77,7 +77,8 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
     }
 
     public void updateListData(List<TrackModel> listData){
-
+        notifyDataSetChanged();
+        /*
         int previousNumberOfItems = this.listData.size();
 
         for (int i = 0; i < this.listData.size(); i++){
@@ -88,16 +89,18 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
             Log.v("updateListData-2", String.format("%s: %s", i, listData.get(i)));
         }
 
-        this.listData = listData;
+        //this.listData = listData;
         Log.v("updateListData", "" + previousNumberOfItems + ", " + listData.size());
         notifyDataSetChanged();
         //notifyItemRangeInserted(previousNumberOfItems, listData.size());
         //updateHashcodeMap();
+        */
     }
 
     //returns the number of rows to display
+    @Override
     public int getItemCount() {
-        return listData.size();
+        return this.listData.size();
     }
 
     public void updateHashcodeMap(){
@@ -131,6 +134,7 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
 
     @Override
     public CustomListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Log.v("onCreateViewHolder", "onCreateViewHolder");
         return new ViewHolder(inflater.inflate(R.layout.list_results_row, parent, false));
     }
 
@@ -163,7 +167,8 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
 
         void bind(int position) {
             this.position = position;
-            checkbox.setTag(listData.get(position));
+            Log.v("bind", "position: " + position);
+            //checkbox.setTag(listData.get(position));
             updateViewHolder(this, position);
             //creates the click listener for the checkbox
         }
@@ -175,23 +180,6 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
             //using the view data - indexPosition in data map
 
             Log.v("onCheckboxClick", "position:" + position);
-
-            /*
-            TrackModel trackModel = ((TrackModel) checkbox.getTag());
-            Log.v("onCheckboxClick", "trackModel: " + trackModel);
-
-            int trackModelHashcode = trackModel.getMap().hashCode();
-            Log.v("onCheckboxClick", "trackModelHashcode: " + trackModelHashcode);
-
-            for (int i = 0; i < hashcodeToPosition.size(); i++){
-                Log.v("onCheckboxClick", String.format("%s: %s", i, trackModel.getMap().hashCode()));
-            }
-
-            int indexPosition = hashcodeToPosition.get(trackModelHashcode);
-
-            Log.v("onCheckboxClick", "indexPosition:" + indexPosition);
-            Log.v("onCheckboxClick", "position: " + position);
-            */
 
             selectAllPressed = false;
             tickCheckbox(position, checkbox.isChecked());
@@ -208,61 +196,4 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
         }
 
     }
-
-    /*
-    //called on every scroll, returns the individual view for each track
-    //so views are reused if possible - convertView holds the reusedView if it exists
-    @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        final View view;
-
-        //If the reused view exists, return it, don't make a new one
-        //and store the track data in the checkbox's tag field
-        if (convertView != null) {
-            view = convertView;
-
-            //get the viewHolder for this view and update its views with information from the listData
-            ViewHolder viewHolder = (ViewHolder) view.getTag();
-            viewHolder.checkbox.setTag(listData.get(position));
-            updateViewHolder(viewHolder, position);
-
-            //if it doesn't exist, inflate a new one
-        } else {
-            view = inflater.inflate(listLayoutID, null);
-
-            //creates a new viewHolder for that track and put the textviews and checkbox inside it
-            final ViewHolder viewHolder = new ViewHolder();
-            setViewHolder(view, viewHolder, checkboxID, textView1ID, textView2ID);
-
-            //set the checkbox's tag field to be the track data
-            viewHolder.checkbox.setTag(listData.get(position));
-
-            //set the tag field of the view for this track to be the viewHolder
-            view.setTag(viewHolder);
-
-            //use the viewHolder for this view and update its views with information from the listData
-            updateViewHolder(viewHolder, position);
-        }
-
-        //breaks the select all button when there isn't any scrolling
-        /*
-        //if the select all button is pressed, and the checkbox isn't ticked, tick it
-        //else if select all isn't pressed and it is ticked, untick it
-		if (selectAllPressed){
-            System.out.println("selectAllPressed");
-            if (selectAll && ! holder.checkbox.isChecked()){
-                System.out.println("setting checkbox to checked");
-				holder.checkbox.setChecked(true);
-			}
-			else if (! selectAll && holder.checkbox.isChecked()){
-                System.out.println("setting checkbox to unchecked");
-				holder.checkbox.setChecked(false);
-			}
-		}
-		*/
-
-    /*
-        return view;
-    }
-    */
 }
