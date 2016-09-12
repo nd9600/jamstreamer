@@ -33,9 +33,6 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
 
     protected final LayoutInflater inflater;
 
-    //listLayoutID is the ID of the layout used for the LV
-    //private final int listLayoutID;
-
     //selectAll is changed when the selectAll/none button is pressed
     public boolean selectAll;
     public boolean selectAllPressed;
@@ -43,12 +40,6 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
     //listData is the data used to generate the listview,
     //made up of individual tracks stored as trackModels
     protected List<TrackModel> listData;
-
-    /*
-    private final int checkboxID;
-    private final int textView1ID;
-    private final int textView2ID;
-    */
 
     //listOfCheckboxes says if a checkbox at position _i_ has been checked
     public SparseBooleanArray listOfCheckboxes = new SparseBooleanArray();
@@ -63,38 +54,6 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
         this.listController = listController;
         this.listData = listData;
         this.inflater = inflater;
-        /*
-        this.listLayoutID = listLayoutID;
-        this.checkboxID = checkboxID;
-        this.textView1ID = textView1ID;
-        this.textView2ID = textView2ID;
-        */
-
-        for (int i = 0; i < this.listData.size(); i++){
-            Log.v("updateListData-1", String.format("%s: %s", i, this.listData.get(i)));
-        }
-
-    }
-
-    public void updateListData(List<TrackModel> listData){
-        notifyDataSetChanged();
-        /*
-        int previousNumberOfItems = this.listData.size();
-
-        for (int i = 0; i < this.listData.size(); i++){
-            Log.v("updateListData-1", String.format("%s: %s", i, this.listData.get(i)));
-        }
-
-        for (int i = 0; i < listData.size(); i++){
-            Log.v("updateListData-2", String.format("%s: %s", i, listData.get(i)));
-        }
-
-        //this.listData = listData;
-        Log.v("updateListData", "" + previousNumberOfItems + ", " + listData.size());
-        notifyDataSetChanged();
-        //notifyItemRangeInserted(previousNumberOfItems, listData.size());
-        //updateHashcodeMap();
-        */
     }
 
     //returns the number of rows to display
@@ -194,6 +153,5 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
         void onRowClick() {
             listController.onRowClick(position);
         }
-
     }
 }

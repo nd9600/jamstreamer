@@ -5,17 +5,12 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.CheckBox;
 import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.ListInteractor;
 import com.leokomarov.jamstreamer.common.TrackModel;
 import com.leokomarov.jamstreamer.util.ComplexPreferences;
-import com.leokomarov.jamstreamer.util.GeneralUtils;
 import com.leokomarov.jamstreamer.util.JSONParser;
 
 import org.json.JSONArray;
@@ -199,33 +194,6 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
             }
         } catch (Exception e) {
             Log.e("trackRequest", "Exception: " + e.getMessage());
-        }
-    }
-
-    public boolean onContextItemSelected(MenuItem item){
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        View viewClicked = info.targetView;
-        int indexPosition = info.position - 1;
-
-        int menuID = item.getItemId();
-        if (menuID == R.id.albums_floating_menu_selectAlbum){
-            listAdapter.selectAllPressed = false;
-            CheckBox checkbox = (CheckBox) viewClicked.findViewById(R.id.row_checkbox);
-
-            checkbox.setChecked(! checkbox.isChecked());
-
-            listController.callActionBar(listAdapter.tickedCheckboxCounter);
-            return true;
-        } else if (menuID == R.id.albums_floating_menu_viewArtist) {
-            GeneralUtils.putHierarchy(context, "albumsFloatingMenuArtist");
-
-            String artistName = albumList.get(indexPosition).get("albumArtist");
-            //Intent artistsIntent = new Intent(context, AlbumslistController.class);
-            //artistsIntent.putExtra(context.getString(R.string.TAG_ARTIST_NAME), artistName);
-            //listController.startNewlistController(artistsIntent, 3);
-            return true;
-        } else {
-            return false;
         }
     }
 

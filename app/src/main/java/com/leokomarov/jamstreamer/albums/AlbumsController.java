@@ -6,7 +6,6 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -46,7 +45,7 @@ public class AlbumsController extends ListController {
         //startActivityForResult(button_playlistIntent, 1);
     }
 
-    private AlbumsPresenter presenter;
+    protected AlbumsPresenter presenter;
     protected static ActionMode mActionMode;
 
     public AlbumsController(Bundle args) {
@@ -91,19 +90,9 @@ public class AlbumsController extends ListController {
         button_playlist.setClickable(clickable);
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, view, menuInfo);
-        getMenuInflater().inflate(R.menu.albums_floating_menu, menu);
-    }
-
-    @Override
-    public boolean onContextItemSelected(android.view.MenuItem item) {
-        return presenter.onContextItemSelected(item);
-    }
-
     //Creates the contextual action bar
     public void callActionBar(int tickedCheckboxCounter) {
+        Log.v("callActionBar", "tickedCheckboxCounter: " + tickedCheckboxCounter);
         if (tickedCheckboxCounter == 0) {
             if (mActionMode != null) {
                 mActionMode.finish();
@@ -131,7 +120,7 @@ public class AlbumsController extends ListController {
         @Override
         public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
             String selectAllTitle = "Select all";
-            if (!listAdapter.selectAll) { //if selectAll is false, we want the button to say "Select none"
+            if (! presenter.listAdapter.selectAll) { //if selectAll is false, we want the button to say "Select none"
                 selectAllTitle = "Select none";
             }
             menu.findItem(R.id.albums_context_menu_SelectAllTracks).setTitle(selectAllTitle);
@@ -141,28 +130,29 @@ public class AlbumsController extends ListController {
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             int itemId = item.getItemId();
-            int numberOfAlbums = albumsLV.getCount();
+            int numberOfAlbums = presenter.listAdapter.getItemCount();
 
             if (itemId == R.id.albums_context_menu_SelectAllTracks) {
                 for (int i = 1; i < numberOfAlbums; i++) {
-                    View view = albumsLV.getChildAt(i);
+                    View view = recyclerView.getChildAt(i);
+
                     int indexPosition = i - 1;
-                    listAdapter.tickCheckbox(indexPosition, listAdapter.selectAll);
+                    presenter.listAdapter.tickCheckbox(indexPosition, presenter.listAdapter.selectAll);
 
                     if (view != null) {
-                        CheckBox checkbox = (CheckBox) view.findViewById(R.id.albums_checkbox);
+                        CheckBox checkbox = (CheckBox) view.findViewById(R.id.row_checkbox);
 
                         //if the checkbox isn't ticked, tick it
                         //or vice versa
-                        if (checkbox.isChecked() == (!listAdapter.selectAll)) {
-                            checkbox.setChecked(listAdapter.selectAll);
+                        if (checkbox.isChecked() == (! presenter.listAdapter.selectAll)) {
+                            checkbox.setChecked(presenter.listAdapter.selectAll);
                         }
                     }
 
                 }
-                listAdapter.selectAllPressed = true;
-                listAdapter.selectAll = !listAdapter.selectAll;
-                callActionBar(listAdapter.tickedCheckboxCounter);
+                presenter.listAdapter.selectAllPressed = true;
+                presenter.listAdapter.selectAll = ! presenter.listAdapter.selectAll;
+                callActionBar(presenter.listAdapter.tickedCheckboxCounter);
                 return true;
             } else if (itemId == R.id.albums_context_menu_addAlbumToPlaylist) {
                 setPlaylistButtonClickable(false);
@@ -179,7 +169,6 @@ public class AlbumsController extends ListController {
         public void onDestroyActionMode(ActionMode mode) {
             if (mActionMode != null) {
                 mActionMode = null;
-                //mode = null;
             }
         }
     };
