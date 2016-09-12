@@ -1,7 +1,6 @@
 package com.leokomarov.jamstreamer.common;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +11,6 @@ import android.widget.TextView;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.controllers.base.ListController;
 
-import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -46,9 +44,6 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
     //tickedCheckboxCounter is the number of checked checkboxes
     public int tickedCheckboxCounter = 0;
 
-    //maps the hashcodes of track models to their indexes
-    protected HashMap<Integer, Integer> hashcodeToPosition = new HashMap<>();
-
     protected CustomListAdapter(CallbackInterface callback, ListController listController, List<TrackModel> listData, LayoutInflater inflater) {
         this.mCallback = callback;
         this.listController = listController;
@@ -60,16 +55,6 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
     @Override
     public int getItemCount() {
         return this.listData.size();
-    }
-
-    public void updateHashcodeMap(){
-        hashcodeToPosition.clear();
-        for (int i = 0; i < listData.size(); i++){
-            Log.v("updateHashcodeMap", String.format("%s: %s", i, listData.get(i)));
-            Log.v("updateHashcodeMap", String.format("%s: %s", i, listData.get(i).getMap()));
-            Log.v("updateHashcodeMap", String.format("%s: %s", i, listData.get(i).getMap().hashCode()));
-            hashcodeToPosition.put(listData.get(i).getMap().hashCode(), i);
-        }
     }
 
     //if the checkbox isn't ticked in the list,
@@ -93,7 +78,6 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
 
     @Override
     public CustomListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.v("onCreateViewHolder", "onCreateViewHolder");
         return new ViewHolder(inflater.inflate(R.layout.list_results_row, parent, false));
     }
 
@@ -126,10 +110,7 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
 
         void bind(int position) {
             this.position = position;
-            Log.v("bind", "position: " + position);
-            //checkbox.setTag(listData.get(position));
             updateViewHolder(this, position);
-            //creates the click listener for the checkbox
         }
 
         @OnClick(R.id.row_checkbox)
@@ -137,8 +118,6 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
             //sets selectAllPressed to false
             //and change the checkbox list and counter
             //using the view data - indexPosition in data map
-
-            Log.v("onCheckboxClick", "position:" + position);
 
             selectAllPressed = false;
             tickCheckbox(position, checkbox.isChecked());

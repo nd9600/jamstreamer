@@ -141,7 +141,6 @@ public class PlaylistController extends ListController {
                 //then the list adapter is told about the change
                 //and updates its map of hashcodes - indexPositions
                 int numberOfTracksDeleted = presenter.removeTracksFromPlaylist(numberOfTracks);
-                presenter.listAdapter.updateHashcodeMap();
                 presenter.listAdapter.notifyDataSetChanged();
 
                 //make the toast telling the user how many tracks were removed
