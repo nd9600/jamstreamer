@@ -28,10 +28,11 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
     private AlbumsController listController;
     public AlbumsAdapter listAdapter;
 
+    protected ArrayList<HashMap<String, String>> tracklist = new ArrayList<>();
     protected ArrayList<HashMap<String, String>> albumList = new ArrayList<>();
 
-    private int albumsToAddLoop = 0;
-    private int onTrackRequestCompletedLoop = 0;
+    private int albumsToAddLoop;
+    private int onTrackRequestCompletedLoop;
 
     private String requestType;
 
@@ -43,6 +44,9 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
         this.listAdapter.selectAllPressed = false;
         this.listAdapter.selectAll = true;
         this.listAdapter.clearCheckboxes();
+
+        albumsToAddLoop = 0;
+        onTrackRequestCompletedLoop = 0;
     }
 
     public List<TrackModel> getListData(){
@@ -145,7 +149,6 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
     }
 
     public void trackRequest(JSONObject json) {
-        ArrayList<HashMap<String, String>> tracklist = new ArrayList<>();
         try {
             JSONArray results = json.getJSONArray(context.getString(R.string.TAG_RESULTS));
             onTrackRequestCompletedLoop++;
@@ -153,6 +156,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
                 JSONArray tracksArray = results.getJSONObject(i).getJSONArray("tracks");
                 String artistName = results.getJSONObject(i).getString(context.getString(R.string.TAG_ARTIST_NAME_LITERAL));
                 String albumName = results.getJSONObject(i).getString(context.getString(R.string.TAG_ALBUM_NAME));
+
                 for(int j = 0; j < tracksArray.length(); j++) {
                     JSONObject trackInfo = tracksArray.getJSONObject(j);
 
@@ -184,7 +188,7 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
                 if (albumsToAddLoop == 1){
                     Toast.makeText(context,"1 album added to the playlist", Toast.LENGTH_LONG).show();
                 } else if(albumsToAddLoop >= 2){
-                    Toast.makeText(context,albumsToAddLoop + " albums added to the playlist", Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, albumsToAddLoop + " albums added to the playlist", Toast.LENGTH_LONG).show();
                 }
             }
         } catch (Exception e) {

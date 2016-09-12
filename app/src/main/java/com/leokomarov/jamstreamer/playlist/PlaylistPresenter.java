@@ -1,6 +1,5 @@
 package com.leokomarov.jamstreamer.playlist;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 
 import com.leokomarov.jamstreamer.common.ListInteractor;
@@ -19,16 +18,13 @@ public class PlaylistPresenter {
     public PlaylistAdapter listAdapter;
 
     public PlaylistPresenter(PlaylistController listController, LayoutInflater inflater){
-        setListData(true, new ArrayList<HashMap<String, String>>());
         this.interactor = new ListInteractor();
         this.listAdapter = new PlaylistAdapter(listController, getListData(), inflater);
         this.listAdapter.selectAllPressed = false;
         this.listAdapter.selectAll = true;
         this.listAdapter.clearCheckboxes();
 
-        for (int i = 0; i < getListData().size(); i++) {
-            Log.v("constr", String.format("%s: %s", i, getListData().get(i)));
-        }
+        setListData(true, new ArrayList<HashMap<String, String>>());
     }
 
     public List<TrackModel> getListData(){

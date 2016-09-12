@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +26,9 @@ public class PlaylistController extends ListController {
 
     @BindView(R.id.results_list_header_text)
     TextView results_list_header_textview;
+
+    @BindView(R.id.results_list_header_btn_playlist)
+    ImageButton playlistButton;
 
     @BindView(R.id.main_recycler_view)
     RecyclerView recyclerView;
@@ -47,6 +51,7 @@ public class PlaylistController extends ListController {
         super.onViewBound(view);
 
         results_list_header_textview.setText(getApplicationContext().getString(R.string.playlist));
+        playlistButton.setVisibility(View.INVISIBLE);
         presenter = new PlaylistPresenter(this, LayoutInflater.from(view.getContext()));
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));

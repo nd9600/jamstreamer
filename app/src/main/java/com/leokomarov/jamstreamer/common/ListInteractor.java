@@ -1,5 +1,7 @@
 package com.leokomarov.jamstreamer.common;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +10,10 @@ public class ListInteractor {
     //listData is the data used to generate the listview,
     //made up of individual records stored as TrackModels
     private List<TrackModel> listData = new ArrayList<>();
+
+    public ListInteractor(){
+        Log.v("listI", "created");
+    }
 
     //Returns the playlist track data
     public List<TrackModel> getListData(){
