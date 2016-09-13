@@ -3,6 +3,7 @@ package com.leokomarov.jamstreamer.playlist;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -59,6 +60,11 @@ public class PlaylistController extends ListController {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(presenter.listAdapter);
+
+        RecyclerView.ItemAnimator itemAnimator = new DefaultItemAnimator();
+        itemAnimator.setAddDuration(500);
+        itemAnimator.setRemoveDuration(500);
+        recyclerView.setItemAnimator(itemAnimator);
     }
 
     //
