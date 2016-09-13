@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.common.CustomListAdapter;
 import com.leokomarov.jamstreamer.controllers.base.ListController;
 
 import butterknife.BindView;
@@ -33,6 +34,8 @@ public class PlaylistController extends ListController {
     @BindView(R.id.main_recycler_view)
     RecyclerView recyclerView;
 
+    LinearLayoutManager layoutManager;
+
     protected static PlaylistPresenter presenter;
     public static ActionMode mActionMode;
 
@@ -43,7 +46,37 @@ public class PlaylistController extends ListController {
 
     @Override
     public void onRowClick(int position) {
-        Log.v("playlist", "clicked: " + position);
+        int numberOfTracks = presenter.listAdapter.getItemCount();
+
+        Log.v("playlist", "numberOfTracks: " + numberOfTracks);
+        int firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
+        int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+        Log.v("playlist", "firstVisiblePosition: " + firstVisiblePosition);
+        Log.v("playlist", "lastVisibleItemPosition: " + lastVisibleItemPosition);
+
+
+        for (int i = 0; i < numberOfTracks; i++) {
+            presenter.listAdapter.tickCheckbox(i, presenter.listAdapter.selectAll);
+            Log.v("playlist", " ");
+            Log.v("playlist", "i: " + i);
+
+            //if ((firstVisiblePosition <= i) && (i <= lastVisibleItemPosition)) {
+                CustomListAdapter.ViewHolder holder = (CustomListAdapter.ViewHolder) recyclerView.findViewHolderForAdapterPosition(i);
+            if (holder != null) {
+                Log.v("playlist", "view not null");
+
+                    //if the checkbox isn't ticked, tick it
+                    //or vice versa
+                    if (holder.checkbox.isChecked() == (! presenter.listAdapter.selectAll)) {
+                        Log.v("playlist", "setting to " + presenter.listAdapter.selectAll);
+                        holder.checkbox.setChecked(presenter.listAdapter.selectAll);
+                    }
+            }
+        }
+
+        //since we want the button to change,
+        //set selectAll to the opposite value
+        presenter.listAdapter.selectAll = ! presenter.listAdapter.selectAll;
     }
 
     @Override
@@ -53,8 +86,9 @@ public class PlaylistController extends ListController {
         results_list_header_textview.setText(getApplicationContext().getString(R.string.playlist));
         playlistButton.setVisibility(View.INVISIBLE);
         presenter = new PlaylistPresenter(this, LayoutInflater.from(view.getContext()));
+        layoutManager = new LinearLayoutManager(view.getContext());
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
+        recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(presenter.listAdapter);
     }
 
@@ -110,21 +144,30 @@ public class PlaylistController extends ListController {
             //if the selectAll button is pressed
             if (itemId == R.id.playlist_context_menu_SelectAllTracks) {
 
-                //set the pressed boolean
-                presenter.listAdapter.selectAllPressed = true;
+                Log.v("playlist", "numberOfTracks: " + numberOfTracks);
+                int firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
+                int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+                Log.v("playlist", "firstVisiblePosition: " + firstVisiblePosition);
+                Log.v("playlist", "lastVisibleItemPosition: " + lastVisibleItemPosition);
+
 
                 for (int i = 0; i < numberOfTracks; i++) {
                     View view = recyclerView.getChildAt(i);
-                    int indexPosition = i - 1;
-                    presenter.listAdapter.tickCheckbox(indexPosition, presenter.listAdapter.selectAll);
+                    presenter.listAdapter.tickCheckbox(i, presenter.listAdapter.selectAll);
+                    Log.v("playlist", " ");
+                    Log.v("playlist", "i: " + i);
 
-                    if (view != null) {
-                        CheckBox checkbox = (CheckBox) view.findViewById(R.id.row_checkbox);
+                    if ((firstVisiblePosition <= i) && (i <= lastVisibleItemPosition)) {
+                        if (view != null) {
+                            Log.v("playlist", "view not null");
 
-                        //if the checkbox isn't ticked, tick it
-                        //or vice versa
-                        if (checkbox.isChecked() == (! presenter.listAdapter.selectAll)){
-                            checkbox.setChecked(presenter.listAdapter.selectAll);
+                            CheckBox checkbox = (CheckBox) view.findViewById(R.id.row_checkbox);
+
+                            //if the checkbox isn't ticked, tick it
+                            //or vice versa
+                            if (checkbox.isChecked() == (! presenter.listAdapter.selectAll)) {
+                                checkbox.setChecked(presenter.listAdapter.selectAll);
+                            }
                         }
                     }
                 }
@@ -135,7 +178,7 @@ public class PlaylistController extends ListController {
 
                 //if all checkboxes have been unticked, close the action bar
                 //else open the action bar and set the title to however many are unticked
-                callActionBar(presenter.listAdapter.tickedCheckboxCounter);
+                //callActionBar(presenter.listAdapter.tickedCheckboxCounter);
                 return true;
 
                 //if the button to remove those specific tracks from the playlist is pressed
@@ -159,12 +202,12 @@ public class PlaylistController extends ListController {
 
                 //clear the checkboxes and close the action bar
                 for (int i = 0; i < numberOfTracks; i++) {
-                    View view = recyclerView.getChildAt(i);
+                    //View view = recyclerView.getChildAt(i);
                     presenter.listAdapter.tickCheckbox(i, false);
-                    if (view != null) {
-                        CheckBox checkbox = (CheckBox) view.findViewById(R.id.row_checkbox);
-                        checkbox.setChecked(false);
-                    }
+                    //if (view != null) {
+                    //    CheckBox checkbox = (CheckBox) view.findViewById(R.id.row_checkbox);
+                    //    checkbox.setChecked(false);
+                    //}
                 }
                 presenter.listAdapter.clearCheckboxes();
 
@@ -174,7 +217,6 @@ public class PlaylistController extends ListController {
                 //if the "delete entire playlist" button is pressed
             } else if (itemId == R.id.playlist_context_menu_deletePlaylist) {
                 //clear and save the tracklist and shuffled tracklist
-                presenter.listAdapter.selectAllPressed = false;
                 presenter.deletePlaylist();
                 presenter.listAdapter.notifyDataSetChanged();
 
@@ -196,10 +238,8 @@ public class PlaylistController extends ListController {
             }
         }
 
-        //called when the action mode is closed
         @Override
         public void onDestroyActionMode(ActionMode mode) {
-            presenter.listAdapter.selectAllPressed = false;
         }
     };
 }

@@ -20,7 +20,6 @@ public class PlaylistPresenter {
     public PlaylistPresenter(PlaylistController listController, LayoutInflater inflater){
         this.interactor = new ListInteractor();
         this.listAdapter = new PlaylistAdapter(listController, getListData(), inflater);
-        this.listAdapter.selectAllPressed = false;
         this.listAdapter.selectAll = true;
         this.listAdapter.clearCheckboxes();
 
@@ -79,7 +78,6 @@ public class PlaylistPresenter {
     //removes the ticked tracks from the playlist
     public int removeTracksFromPlaylist(int numberOfTracks){
         ArrayList<HashMap<String, String>> tracklist = TracklistUtils.restoreTracklist();
-        listAdapter.selectAllPressed = false;
 
         ArrayList<Integer> tracksToDelete = new ArrayList<>();
         //add every track that is ticked to a list

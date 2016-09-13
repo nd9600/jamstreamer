@@ -41,7 +41,6 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
         this.listController = listController;
         this.interactor = new ListInteractor();
         this.listAdapter = new AlbumsAdapter(listController, getListData(), inflater);
-        this.listAdapter.selectAllPressed = false;
         this.listAdapter.selectAll = true;
         this.listAdapter.clearCheckboxes();
 
@@ -197,7 +196,6 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
     }
 
     public void addAlbumToPlaylist(int numberOfAlbums){
-        listAdapter.selectAllPressed = false;
         albumsToAddLoop = 0;
         onTrackRequestCompletedLoop = 0;
         for (int i = 0; i < numberOfAlbums; i++){

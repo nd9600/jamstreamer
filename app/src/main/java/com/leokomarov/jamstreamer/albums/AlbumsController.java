@@ -150,7 +150,6 @@ public class AlbumsController extends ListController {
                     }
 
                 }
-                presenter.listAdapter.selectAllPressed = true;
                 presenter.listAdapter.selectAll = ! presenter.listAdapter.selectAll;
                 callActionBar(presenter.listAdapter.tickedCheckboxCounter);
                 return true;
