@@ -1,4 +1,5 @@
-#JamStreamer - Android Jamendo client
+# JamStreamer - Android Jamendo client
+
 [Play Store link](https://play.google.com/store/apps/details?id=com.leokomarov.jamstreamer&hl=en)
 
 # Planned features

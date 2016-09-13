@@ -15,7 +15,7 @@
         android:id="@+id/results_list_header_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/myPurple"
+        android:background="@color/primary"
         android:paddingBottom="5dp"
         android:paddingTop="5dp"
         android:paddingLeft="5dp"

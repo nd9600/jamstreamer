@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="myPurple">#702f6f</color>
+    <color name="primary">#702f6f</color>
+    <color name="primary_dark">#4e204d</color>
+    <color name="defaultText">#222222</color>
 </resources>
