@@ -1,22 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:padding="20dp">
     
     <EditText 
         android:id="@+id/search_field"
-        android:layout_weight="1"
-        android:layout_width="0dp"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:padding="20dp"
         android:inputType="textCapWords"
-        android:hint="@string/artistsByNameFieldText" />
+        android:hint="@string/searchFieldText" />
 
-    <Button
-        android:id="@+id/search_button"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/buttonText" />
+        android:layout_below="@id/search_field"
+        android:layout_alignLeft="@id/search_field"
+        android:layout_alignStart="@id/search_field"
+        android:id="@+id/search_relative_layout2">
+        <Spinner
+            android:id="@+id/search_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:entries="@array/search_spinner_array"
+            android:layout_centerVertical="true" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/search_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@id/search_spinner"
+            android:layout_toRightOf="@id/search_spinner"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@id/search_spinner"
+            android:text="@string/buttonText"
+            android:layout_centerVertical="true"/>
+
+    </RelativeLayout>
+
+
+</RelativeLayout>

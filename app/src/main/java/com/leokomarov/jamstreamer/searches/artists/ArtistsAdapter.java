@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.artists;
+package com.leokomarov.jamstreamer.searches.artists;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.leokomarov.jamstreamer.R;
+import com.leokomarov.jamstreamer.artists.ArtistsController;
 
 import java.util.ArrayList;
 
@@ -29,7 +30,7 @@ public class ArtistsAdapter extends RecyclerView.Adapter<ArtistsAdapter.ViewHold
 
     @Override
     public ArtistsAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(inflater.inflate(R.layout.artists_row, parent, false));
+        return new ViewHolder(inflater.inflate(R.layout.row_list_artists, parent, false));
     }
 
     @Override

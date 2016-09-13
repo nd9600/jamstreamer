@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.controllers;
+package com.leokomarov.jamstreamer.home;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.controllers.base.ButterKnifeController;
+import com.leokomarov.jamstreamer.common.controllers.base.ButterKnifeController;
 import com.leokomarov.jamstreamer.playlist.PlaylistController;
 
 import butterknife.BindView;
@@ -66,7 +66,7 @@ public class HomeController extends ButterKnifeController {
 
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ViewHolder(inflater.inflate(R.layout.row_home, parent, false));
+            return new ViewHolder(inflater.inflate(R.layout.row_list_home, parent, false));
         }
 
         @Override

@@ -13,9 +13,7 @@
     <string name="repeatButton">Repeat</string>
     <string name="shuffleButton">Shuffle</string>
 
-    <string name="artistsByNameFieldText">Enter an artist</string>
-    <string name="albumsByNameFieldText">Enter an album</string>
-    <string name="tracksByNameFieldText">Enter a track</string>
+    <string name="searchFieldText">Enter a search term</string>
     <string name="buttonText">Search</string>
     <string name="selectTrack">Select track</string>
     <string name="selectAlbum">Select album</string>

@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import com.bluelinelabs.conductor.Conductor;
 import com.bluelinelabs.conductor.Router;
 import com.bluelinelabs.conductor.RouterTransaction;
-import com.leokomarov.jamstreamer.controllers.HomeController;
+import com.leokomarov.jamstreamer.home.HomeController;
 import com.leokomarov.jamstreamer.util.ComplexPreferences;
 
 import butterknife.BindView;

@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.albums;
+package com.leokomarov.jamstreamer.searches.tracks;
 
 import android.content.Context;
 import android.util.Log;
@@ -20,13 +20,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
-public class AlbumsPresenter implements JSONParser.CallbackInterface {
+public class TracksPresenter implements JSONParser.CallbackInterface {
 
     private Context context;
     private ListInteractor interactor;
 
-    private AlbumsController listController;
-    public AlbumsAdapter listAdapter;
+    private TracksController listController;
+    public TracksAdapter listAdapter;
 
     protected ArrayList<HashMap<String, String>> tracklist = new ArrayList<>();
     protected ArrayList<HashMap<String, String>> albumList = new ArrayList<>();
@@ -36,11 +36,11 @@ public class AlbumsPresenter implements JSONParser.CallbackInterface {
 
     private String requestType;
 
-    public AlbumsPresenter(Context context, AlbumsController listController, LayoutInflater inflater){
+    public TracksPresenter(Context context, TracksController listController, LayoutInflater inflater){
         this.context = context;
         this.listController = listController;
         this.interactor = new ListInteractor();
-        this.listAdapter = new AlbumsAdapter(listController, getListData(), inflater);
+        this.listAdapter = new TracksAdapter(listController, getListData(), inflater);
         this.listAdapter.selectAll = true;
         this.listAdapter.clearCheckboxes();
 

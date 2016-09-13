@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.controllers.base;
+package com.leokomarov.jamstreamer.common.controllers;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;

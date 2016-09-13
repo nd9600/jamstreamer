@@ -22,4 +22,11 @@
     <string name="TAG_TRACK_NAME">name</string>
     <string name="TAG_TRACK_DURATION">duration</string>
 
+    <string-array name="search_spinner_array">
+        <item>Artists</item>
+        <item>Albums</item>
+        <item>Tracks</item>
+    </string-array>
+
+
 </resources>

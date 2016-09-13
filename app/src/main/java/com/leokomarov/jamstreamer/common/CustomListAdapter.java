@@ -9,7 +9,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.controllers.base.ListController;
+import com.leokomarov.jamstreamer.common.controllers.ListController;
 
 import java.util.List;
 
@@ -76,7 +76,7 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
 
     @Override
     public CustomListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new ViewHolder(inflater.inflate(R.layout.list_results_row, parent, false));
+        return new ViewHolder(inflater.inflate(R.layout.row_list_results, parent, false));
     }
 
     public void onBindViewHolder(CustomListAdapter.ViewHolder holder, int position) {

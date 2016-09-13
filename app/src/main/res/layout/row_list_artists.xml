@@ -3,20 +3,20 @@
       android:id="@+id/row_root"
       android:orientation="vertical"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content" >
+      android:layout_height="wrap_content"
+      android:background="?android:attr/selectableItemBackground"
+      android:paddingLeft="16dp"
+      android:paddingRight="16dp">
 
     <TextView
         android:id="@+id/artists_list_artists_names"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/background_highlighter"
-        android:textColor="@drawable/text_highlighter"
-        android:textSize="18sp"
-        android:paddingTop="5dp"
-        android:paddingLeft="5dp"
-        android:paddingBottom="5dp"
-        style="@style/Base.TextAppearance.AppCompat.Large"
-        />
+        android:textSize="16sp"
+        android:textColor="@color/defaultText"
+        android:textStyle="bold"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp" />
 
     <View
         android:layout_width="match_parent"

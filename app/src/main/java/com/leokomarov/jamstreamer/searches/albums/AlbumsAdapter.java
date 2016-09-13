@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.albums;
+package com.leokomarov.jamstreamer.searches.albums;
 
 import android.view.LayoutInflater;
 

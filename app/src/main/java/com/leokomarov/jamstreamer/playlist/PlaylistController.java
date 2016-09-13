@@ -19,7 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.controllers.base.ListController;
+import com.leokomarov.jamstreamer.common.controllers.ListController;
 
 import butterknife.BindView;
 

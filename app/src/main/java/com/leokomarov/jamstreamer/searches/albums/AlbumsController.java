@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.albums;
+package com.leokomarov.jamstreamer.searches.albums;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.controllers.base.ListController;
+import com.leokomarov.jamstreamer.common.controllers.ListController;
 import com.leokomarov.jamstreamer.playlist.PlaylistController;
 import com.leokomarov.jamstreamer.util.BundleBuilder;
 import com.leokomarov.jamstreamer.util.GeneralUtils;
@@ -29,7 +29,7 @@ import butterknife.OnClick;
 
 public class AlbumsController extends ListController {
 
-    private String artistID;
+    private String searchTerm;
 
     @BindView(R.id.results_list_header_text)
     TextView results_list_header_textview;
@@ -52,11 +52,11 @@ public class AlbumsController extends ListController {
         super(args);
     }
 
-    public AlbumsController(String artistID){
+    public AlbumsController(String searchTerm){
         this(new BundleBuilder(new Bundle())
-                .putString("artistID", artistID)
+                .putString("searchTerm", searchTerm)
                 .build());
-        this.artistID = artistID;
+        this.searchTerm = searchTerm;
     }
 
     @Override
@@ -75,7 +75,7 @@ public class AlbumsController extends ListController {
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         recyclerView.setAdapter(presenter.listAdapter);
 
-        presenter.populateList(artistID);
+        presenter.populateList(searchTerm);
     }
 
     @Override

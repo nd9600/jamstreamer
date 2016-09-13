@@ -1,4 +1,4 @@
-package com.leokomarov.jamstreamer.artists;
+package com.leokomarov.jamstreamer.searches.artists;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,9 +13,9 @@ import android.widget.Toast;
 
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.albums.AlbumsController;
-import com.leokomarov.jamstreamer.controllers.base.ButterKnifeController;
+import com.leokomarov.jamstreamer.common.controllers.ButterKnifeController;
 import com.leokomarov.jamstreamer.playlist.PlaylistController;
+import com.leokomarov.jamstreamer.searches.albums.AlbumsController;
 import com.leokomarov.jamstreamer.util.BundleBuilder;
 import com.leokomarov.jamstreamer.util.GeneralUtils;
 import com.leokomarov.jamstreamer.util.JSONParser;
