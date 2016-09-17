@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/albums_context_menu_SelectAllTracks"
+        android:id="@+id/albums_context_menu_SelectAllAlbums"
         android:title="@string/selectAll"
         app:showAsAction="ifRoom">
     </item>

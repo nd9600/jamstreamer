@@ -16,14 +16,13 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.leokomarov.jamstreamer.R;
 import com.leokomarov.jamstreamer.common.controllers.ListController;
 import com.leokomarov.jamstreamer.playlist.PlaylistController;
-import com.leokomarov.jamstreamer.searches.albums.AlbumsPresenter;
 import com.leokomarov.jamstreamer.util.BundleBuilder;
-import com.leokomarov.jamstreamer.util.GeneralUtils;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -46,7 +45,7 @@ public class TracksController extends ListController {
         getRouter().pushController(RouterTransaction.with(new PlaylistController()));
     }
 
-    protected static AlbumsPresenter presenter;
+    protected static TracksPresenter presenter;
     protected static ActionMode mActionMode;
 
     public TracksController(Bundle args) {
@@ -69,8 +68,8 @@ public class TracksController extends ListController {
     protected void onViewBound(@NonNull View view) {
         super.onViewBound(view);
 
-        results_list_header_textview.setText(getApplicationContext().getString(R.string.mainAlbums));
-        presenter = new TracksPresenter(view.getContext(), this, LayoutInflater.from(view.getContext());;
+        results_list_header_textview.setText(getApplicationContext().getString(R.string.mainTracks));
+        presenter = new TracksPresenter(view.getContext(), this, LayoutInflater.from(view.getContext()));
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
@@ -81,14 +80,8 @@ public class TracksController extends ListController {
 
     @Override
     public void onRowClick(int position) {
-        GeneralUtils.putHierarchy(getApplicationContext(), "albums");
-        String albumID = presenter.albumList.get(position).get("albumID");
-        Log.v("onRowClick", albumID);
+        presenter.recyclerViewOnClick(position);
         //getRouter().pushController(RouterTransaction.with(new AlbumsController(artistID)));
-    }
-
-    public void setPlaylistButtonClickable(boolean clickable) {
-        button_playlist.setClickable(clickable);
     }
 
     //Creates the contextual action bar
@@ -114,7 +107,7 @@ public class TracksController extends ListController {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = getActivity().getMenuInflater();
-            inflater.inflate(R.menu.albums_contextual_menu, menu);
+            inflater.inflate(R.menu.tracks_contextual_menu, menu);
             return true;
         }
 
@@ -124,17 +117,17 @@ public class TracksController extends ListController {
             if (! presenter.listAdapter.selectAll) { //if selectAll is false, we want the button to say "Select none"
                 selectAllTitle = "Select none";
             }
-            menu.findItem(R.id.albums_context_menu_SelectAllTracks).setTitle(selectAllTitle);
+            menu.findItem(R.id.tracks_context_menu_SelectAllTracks).setTitle(selectAllTitle);
             return true;
         }
 
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             int itemId = item.getItemId();
-            int numberOfAlbums = presenter.listAdapter.getItemCount();
+            int numberOfTracks = presenter.listAdapter.getItemCount();
 
-            if (itemId == R.id.albums_context_menu_SelectAllTracks) {
-                for (int i = 0; i < numberOfAlbums; i++) {
+            if (itemId == R.id.tracks_context_menu_SelectAllTracks) {
+                for (int i = 0; i < numberOfTracks; i++) {
                     View view = recyclerView.getChildAt(i);
 
                     int indexPosition = i - 1;
@@ -154,10 +147,14 @@ public class TracksController extends ListController {
                 presenter.listAdapter.selectAll = ! presenter.listAdapter.selectAll;
                 callActionBar(presenter.listAdapter.tickedCheckboxCounter);
                 return true;
-            } else if (itemId == R.id.albums_context_menu_addAlbumToPlaylist) {
-                setPlaylistButtonClickable(false);
-                presenter.addAlbumToPlaylist(numberOfAlbums);
+            } else if (itemId == R.id.tracks_context_menu_addTrackToPlaylist) {
+                int numberOfTracksAdded = presenter.addTrackToPlaylist(numberOfTracks);
 
+                if (numberOfTracksAdded == 1) {
+                    Toast.makeText(getApplicationContext(), "1 track added to the playlist", Toast.LENGTH_LONG).show();
+                } else if (numberOfTracksAdded >= 2) {
+                    Toast.makeText(getApplicationContext(), numberOfTracksAdded + " tracks added to the playlist", Toast.LENGTH_LONG).show();
+                }
                 mActionMode.finish();
                 return true;
             } else {

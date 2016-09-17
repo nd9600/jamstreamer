@@ -123,7 +123,7 @@ public class AlbumsController extends ListController {
             if (! presenter.listAdapter.selectAll) { //if selectAll is false, we want the button to say "Select none"
                 selectAllTitle = "Select none";
             }
-            menu.findItem(R.id.albums_context_menu_SelectAllTracks).setTitle(selectAllTitle);
+            menu.findItem(R.id.albums_context_menu_SelectAllAlbums).setTitle(selectAllTitle);
             return true;
         }
 
@@ -132,7 +132,7 @@ public class AlbumsController extends ListController {
             int itemId = item.getItemId();
             int numberOfAlbums = presenter.listAdapter.getItemCount();
 
-            if (itemId == R.id.albums_context_menu_SelectAllTracks) {
+            if (itemId == R.id.albums_context_menu_SelectAllAlbums) {
                 for (int i = 0; i < numberOfAlbums; i++) {
                     View view = recyclerView.getChildAt(i);
 
