@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.bluelinelabs.conductor.RouterTransaction;
 import com.bluelinelabs.conductor.changehandler.FadeChangeHandler;
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.common.controllers.base.ButterKnifeController;
+import com.leokomarov.jamstreamer.common.controllers.ButterKnifeController;
 import com.leokomarov.jamstreamer.playlist.PlaylistController;
 
 import butterknife.BindView;
@@ -38,6 +38,7 @@ public class HomeController extends ButterKnifeController {
     protected void onViewBound(@NonNull View view) {
         super.onViewBound(view);
 
+        setRetainViewMode(RetainViewMode.RELEASE_DETACH);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(view.getContext()));
         recyclerView.setAdapter(new HomeAdapter(LayoutInflater.from(view.getContext()), HomeModel.values()));

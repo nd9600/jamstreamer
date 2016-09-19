@@ -37,11 +37,10 @@ public class SearchController extends ButterKnifeController {
 
     @Override
     protected void onViewBound(@NonNull View view){
-        //ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(getApplicationContext(), R.array.search_spinner_array, android.R.layout.simple_spinner_item);
-        // Specify the layout to use when the list of choices appears
-        //spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        // Apply the adapter to the spinner
-        //searchSpinner.setAdapter(spinnerAdapter);
+        super.onViewBound(view);
+
+        setRetainViewMode(RetainViewMode.RELEASE_DETACH);
+
         searchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long l) {

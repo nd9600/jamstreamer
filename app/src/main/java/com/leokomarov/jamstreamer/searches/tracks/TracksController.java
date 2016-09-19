@@ -37,9 +37,6 @@ public class TracksController extends ListController {
     @BindView(R.id.results_list_header_btn_playlist)
     ImageButton button_playlist;
 
-    @BindView(R.id.main_recycler_view)
-    RecyclerView recyclerView;
-
     @OnClick(R.id.results_list_header_btn_playlist)
     void playlistButtonClicked(){
         getRouter().pushController(RouterTransaction.with(new PlaylistController()));
@@ -124,30 +121,12 @@ public class TracksController extends ListController {
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             int itemId = item.getItemId();
-            int numberOfTracks = presenter.listAdapter.getItemCount();
 
             if (itemId == R.id.tracks_context_menu_SelectAllTracks) {
-                for (int i = 0; i < numberOfTracks; i++) {
-                    View view = recyclerView.getChildAt(i);
-
-                    int indexPosition = i - 1;
-                    presenter.listAdapter.tickCheckbox(indexPosition, presenter.listAdapter.selectAll);
-
-                    if (view != null) {
-                        CheckBox checkbox = (CheckBox) view.findViewById(R.id.row_checkbox);
-
-                        //if the checkbox isn't ticked, tick it
-                        //or vice versa
-                        if (checkbox.isChecked() == (! presenter.listAdapter.selectAll)) {
-                            checkbox.setChecked(presenter.listAdapter.selectAll);
-                        }
-                    }
-
-                }
-                presenter.listAdapter.selectAll = ! presenter.listAdapter.selectAll;
-                callActionBar(presenter.listAdapter.tickedCheckboxCounter);
+                presenter.listAdapter.selectAllItems();
                 return true;
             } else if (itemId == R.id.tracks_context_menu_addTrackToPlaylist) {
+                int numberOfTracks = presenter.listAdapter.getItemCount();
                 int numberOfTracksAdded = presenter.addTrackToPlaylist(numberOfTracks);
 
                 if (numberOfTracksAdded == 1) {

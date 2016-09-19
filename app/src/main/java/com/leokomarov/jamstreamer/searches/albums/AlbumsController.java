@@ -92,7 +92,6 @@ public class AlbumsController extends ListController {
 
     //Creates the contextual action bar
     public void callActionBar(int tickedCheckboxCounter) {
-        Log.v("callActionBar", "tickedCheckboxCounter: " + tickedCheckboxCounter);
         if (tickedCheckboxCounter == 0) {
             if (mActionMode != null) {
                 mActionMode.finish();
@@ -133,25 +132,7 @@ public class AlbumsController extends ListController {
             int numberOfAlbums = presenter.listAdapter.getItemCount();
 
             if (itemId == R.id.albums_context_menu_SelectAllAlbums) {
-                for (int i = 0; i < numberOfAlbums; i++) {
-                    View view = recyclerView.getChildAt(i);
-
-                    int indexPosition = i - 1;
-                    presenter.listAdapter.tickCheckbox(indexPosition, presenter.listAdapter.selectAll);
-
-                    if (view != null) {
-                        CheckBox checkbox = (CheckBox) view.findViewById(R.id.row_checkbox);
-
-                        //if the checkbox isn't ticked, tick it
-                        //or vice versa
-                        if (checkbox.isChecked() == (! presenter.listAdapter.selectAll)) {
-                            checkbox.setChecked(presenter.listAdapter.selectAll);
-                        }
-                    }
-
-                }
-                presenter.listAdapter.selectAll = ! presenter.listAdapter.selectAll;
-                callActionBar(presenter.listAdapter.tickedCheckboxCounter);
+                presenter.listAdapter.selectAllItems();
                 return true;
             } else if (itemId == R.id.albums_context_menu_addAlbumToPlaylist) {
                 setPlaylistButtonClickable(false);

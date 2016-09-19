@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.leokomarov.jamstreamer.R;
-import com.leokomarov.jamstreamer.artists.ArtistsController;
 
 import java.util.ArrayList;
 

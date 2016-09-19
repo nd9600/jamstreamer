@@ -1,6 +1,7 @@
 package com.leokomarov.jamstreamer.common;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,9 +62,11 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
     //and increment the counter
     //or vice versa
     public void tickCheckbox(int position, boolean tickIt){
+        Log.v("tracks", "ticking position: " + position);
         if (listOfCheckboxes.get(position, false) == (! tickIt)){
             listOfCheckboxes.put(position, tickIt);
             tickedCheckboxCounter += tickIt ? 1 : -1;
+            Log.v("tracks", "setting to: " + tickIt);
         }
     }
 
@@ -72,6 +75,28 @@ public abstract class CustomListAdapter extends RecyclerView.Adapter<CustomListA
         listOfCheckboxes.clear();
         tickedCheckboxCounter = 0;
         mCallback.callActionBar(0);
+    }
+
+    public void selectAllItems(){
+        int numberOfTracks = getItemCount();
+
+        for (int i = 0; i < numberOfTracks; i++) {
+            tickCheckbox(i, selectAll);
+            View view = listController.recyclerView.getChildAt(i);
+
+            if (view != null) {
+                CheckBox checkbox = (CheckBox) view.findViewById(R.id.row_checkbox);
+
+                //if the checkbox isn't ticked, tick it
+                //or vice versa
+                if (checkbox.isChecked() == (! selectAll)) {
+                    checkbox.setChecked(selectAll);
+                }
+            }
+
+        }
+        selectAll = ! selectAll;
+        mCallback.callActionBar(tickedCheckboxCounter);
     }
 
     @Override
